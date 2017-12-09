@@ -1929,10 +1929,16 @@ public class CommandLine {
             result.propertyType(field.getType()); // field type
             result.propertyName(field.getName());
             result.defaultValue(getDefaultValue(scope, field));
-            result.setToString("field " + field.toGenericString());
+            result.setToString(abbreviate("field " + field.toGenericString()));
             result.getter(new FieldGetter(scope, field));
             result.setter(new FieldSetter(scope, field));
             return result;
+        }
+        private static String abbreviate(String text) {
+            return text.replace("field private ", "field ")
+                    .replace("field protected ", "field ")
+                    .replace("field public ", "field ")
+                    .replace("java.lang.", "");
         }
         private static Class<?>[] inferTypes(Class<?> propertyType, Class<?>[] annotationTypes, Type genericType) {
             if (annotationTypes.length > 0) { return annotationTypes; }
@@ -1991,7 +1997,7 @@ public class CommandLine {
             result.propertyType(field.getType());
             result.propertyName(field.getName());
             result.defaultValue(OptionSpecBuilder.getDefaultValue(scope, field));
-            result.setToString("field " + field.toGenericString());
+            result.setToString(OptionSpecBuilder.abbreviate("field " + field.toGenericString()));
             result.getter(new FieldGetter(scope, field));
             result.setter(new FieldSetter(scope, field));
             return result;
@@ -3464,7 +3470,7 @@ public class CommandLine {
         }
 
         /** Sorts all {@code Options} with the specified {@code comparator} (if the comparator is non-{@code null}),
-         * then {@linkplain Layout#addOption(OptionSpec, CommandLine.Help.IParamLabelRenderer) adds} all non-hidden options to the
+         * then {@linkplain Layout#addOption(CommandLine.OptionSpec, CommandLine.Help.IParamLabelRenderer) adds} all non-hidden options to the
          * specified TextTable and returns the result of TextTable.toString().
          * @param layout responsible for rendering the option list
          * @param optionSort determines in what order {@code Options} should be listed. Declared order if {@code null}
@@ -3992,7 +3998,7 @@ public class CommandLine {
          * <p>Delegates to the renderers to create {@link Text} values for the annotated fields, and uses a
          * {@link TextTable} to display these values in tabular format. Layout is responsible for deciding which values
          * to display where in the table. By default, Layout shows one option or parameter per table row.</p>
-         * <p>Customize by overriding the {@link #layout(ArgSpec, CommandLine.Help.Ansi.Text[][])} method.</p>
+         * <p>Customize by overriding the {@link #layout(CommandLine.ArgSpec, CommandLine.Help.Ansi.Text[][])} method.</p>
          * @see IOptionRenderer rendering options to text
          * @see IParameterRenderer rendering parameters to text
          * @see TextTable showing values in a tabular format
@@ -4041,7 +4047,7 @@ public class CommandLine {
                     table.addRowValues(oneRow);
                 }
             }
-            /** Calls {@link #addOption(OptionSpec, CommandLine.Help.IParamLabelRenderer)} for all non-hidden Options in the list.
+            /** Calls {@link #addOption(CommandLine.OptionSpec, CommandLine.Help.IParamLabelRenderer)} for all non-hidden Options in the list.
              * @param options options to add usage descriptions for
              * @param paramLabelRenderer object that knows how to render option parameters */
             public void addOptions(List<OptionSpec> options, IParamLabelRenderer paramLabelRenderer) {
@@ -4053,7 +4059,7 @@ public class CommandLine {
             }
             /**
              * Delegates to the {@link #optionRenderer option renderer} of this layout to obtain
-             * text values for the specified {@link Option}, and then calls the {@link #layout(ArgSpec, CommandLine.Help.Ansi.Text[][])}
+             * text values for the specified {@link Option}, and then calls the {@link #layout(CommandLine.ArgSpec, CommandLine.Help.Ansi.Text[][])}
              * method to write these text values into the correct cells in the TextTable.
              * @param option the option argument
              * @param paramLabelRenderer knows how to render option parameters
@@ -4062,7 +4068,7 @@ public class CommandLine {
                 Text[][] values = optionRenderer.render(option, paramLabelRenderer, colorScheme);
                 layout(option, values);
             }
-            /** Calls {@link #addPositionalParameter(PositionalParamSpec, CommandLine.Help.IParamLabelRenderer)} for all non-hidden Parameters in the list.
+            /** Calls {@link #addPositionalParameter(CommandLine.PositionalParamSpec, CommandLine.Help.IParamLabelRenderer)} for all non-hidden Parameters in the list.
              * @param params positional parameters to add usage descriptions for
              * @param paramLabelRenderer knows how to render option parameters */
             public void addPositionalParameters(List<PositionalParamSpec> params, IParamLabelRenderer paramLabelRenderer) {
@@ -4075,7 +4081,7 @@ public class CommandLine {
             /**
              * Delegates to the {@link #parameterRenderer parameter renderer} of this layout
              * to obtain text values for the specified {@link Parameters}, and then calls
-             * {@link #layout(ArgSpec, CommandLine.Help.Ansi.Text[][])} to write these text values into the correct cells in the TextTable.
+             * {@link #layout(CommandLine.ArgSpec, CommandLine.Help.Ansi.Text[][])} to write these text values into the correct cells in the TextTable.
              * @param param the positional parameter
              * @param paramLabelRenderer knows how to render option parameters
              */

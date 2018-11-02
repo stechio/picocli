@@ -15,16 +15,8 @@
  */
 package picocli;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.contrib.java.lang.system.ProvideSystemProperty;
-import org.junit.contrib.java.lang.system.SystemErrRule;
-import org.junit.contrib.java.lang.system.SystemOutRule;
-import picocli.CommandLine.Model.CommandSpec;
-import picocli.CommandLine.Model.OptionSpec;
-import picocli.CommandLine.Model.PositionalParamSpec;
-import picocli.CommandLine.Option;
-import picocli.CommandLine.Parameters;
+import static org.junit.Assert.assertEquals;
+import static picocli.HelpTestUtil.usageString;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -33,9 +25,17 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import static java.lang.String.format;
-import static org.junit.Assert.*;
-import static picocli.HelpTestUtil.usageString;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.contrib.java.lang.system.ProvideSystemProperty;
+import org.junit.contrib.java.lang.system.SystemErrRule;
+import org.junit.contrib.java.lang.system.SystemOutRule;
+
+import picocli.CommandLine.Model.CommandSpec;
+import picocli.CommandLine.Model.OptionSpec;
+import picocli.CommandLine.Model.PositionalParamSpec;
+import picocli.CommandLine.Option;
+import picocli.CommandLine.Parameters;
 
 /**
  * Tests valid values-related functionality.
@@ -206,7 +206,7 @@ public class CompletionCandidatesTest {
                 "                         Default={key1=veryveryverylonglonglongvaluevaluevalue,%n" +
                 "                           key2=very2very2very2longlonglongvaluevaluevalue2,%n" +
                 "                           key3=very3very3very3longlonglongvaluevaluevalue3}%n", new File("/a/b/c"));
-        String actual = usageString(new CommandLine(new App(), new InnerClassFactory(this)), CommandLine.Help.Ansi.OFF);
+        String actual = usageString(new CommandLine(new App(), new InnerClassFactory(this)), Help.Ansi.OFF);
         assertEquals(expected, actual);
     }
 

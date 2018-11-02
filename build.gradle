@@ -20,8 +20,8 @@ apply plugin: 'maven-publish'
 allprojects {
     apply plugin: 'groovy'
     apply plugin: 'java'
-    sourceCompatibility = 1.5
-    targetCompatibility = 1.5
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
 
     repositories {
         jcenter()
@@ -37,6 +37,8 @@ allprojects {
         ivy
     }
     dependencies {
+        implementation "org.apache.commons:commons-lang3:$commonsLangVersion"
+        implementation "org.apache.commons:commons-collections4:$commonsCollectionsVersion"
         compileOnly "org.codehaus.groovy:groovy-all:$groovyVersion"
         ivy         "org.apache.ivy:ivy:$ivyVersion" // for Gradle
         testCompile "junit:junit:$junitVersion",

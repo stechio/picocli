@@ -1,7 +1,11 @@
 .gradle/
 .idea/
+.settings/
+bin/
 build/
-local.properties
 target/
 tmp/
+.classpath
+.project
+local.properties
 picocli.iml

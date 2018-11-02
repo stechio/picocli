@@ -27,7 +27,7 @@ import org.junit.contrib.java.lang.system.SystemErrRule;
 import org.junit.contrib.java.lang.system.SystemOutRule;
 import picocli.CommandLine.*;
 import picocli.CommandLine.Model.*;
-import picocli.CommandLine.Help.Ansi;
+import picocli.Help.Ansi;
 
 import static org.junit.Assert.*;
 import static picocli.HelpTestUtil.setTraceLevel;

@@ -15,9 +15,9 @@
  */
 package picocli;
 
-import picocli.CommandLine.Help;
-import picocli.CommandLine.Help.Ansi;
-import picocli.CommandLine.Help.Ansi.Text;
+import picocli.Help;
+import picocli.Help.Ansi;
+import picocli.Help.Ansi.Text;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;

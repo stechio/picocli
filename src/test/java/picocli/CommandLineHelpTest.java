@@ -21,11 +21,11 @@ import org.junit.Test;
 import org.junit.contrib.java.lang.system.ProvideSystemProperty;
 import picocli.CommandLine.*;
 import picocli.CommandLine.Model.*;
-import picocli.CommandLine.Help.Ansi.IStyle;
-import picocli.CommandLine.Help.Ansi.Style;
-import picocli.CommandLine.Help.Ansi.Text;
-import picocli.CommandLine.Help.ColorScheme;
-import picocli.CommandLine.Help.TextTable;
+import picocli.Help.Ansi.IStyle;
+import picocli.Help.Ansi.Style;
+import picocli.Help.Ansi.Text;
+import picocli.Help.ColorScheme;
+import picocli.Help.TextTable;
 
 import java.io.*;
 import java.lang.reflect.Constructor;
@@ -39,8 +39,8 @@ import java.util.concurrent.TimeUnit;
 import static java.lang.String.format;
 import org.fusesource.jansi.AnsiConsole;
 import static org.junit.Assert.*;
-import static picocli.CommandLine.Help.Ansi.ISATTY;
-import static picocli.CommandLine.Help.Visibility.*;
+import static picocli.Help.Ansi.ISATTY;
+import static picocli.Help.Visibility.*;
 import static picocli.HelpTestUtil.textArray;
 import static picocli.HelpTestUtil.usageString;
 import static picocli.ModelTestUtil.options;
@@ -1254,7 +1254,7 @@ public class CommandLineHelpTest {
         Help.IOptionRenderer renderer = Help.createMinimalOptionRenderer();
         Help help = new Help(new Example(), Help.Ansi.ON);
         Help.IParamLabelRenderer parameterRenderer = help.createDefaultParamLabelRenderer();
-        OptionSpec option = help.options().get(0);
+        OptionSpec option = help.commandSpec().options().get(0);
         Text[][] row1 = renderer.render(option, parameterRenderer, Help.defaultColorScheme(
                 help.ansi()));
         assertEquals(1, row1.length);
@@ -1263,7 +1263,7 @@ public class CommandLineHelpTest {
                 help.ansi().new Text(format("%s---long%s=%s<longField>%s", "@|fg(yellow) ", "|@", "@|italic ", "|@")),
                 help.ansi().new Text("long description")}, row1[0]);
 
-        OptionSpec option2 = help.options().get(1);
+        OptionSpec option2 = help.commandSpec().options().get(1);
         Text[][] row2 = renderer.render(option2, parameterRenderer, Help.defaultColorScheme(
                 help.ansi()));
         assertEquals(1, row2.length);
@@ -1288,13 +1288,13 @@ public class CommandLineHelpTest {
         Help help = new Help(new Example());
         Help.IOptionRenderer renderer = help.createDefaultOptionRenderer();
         Help.IParamLabelRenderer parameterRenderer = help.createDefaultParamLabelRenderer();
-        OptionSpec option = help.options().get(0);
+        OptionSpec option = help.commandSpec().options().get(0);
         Text[][] row1 = renderer.render(option, parameterRenderer, help.colorScheme());
         assertEquals(1, row1.length);
         assertArrayEquals(Arrays.toString(row1[0]), textArray(help, "", "-L", ",", "---long=<longField>", "long description"), row1[0]);
         //assertArrayEquals(Arrays.toString(row1[1]), textArray(help, "", "", "", "", "  Default: null"), row1[1]); // #201 don't show null defaults
 
-        option = help.options().get(1);
+        option = help.commandSpec().options().get(1);
         Text[][] row2 = renderer.render(option, parameterRenderer, help.colorScheme());
         assertEquals(2, row2.length);
         assertArrayEquals(Arrays.toString(row2[0]), textArray(help, "", "-b", ",", "-a, --alpha=<otherField>", "other"), row2[0]);
@@ -1310,7 +1310,7 @@ public class CommandLineHelpTest {
         Help help = new Help(new Example());
         Help.IOptionRenderer renderer = help.createDefaultOptionRenderer();
         Help.IParamLabelRenderer parameterRenderer = help.createDefaultParamLabelRenderer();
-        OptionSpec option = help.options().get(0);
+        OptionSpec option = help.commandSpec().options().get(0);
         Text[][] row = renderer.render(option, parameterRenderer, help.colorScheme());
         assertEquals(2, row.length);
         assertArrayEquals(Arrays.toString(row[0]), textArray(help, "*", "-b", ",", "-a, --alpha=<otherField>", "other"), row[0]);
@@ -1326,7 +1326,7 @@ public class CommandLineHelpTest {
         Help help = new Help(new Example());
         Help.IOptionRenderer renderer = help.createDefaultOptionRenderer();
         Help.IParamLabelRenderer parameterRenderer = help.createDefaultParamLabelRenderer();
-        OptionSpec option = help.options().get(0);
+        OptionSpec option = help.commandSpec().options().get(0);
         Text[][] row = renderer.render(option, parameterRenderer, help.colorScheme());
         assertEquals(1, row.length);
         assertArrayEquals(Arrays.toString(row[0]), textArray(help, "*", "-b", ",", "-a, --alpha=<otherField>", "other"), row[0]);
@@ -1340,7 +1340,7 @@ public class CommandLineHelpTest {
         Help help = new Help(new Example());
         Help.IOptionRenderer renderer = help.createDefaultOptionRenderer();
         Help.IParamLabelRenderer parameterRenderer = help.createDefaultParamLabelRenderer();
-        OptionSpec option = help.options().get(0);
+        OptionSpec option = help.commandSpec().options().get(0);
         Text[][] row = renderer.render(option, parameterRenderer, help.colorScheme());
         assertEquals(1, row.length);
         assertArrayEquals(Arrays.toString(row[0]), textArray(help, " ", "-b", ",", "-a, --alpha=<otherField>", "other"), row[0]);
@@ -1356,7 +1356,7 @@ public class CommandLineHelpTest {
         help.commandSpec().usageMessage().showDefaultValues(true);
         Help.IOptionRenderer renderer = help.createDefaultOptionRenderer();
         Help.IParamLabelRenderer parameterRenderer = help.createDefaultParamLabelRenderer();
-        OptionSpec option = help.options().get(0);
+        OptionSpec option = help.commandSpec().options().get(0);
         Text[][] row = renderer.render(option, parameterRenderer, help.colorScheme());
         assertEquals(1, row.length);
         assertArrayEquals(Arrays.toString(row[0]), textArray(help, " ", "-b", ",", "-a, --alpha=<otherField>", "other"), row[0]);
@@ -1371,7 +1371,7 @@ public class CommandLineHelpTest {
         Help help = new Help(new Required());
         Help.IParameterRenderer renderer = help.createDefaultParameterRenderer();
         Help.IParamLabelRenderer parameterRenderer = Help.createMinimalParamLabelRenderer();
-        PositionalParamSpec param = help.positionalParameters().get(0);
+        PositionalParamSpec param = help.commandSpec().positionalParameters().get(0);
         Text[][] row1 = renderer.render(param, parameterRenderer, help.colorScheme());
         assertEquals(1, row1.length);
         assertArrayEquals(Arrays.toString(row1[0]), textArray(help, " ", "", "", "<required>", "required"), row1[0]);
@@ -1386,7 +1386,7 @@ public class CommandLineHelpTest {
         Help help = new Help(new Required());
         Help.IParameterRenderer renderer = help.createDefaultParameterRenderer();
         Help.IParamLabelRenderer parameterRenderer = Help.createMinimalParamLabelRenderer();
-        PositionalParamSpec param = help.positionalParameters().get(0);
+        PositionalParamSpec param = help.commandSpec().positionalParameters().get(0);
         Text[][] row1 = renderer.render(param, parameterRenderer, help.colorScheme());
         assertEquals(1, row1.length);
         assertArrayEquals(Arrays.toString(row1[0]), textArray(help, "*", "", "", "<required>", "required"), row1[0]);
@@ -1401,7 +1401,7 @@ public class CommandLineHelpTest {
         Help help = new Help(new Optional());
         Help.IParameterRenderer renderer = help.createDefaultParameterRenderer();
         Help.IParamLabelRenderer parameterRenderer = Help.createMinimalParamLabelRenderer();
-        PositionalParamSpec param = help.positionalParameters().get(0);
+        PositionalParamSpec param = help.commandSpec().positionalParameters().get(0);
         Text[][] row1 = renderer.render(param, parameterRenderer, help.colorScheme());
         assertEquals(1, row1.length);
         assertArrayEquals(Arrays.toString(row1[0]), textArray(help, "", "", "", "<optional>", "optional"), row1[0]);
@@ -1431,7 +1431,7 @@ public class CommandLineHelpTest {
                 {"", "-b", ",", "--beta=<combiField>", "combi"},
         };
         int i = -1;
-        for (OptionSpec option : help.options()) {
+        for (OptionSpec option : help.commandSpec().options()) {
             Text[][] row = renderer.render(option, parameterRenderer, help.colorScheme());
             assertEquals(1, row.length);
             assertArrayEquals(Arrays.toString(row[0]), textArray(help, expected[++i]), row[0]);
@@ -1465,7 +1465,7 @@ public class CommandLineHelpTest {
         int[] rowCount = {1, 1, 2, 2, 2};
         int i = -1;
         int rowIndex = 0;
-        for (OptionSpec option : help.options()) {
+        for (OptionSpec option : help.commandSpec().options()) {
             Text[][] row = renderer.render(option, parameterRenderer, help.colorScheme());
             assertEquals(rowCount[++i], row.length);
             assertArrayEquals(Arrays.toString(row[0]), textArray(help, expected[rowIndex]), row[0]);
@@ -1496,7 +1496,7 @@ public class CommandLineHelpTest {
                 "LABEL",
         };
         int i = -1;
-        for (OptionSpec option : help.options()) {
+        for (OptionSpec option : help.commandSpec().options()) {
             i++;
             Text withSpace = spaceSeparatedParameterRenderer.renderParameterLabel(option, help.ansi(), Collections.<IStyle>emptyList());
             assertEquals(withSpace.toString(), " " + expected[i], withSpace.toString());
@@ -1515,15 +1515,15 @@ public class CommandLineHelpTest {
         withLabel.commandSpec().parser().separator("=");
         Help.IParamLabelRenderer spaced = withLabel.createDefaultParamLabelRenderer();
 
-        Text withSpace = spaced.renderParameterLabel(withLabel.positionalParameters().get(0), withLabel.ansi(), Collections.<IStyle>emptyList());
+        Text withSpace = spaced.renderParameterLabel(withLabel.commandSpec().positionalParameters().get(0), withLabel.ansi(), Collections.<IStyle>emptyList());
         assertEquals(withSpace.toString(), "POSITIONAL_ARGS", withSpace.toString());
-        Text withEquals = equals.renderParameterLabel(withLabel.positionalParameters().get(0), withLabel.ansi(), Collections.<IStyle>emptyList());
+        Text withEquals = equals.renderParameterLabel(withLabel.commandSpec().positionalParameters().get(0), withLabel.ansi(), Collections.<IStyle>emptyList());
         assertEquals(withEquals.toString(), "POSITIONAL_ARGS", withEquals.toString());
 
         Help withoutLabel = new Help(new WithoutLabel());
-        withSpace = spaced.renderParameterLabel(withoutLabel.positionalParameters().get(0), withoutLabel.ansi(), Collections.<IStyle>emptyList());
+        withSpace = spaced.renderParameterLabel(withoutLabel.commandSpec().positionalParameters().get(0), withoutLabel.ansi(), Collections.<IStyle>emptyList());
         assertEquals(withSpace.toString(), "<positional>", withSpace.toString());
-        withEquals = equals.renderParameterLabel(withoutLabel.positionalParameters().get(0), withoutLabel.ansi(), Collections.<IStyle>emptyList());
+        withEquals = equals.renderParameterLabel(withoutLabel.commandSpec().positionalParameters().get(0), withoutLabel.ansi(), Collections.<IStyle>emptyList());
         assertEquals(withEquals.toString(), "<positional>", withEquals.toString());
     }
 
@@ -1601,8 +1601,8 @@ public class CommandLineHelpTest {
                 "<multiHideSplit>", //
         };
         for (int i = 0; i < expected.length; i++) {
-            Text withEquals = equals.renderParameterLabel(withLabel.positionalParameters().get(i), withLabel.ansi(), Collections.<IStyle>emptyList());
-            Text withSpace = spaced.renderParameterLabel(withLabel.positionalParameters().get(i), withLabel.ansi(), Collections.<IStyle>emptyList());
+            Text withEquals = equals.renderParameterLabel(withLabel.commandSpec().positionalParameters().get(i), withLabel.ansi(), Collections.<IStyle>emptyList());
+            Text withSpace = spaced.renderParameterLabel(withLabel.commandSpec().positionalParameters().get(i), withLabel.ansi(), Collections.<IStyle>emptyList());
             assertEquals(withEquals.toString(), expected[i], withEquals.toString());
             assertEquals(withSpace.toString(), expected[i], withSpace.toString());
         }
@@ -1636,7 +1636,7 @@ public class CommandLineHelpTest {
             @Option(names = {"--help", "-h"}, hidden = true) boolean helpRequested;
         }
         Help help = new Help(new App(), Help.Ansi.OFF);
-        assertEquals("<main class> [OPTIONS]" + LINESEP, help.synopsis(0));
+        assertEquals("Usage: <main class> [OPTIONS]" + LINESEP, help.sections("synopsis").render(help));
     }
 
     @Test
@@ -1648,7 +1648,7 @@ public class CommandLineHelpTest {
             @Option(names = {"--help", "-h"}, hidden = true) boolean helpRequested;
         }
         Help help = new Help(new App(), Help.Ansi.ON);
-        assertEquals(Help.Ansi.ON.new Text("@|bold <main class>|@ [OPTIONS]" + LINESEP).toString(), help.synopsis(0));
+        assertEquals(Help.Ansi.ON.new Text("Usage: @|bold <main class>|@ [OPTIONS]" + LINESEP).toString(), help.sections("synopsis").render(help));
     }
 
     @Test
@@ -1661,7 +1661,7 @@ public class CommandLineHelpTest {
             @Parameters File[] files;
         }
         Help help = new Help(new App(), Help.Ansi.OFF);
-        assertEquals("<main class> [OPTIONS] [<files>...]" + LINESEP, help.synopsis(0));
+        assertEquals("Usage: <main class> [OPTIONS] [<files>...]" + LINESEP, help.sections("synopsis").render(help));
     }
 
     @Test
@@ -1674,7 +1674,7 @@ public class CommandLineHelpTest {
             @Parameters File[] files;
         }
         Help help = new Help(new App(), Help.Ansi.ON);
-        assertEquals(Help.Ansi.ON.new Text("@|bold <main class>|@ [OPTIONS] [@|yellow <files>|@...]" + LINESEP).toString(), help.synopsis(0));
+        assertEquals(Help.Ansi.ON.new Text("Usage: @|bold <main class>|@ [OPTIONS] [@|yellow <files>|@...]" + LINESEP).toString(), help.sections("synopsis").render(help));
     }
 
     @Test
@@ -1756,7 +1756,7 @@ public class CommandLineHelpTest {
             @Option(names = {"--help", "-h"}, hidden = true) boolean helpRequested;
         }
         Help help = new Help(new App(), Help.Ansi.OFF);
-        assertEquals("<main class> [-v] [-c=<count>...]" + LINESEP, help.synopsis(0));
+        assertEquals("Usage: <main class> [-v] [-c=<count>...]" + LINESEP, help.sections("synopsis").render(help));
     }
 
     @Test
@@ -1767,8 +1767,8 @@ public class CommandLineHelpTest {
             @Option(names = {"--help", "-h"}, hidden = true) boolean helpRequested;
         }
         Help help = new Help(new App(), Help.Ansi.ON);
-        assertEquals(Help.Ansi.ON.new Text("@|bold <main class>|@ [@|yellow -v|@] [@|yellow -c|@=@|italic <count>|@...]" + LINESEP),
-                help.synopsis(0));
+        assertEquals(Help.Ansi.ON.new Text("Usage: @|bold <main class>|@ [@|yellow -v|@] [@|yellow -c|@=@|italic <count>|@...]" + LINESEP),
+                help.sections("synopsis").render(help));
     }
 
     @Test
@@ -1779,7 +1779,7 @@ public class CommandLineHelpTest {
             @Option(names = {"--help", "-h"}, hidden = true) boolean helpRequested;
         }
         Help help = new Help(new App(), Help.Ansi.OFF);
-        assertEquals("<main class> [-v] [-c [<count>]]" + LINESEP, help.synopsis(0));
+        assertEquals("Usage: <main class> [-v] [-c [<count>]]" + LINESEP, help.sections("synopsis").render(help));
     }
 
     @Test
@@ -1790,7 +1790,7 @@ public class CommandLineHelpTest {
             @Option(names = {"--help", "-h"}, hidden = true) boolean helpRequested;
         }
         Help help = new Help(new App(), Help.Ansi.ON);
-        assertEquals(Help.Ansi.ON.new Text("@|bold <main class>|@ [@|yellow -v|@] [@|yellow -c|@ [@|italic <count>|@]]" + LINESEP), help.synopsis(0));
+        assertEquals(Help.Ansi.ON.new Text("Usage: @|bold <main class>|@ [@|yellow -v|@] [@|yellow -c|@ [@|italic <count>|@]]" + LINESEP), help.sections("synopsis").render(help));
     }
 
     @Test
@@ -1801,7 +1801,7 @@ public class CommandLineHelpTest {
             @Option(names = {"--help", "-h"}, hidden = true) boolean helpRequested;
         }
         Help help = new Help(new App(), Help.Ansi.OFF);
-        assertEquals("<main class> [-v] -c=<count>" + LINESEP, help.synopsis(0));
+        assertEquals("Usage: <main class> [-v] -c=<count>" + LINESEP, help.sections("synopsis").render(help));
     }
 
     @Test
@@ -1812,7 +1812,7 @@ public class CommandLineHelpTest {
             @Option(names = {"--help", "-h"}, hidden = true) boolean helpRequested;
         }
         Help help = new Help(new App(), Help.Ansi.ON);
-        assertEquals(Help.Ansi.ON.new Text("@|bold <main class>|@ [@|yellow -v|@] @|yellow -c|@=@|italic <count>|@" + LINESEP), help.synopsis(0));
+        assertEquals(Help.Ansi.ON.new Text("Usage: @|bold <main class>|@ [@|yellow -v|@] @|yellow -c|@=@|italic <count>|@" + LINESEP), help.sections("synopsis").render(help));
     }
 
     @Test
@@ -1823,7 +1823,7 @@ public class CommandLineHelpTest {
             @Option(names = {"--help", "-h"}, hidden = true) boolean helpRequested;
         }
         Help help = new Help(new App(), Help.Ansi.OFF);
-        assertEquals("<main class> [-v] [-c <count>]" + LINESEP, help.synopsis(0));
+        assertEquals("Usage: <main class> [-v] [-c <count>]" + LINESEP, help.sections("synopsis").render(help));
     }
 
     @Test
@@ -1834,7 +1834,7 @@ public class CommandLineHelpTest {
             @Option(names = {"--help", "-h"}, hidden = true) boolean helpRequested;
         }
         Help help = new Help(new App(), Help.Ansi.OFF);
-        assertEquals("<main class> [-v] [-c[=<count>]]" + LINESEP, help.synopsis(0));
+        assertEquals("Usage: <main class> [-v] [-c[=<count>]]" + LINESEP, help.sections("synopsis").render(help));
     }
 
     @Test
@@ -1846,7 +1846,7 @@ public class CommandLineHelpTest {
         }
         Help help = new Help(new App(), Help.Ansi.OFF);
         // NOTE Expected :<main class> [-v] [-c[=<count>]...] but arity=0 for int field is weird anyway...
-        assertEquals("<main class> [-v] [-c[=<count>...]]" + LINESEP, help.synopsis(0));
+        assertEquals("Usage: <main class> [-v] [-c[=<count>...]]" + LINESEP, help.sections("synopsis").render(help));
     }
 
     @Test
@@ -1857,7 +1857,7 @@ public class CommandLineHelpTest {
             @Option(names = {"--help", "-h"}, hidden = true) boolean helpRequested;
         }
         Help help = new Help(new App(), Help.Ansi.OFF);
-        assertEquals("<main class> [-v] [-c=<count>...]" + LINESEP, help.synopsis(0));
+        assertEquals("Usage: <main class> [-v] [-c=<count>...]" + LINESEP, help.sections("synopsis").render(help));
     }
 
     @Test
@@ -1887,7 +1887,7 @@ public class CommandLineHelpTest {
             @Parameters File[] files;
         }
         Help help = new Help(new App(), Help.Ansi.OFF);
-        assertEquals("<main class> [-v] [-c:<count>] [<files>...]" + LINESEP, help.synopsis(0));
+        assertEquals("Usage: <main class> [-v] [-c:<count>] [<files>...]" + LINESEP, help.sections("synopsis").render(help));
     }
 
     @Test
@@ -1899,8 +1899,8 @@ public class CommandLineHelpTest {
             @Parameters File[] files;
         }
         Help help = new Help(new App(), Help.Ansi.ON);
-        assertEquals(Help.Ansi.ON.new Text("@|bold <main class>|@ [@|yellow -v|@] [@|yellow -c|@:@|italic <count>|@] [@|yellow <files>|@...]" + LINESEP),
-                help.synopsis(0));
+        assertEquals(Help.Ansi.ON.new Text("Usage: @|bold <main class>|@ [@|yellow -v|@] [@|yellow -c|@:@|italic <count>|@] [@|yellow <files>|@...]" + LINESEP),
+                help.sections("synopsis").render(help));
     }
 
     @Test
@@ -1912,7 +1912,7 @@ public class CommandLineHelpTest {
             @Parameters(paramLabel = "FILE") File[] files;
         }
         Help help = new Help(new App(), Help.Ansi.OFF);
-        assertEquals("<main class> [-v] [-c=<count>] [FILE...]" + LINESEP, help.synopsis(0));
+        assertEquals("Usage: <main class> [-v] [-c=<count>] [FILE...]" + LINESEP, help.sections("synopsis").render(help));
     }
 
     @Test
@@ -1924,8 +1924,8 @@ public class CommandLineHelpTest {
             @Parameters(paramLabel = "FILE") File[] files;
         }
         Help help = new Help(new App(), Help.Ansi.ON);
-        assertEquals(Help.Ansi.ON.new Text("@|bold <main class>|@ [@|yellow -v|@] [@|yellow -c|@=@|italic <count>|@] [@|yellow FILE|@...]" + LINESEP),
-                help.synopsis(0));
+        assertEquals(Help.Ansi.ON.new Text("Usage: @|bold <main class>|@ [@|yellow -v|@] [@|yellow -c|@=@|italic <count>|@] [@|yellow FILE|@...]" + LINESEP),
+                help.sections("synopsis").render(help));
     }
 
     @Test
@@ -1937,7 +1937,7 @@ public class CommandLineHelpTest {
             @Parameters(paramLabel = "FILE", arity = "1..*") File[] files;
         }
         Help help = new Help(new App(), Help.Ansi.OFF);
-        assertEquals("<main class> [-v] [-c=<count>] FILE..." + LINESEP, help.synopsis(0));
+        assertEquals("Usage: <main class> [-v] [-c=<count>] FILE..." + LINESEP, help.sections("synopsis").render(help));
     }
 
     @Test
@@ -1949,8 +1949,8 @@ public class CommandLineHelpTest {
             @Parameters(paramLabel = "FILE", arity = "1..*") File[] files;
         }
         Help help = new Help(new App(), Help.Ansi.ON);
-        assertEquals(Help.Ansi.ON.new Text("@|bold <main class>|@ [@|yellow -v|@] [@|yellow -c|@=@|italic <count>|@] @|yellow FILE|@..." + LINESEP),
-                help.synopsis(0));
+        assertEquals(Help.Ansi.ON.new Text("Usage: @|bold <main class>|@ [@|yellow -v|@] [@|yellow -c|@=@|italic <count>|@] @|yellow FILE|@..." + LINESEP),
+                help.sections("synopsis").render(help));
     }
 
     @Test
@@ -1962,7 +1962,7 @@ public class CommandLineHelpTest {
             @Option(names = {"--count", "-c"}, paramLabel = "COUNT") int count;
         }
         Help help = new Help(new App(), Help.Ansi.OFF);
-        assertEquals("<main class> [-avx] [-c=COUNT]" + LINESEP, help.synopsis(0));
+        assertEquals("Usage: <main class> [-avx] [-c=COUNT]" + LINESEP, help.sections("synopsis").render(help));
     }
 
     @Test
@@ -1974,7 +1974,7 @@ public class CommandLineHelpTest {
             @Option(names = {"--count", "-c"}, paramLabel = "COUNT") int count;
         }
         Help help = new Help(new App(), Help.Ansi.OFF);
-        assertEquals("<main class> -avx [-c=COUNT]" + LINESEP, help.synopsis(0));
+        assertEquals("Usage: <main class> -avx [-c=COUNT]" + LINESEP, help.sections("synopsis").render(help));
     }
 
     @Test
@@ -1989,7 +1989,7 @@ public class CommandLineHelpTest {
             @Option(names = {"--count", "-c"}, paramLabel = "COUNT") int count;
         }
         Help help = new Help(new App(), Help.Ansi.OFF);
-        assertEquals("<main class> -AVX [-avx] [-c=COUNT]" + LINESEP, help.synopsis(0));
+        assertEquals("Usage: <main class> -AVX [-avx] [-c=COUNT]" + LINESEP, help.sections("synopsis").render(help));
     }
 
     @Test
@@ -2004,8 +2004,8 @@ public class CommandLineHelpTest {
             @Option(names = {"--count", "-c"}, paramLabel = "COUNT") int count;
         }
         Help help = new Help(new App(), Help.Ansi.ON);
-        assertEquals(Help.Ansi.ON.new Text("@|bold <main class>|@ @|yellow -AVX|@ [@|yellow -avx|@] [@|yellow -c|@=@|italic COUNT|@]" + LINESEP),
-                help.synopsis(0));
+        assertEquals(Help.Ansi.ON.new Text("Usage: @|bold <main class>|@ @|yellow -AVX|@ [@|yellow -avx|@] [@|yellow -c|@=@|italic COUNT|@]" + LINESEP),
+                help.sections("synopsis").render(help));
     }
 
     @Test
@@ -2033,14 +2033,14 @@ public class CommandLineHelpTest {
                 "Usage: small-test-program [-!?acorv] [--version] [-h <number>] [-i" + LINESEP +
                 "                          <includePattern>] [-p <file>|<folder>] [-d <folder>" + LINESEP +
                 "                          [<folder>]]..." + LINESEP;
-        assertEquals(expected, help.synopsisHeading() + help.synopsis(help.synopsisHeadingLength()));
+        assertEquals(expected, help.sections("synopsis").render(help));
 
         help.commandSpec().usageMessage().synopsisHeading("Usage:%n");
         expected = "" +
                 "Usage:" + LINESEP +
                 "small-test-program [-!?acorv] [--version] [-h <number>] [-i <includePattern>]" + LINESEP +
                 "                   [-p <file>|<folder>] [-d <folder> [<folder>]]..." + LINESEP;
-        assertEquals(expected, help.synopsisHeading() + help.synopsis(help.synopsisHeadingLength()));
+        assertEquals(expected, help.sections("synopsis").render(help));
     }
 
     @Test
@@ -2054,11 +2054,11 @@ public class CommandLineHelpTest {
         }
         Help help = new Help(new App(), Help.Ansi.OFF);
         assertEquals(String.format(
-                "<best-app-ever> [--another-long-option-name=<another-long-option-value>]%n" +
-                "                [--fourth-long-option-name=<fourth-long-option-value>]%n" +
-                "                [--long-option-name=<long-option-value>]%n" +
-                "                [--third-long-option-name=<third-long-option-value>]%n"),
-                help.synopsis(0));
+                "Usage: <best-app-ever> [--another-long-option-name=<another-long-option-value>]%n" +
+                "                       [--fourth-long-option-name=<fourth-long-option-value>]%n" +
+                "                       [--long-option-name=<long-option-value>]%n" +
+                "                       [--third-long-option-name=<third-long-option-value>]%n"),
+                help.sections("synopsis").render(help));
     }
 
     @Test
@@ -2072,11 +2072,11 @@ public class CommandLineHelpTest {
         }
         Help help = new Help(new App(), Help.Ansi.OFF);
         assertEquals(String.format(
-                "<best-app-ever> [--another-long-option-name=^[<another-long-option-value>]]%n" +
-                "                [--fourth-long-option-name=<fourth-long-option-value>]%n" +
-                "                [--long-option@-name=<long-option-valu@@e>]%n" +
-                "                [--third-long-option-name=<third-long-option-value>]%n"),
-                help.synopsis(0));
+                "Usage: <best-app-ever> [--another-long-option-name=^[<another-long-option-value>]]%n" +
+                "                       [--fourth-long-option-name=<fourth-long-option-value>]%n" +
+                "                       [--long-option@-name=<long-option-valu@@e>]%n" +
+                "                       [--third-long-option-name=<third-long-option-value>]%n"),
+                help.sections("synopsis").render(help));
     }
 
     @Test
@@ -2090,11 +2090,11 @@ public class CommandLineHelpTest {
         }
         Help help = new Help(new App(), Help.Ansi.ON);
         assertEquals(Help.Ansi.ON.new Text(String.format(
-                "@|bold <best-app-ever>|@ [@|yellow --another-long-option-name|@=@|italic ^[<another-long-option-value>]|@]%n" +
-                        "                [@|yellow --fourth-long-option-name|@=@|italic <fourth-long-option-value>|@]%n" +
-                        "                [@|yellow --long-option@-name|@=@|italic <long-option-valu@@e>|@]%n" +
-                        "                [@|yellow --third-long-option-name|@=@|italic <third-long-option-value>|@]%n")),
-                help.synopsis(0));
+                "Usage: @|bold <best-app-ever>|@ [@|yellow --another-long-option-name|@=@|italic ^[<another-long-option-value>]|@]%n" +
+                "                [@|yellow --fourth-long-option-name|@=@|italic <fourth-long-option-value>|@]%n" +
+                "                [@|yellow --long-option@-name|@=@|italic <long-option-valu@@e>|@]%n" +
+                "                [@|yellow --third-long-option-name|@=@|italic <third-long-option-value>|@]%n")),
+                help.sections("synopsis").render(help));
     }
 
     @Test
@@ -2110,7 +2110,7 @@ public class CommandLineHelpTest {
                 "<the-app> --number=NUMBER --other-option=<aargh>%n" +
                 "          --more=OTHER --and-other-option=<aargh>%n" +
                 "<the-app> --number=NUMBER --and-other-option=<aargh>%n"),
-                help.synopsis(0));
+                help.sections("synopsis").renderBody(help));
     }
     @Test
     public void testTextTable() {
@@ -2312,26 +2312,22 @@ public class CommandLineHelpTest {
         @Command
         class EmptySub extends Base {}
         Help help = new Help(new EmptySub());
-        assertEquals("base", help.commandName());
-        assertEquals(String.format("cust%n"), help.synopsis(0));
-        assertEquals(String.format("cust%n"), help.customSynopsis());
-        assertEquals(String.format("base%n"), help.abbreviatedSynopsis());
-        assertEquals(String.format("base%n"), help.detailedSynopsis(0,null, true));
-        assertEquals("abcd", help.synopsisHeading());
-        assertEquals("", help.commandList());
-        assertEquals("", help.commandListHeading());
-        assertEquals("c o m m a n d s", help.commandSpec().usageMessage().commandListHeading());
-        assertEquals(String.format("base description%n"), help.description());
-        assertEquals("base descr heading", help.descriptionHeading());
-        assertEquals(String.format("base footer%n"), help.footer());
-        assertEquals("base footer heading", help.footerHeading());
-        assertEquals(String.format("base header%n"), help.header());
-        assertEquals("base header heading", help.headerHeading());
-        assertEquals("", help.optionList());
-        assertEquals("", help.optionListHeading());
+        assertEquals("base", help.commandSpec().name());
+        assertEquals(String.format("cust%n"), help.sections("synopsis").renderBody(help));
+        help.commandSpec().usageMessage().customSynopsis("");
+        assertEquals(String.format("base%n"), help.sections("synopsis").renderBody(help));
+        assertEquals("abcd", help.sections("synopsis").renderHeading(help));
+        assertEquals("", help.sections("commandList").render(help));
+        assertEquals("c o m m a n d s", help.sections("commandList").renderHeading(help));
+        assertEquals(String.format("base description%n"), help.sections("description").renderBody(help));
+        assertEquals("base descr heading", help.sections("description").renderHeading(help));
+        assertEquals(String.format("base footer%n"), help.sections("footer").renderBody(help));
+        assertEquals("base footer heading", help.sections("footer").renderHeading(help));
+        assertEquals(String.format("base header%n"), help.sections("header").renderBody(help));
+        assertEquals("base header heading", help.sections("header").renderHeading(help));
+        assertEquals("", help.sections("optionList").render(help));
         assertEquals("base option heading", help.commandSpec().usageMessage().optionListHeading());
-        assertEquals("", help.parameterList());
-        assertEquals("", help.parameterListHeading());
+        assertEquals("", help.sections("parameterList").render(help));
         assertEquals("base param heading", help.commandSpec().usageMessage().parameterListHeading());
 
         assertEquals(";", help.commandSpec().parser().separator());
@@ -2354,26 +2350,23 @@ public class CommandLineHelpTest {
                 sortOptions = false, synopsisHeading = "abcd", subcommands = Sub.class)
         class FullBase extends EmptyBase{ }
         Help help = new Help(new FullBase());
-        assertEquals("base", help.commandName());
-        assertEquals(String.format("cust%n"), help.synopsis(0));
-        assertEquals(String.format("cust%n"), help.customSynopsis());
-        assertEquals(String.format("base [COMMAND]%n"), help.abbreviatedSynopsis());
-        assertEquals(String.format("base [COMMAND]%n"), help.detailedSynopsis(0, null, true));
-        assertEquals("abcd", help.synopsisHeading());
-        assertEquals(String.format("  sub  This is a subcommand%n"), help.commandList());
-        assertEquals("c o m m a n d s", help.commandListHeading());
-        assertEquals(String.format("base description%n"), help.description());
-        assertEquals("base descr heading", help.descriptionHeading());
-        assertEquals(String.format("base footer%n"), help.footer());
-        assertEquals("base footer heading", help.footerHeading());
-        assertEquals(String.format("base header%n"), help.header());
-        assertEquals("base header heading", help.headerHeading());
-        assertEquals("", help.optionList());
+        assertEquals("base", help.commandSpec().name());
+        assertEquals(String.format("cust%n"), help.sections("synopsis").renderBody(help));
+        help.commandSpec().usageMessage().customSynopsis("");
+        assertEquals(String.format("base [COMMAND]%n"), help.sections("synopsis").renderBody(help));
+        assertEquals("abcd", help.sections("synopsis").renderHeading(help));
+        assertEquals(String.format("  sub  This is a subcommand%n"), help.sections("commandList").renderBody(help));
+        assertEquals("c o m m a n d s", help.sections("commandList").renderHeading(help));
+        assertEquals(String.format("base description%n"), help.sections("description").renderBody(help));
+        assertEquals("base descr heading", help.sections("description").renderHeading(help));
+        assertEquals(String.format("base footer%n"), help.sections("footer").renderBody(help));
+        assertEquals("base footer heading", help.sections("footer").renderHeading(help));
+        assertEquals(String.format("base header%n"), help.sections("header").renderBody(help));
+        assertEquals("base header heading", help.sections("header").renderHeading(help));
+        assertEquals("", help.sections("optionList").renderBody(help));
         assertEquals("base option heading", help.commandSpec().usageMessage().optionListHeading());
-        assertEquals("", help.optionListHeading()); // because no options
-        assertEquals("", help.parameterList());
+        assertEquals("", help.sections("parameterList").render(help));
         assertEquals("base param heading", help.commandSpec().usageMessage().parameterListHeading());
-        assertEquals("", help.parameterListHeading()); // because no parameters
         assertTrue(help.commandSpec().usageMessage().abbreviateSynopsis());
         assertTrue(help.commandSpec().usageMessage().showDefaultValues());
         assertFalse(help.commandSpec().usageMessage().sortOptions());
@@ -2391,26 +2384,22 @@ public class CommandLineHelpTest {
                 sortOptions = true, synopsisHeading = "xyz")
         class FullSub extends Base{ }
         Help help = new Help(new FullSub());
-        assertEquals("sub", help.commandName());
-        assertEquals(String.format("subcust%n"), help.synopsis(0));
-        assertEquals(String.format("subcust%n"), help.customSynopsis());
-        assertEquals(String.format("sub%n"), help.abbreviatedSynopsis());
-        assertEquals(String.format("sub%n"), help.detailedSynopsis(0,null, true));
-        assertEquals("xyz", help.synopsisHeading());
-        assertEquals("", help.commandList());
-        assertEquals("", help.commandListHeading()); // empty: no commands
+        assertEquals("sub", help.commandSpec().name());
+        assertEquals(String.format("subcust%n"), help.sections("synopsis").renderBody(help));
+        help.commandSpec().usageMessage().customSynopsis("");
+        assertEquals(String.format("sub%n"), help.sections("synopsis").renderBody(help));
+        assertEquals("xyz", help.sections("synopsis").renderHeading(help));
+        assertEquals("", help.sections("commandList").render(help)); // empty: no commands
         assertEquals("subc o m m a n d s", help.commandSpec().usageMessage().commandListHeading());
-        assertEquals(String.format("sub description%n"), help.description());
-        assertEquals("sub descr heading", help.descriptionHeading());
-        assertEquals(String.format("sub footer%n"), help.footer());
-        assertEquals("sub footer heading", help.footerHeading());
-        assertEquals(String.format("sub header%n"), help.header());
-        assertEquals("sub header heading", help.headerHeading());
-        assertEquals("", help.optionList());
-        assertEquals("", help.optionListHeading());
+        assertEquals(String.format("sub description%n"), help.sections("description").renderBody(help));
+        assertEquals("sub descr heading", help.sections("description").renderHeading(help));
+        assertEquals(String.format("sub footer%n"), help.sections("footer").renderBody(help));
+        assertEquals("sub footer heading", help.sections("footer").renderHeading(help));
+        assertEquals(String.format("sub header%n"), help.sections("header").renderBody(help));
+        assertEquals("sub header heading", help.sections("header").renderHeading(help));
+        assertEquals("", help.sections("optionList").render(help));
         assertEquals("sub option heading", help.commandSpec().usageMessage().optionListHeading());
-        assertEquals("", help.parameterList());
-        assertEquals("", help.parameterListHeading());
+        assertEquals("", help.sections("parameterList").render(help));
         assertEquals("sub param heading", help.commandSpec().usageMessage().parameterListHeading());
         assertTrue(help.commandSpec().usageMessage().abbreviateSynopsis());
         assertTrue(help.commandSpec().usageMessage().showDefaultValues());
@@ -2474,7 +2463,7 @@ public class CommandLineHelpTest {
             @Parameters(index = "0") String param0;
         }
         Help help = new Help(new WithParams());
-        assertEquals(format("<main class> <param0> <param1>%n"), help.synopsis(0));
+        assertEquals(format("Usage: <main class> <param0> <param1>%n"), help.sections("synopsis").render(help));
     }
 
     @Test
@@ -2488,7 +2477,7 @@ public class CommandLineHelpTest {
             @Parameters(index = "2") String param2;
         }
         Help help = new Help(new SubWithParams());
-        assertEquals(format("<main class> <param0> <param1> <param2> <param3>%n"), help.synopsis(0));
+        assertEquals(format("Usage: <main class> <param0> <param1> <param2> <param3>%n"), help.sections("synopsis").render(help));
     }
 
     @Test
@@ -2835,15 +2824,17 @@ public class CommandLineHelpTest {
         }
         Help.Ansi ansi = Help.Ansi.ON;
         // default color scheme
-        assertEquals(ansi.new Text("@|bold <main class>|@ [@|yellow -v|@] [@|yellow -c|@=@|italic <count>|@] @|yellow FILE|@..." + LINESEP),
-                new Help(new App(), ansi).synopsis(0));
+        Help help = new Help(new App(), ansi);
+        assertEquals(ansi.new Text("Usage: @|bold <main class>|@ [@|yellow -v|@] [@|yellow -c|@=@|italic <count>|@] @|yellow FILE|@..." + LINESEP),
+                help.sections("synopsis").render(help));
 
         System.setProperty("picocli.color.commands", "blue");
         System.setProperty("picocli.color.options", "green");
         System.setProperty("picocli.color.parameters", "cyan");
         System.setProperty("picocli.color.optionParams", "magenta");
-        assertEquals(ansi.new Text("@|blue <main class>|@ [@|green -v|@] [@|green -c|@=@|magenta <count>|@] @|cyan FILE|@..." + LINESEP),
-                new Help(new App(), ansi).synopsis(0));
+        help = new Help(new App(), ansi);
+        assertEquals(ansi.new Text("Usage: @|blue <main class>|@ [@|green -v|@] [@|green -c|@=@|magenta <count>|@] @|cyan FILE|@..." + LINESEP),
+                help.sections("synopsis").render(help));
     }
 
     @Test
@@ -2861,15 +2852,17 @@ public class CommandLineHelpTest {
                 .parameters(Style.reverse)
                 .optionParams(Style.bg_green);
         // default color scheme
-        assertEquals(ansi.new Text("@|faint,bg(magenta) <main class>|@ [@|bg(red) -v|@] [@|bg(red) -c|@=@|bg(green) <count>|@] @|reverse FILE|@..." + LINESEP),
-                new Help(CommandSpec.forAnnotatedObject(new App(), CommandLine.defaultFactory()), explicit).synopsis(0));
+        Help help = new Help(CommandSpec.forAnnotatedObject(new App(), CommandLine.defaultFactory()), explicit);
+        assertEquals(ansi.new Text("Usage: @|faint,bg(magenta) <main class>|@ [@|bg(red) -v|@] [@|bg(red) -c|@=@|bg(green) <count>|@] @|reverse FILE|@..." + LINESEP),
+                help.sections("synopsis").render(help));
 
         System.setProperty("picocli.color.commands", "blue");
         System.setProperty("picocli.color.options", "blink");
         System.setProperty("picocli.color.parameters", "red");
         System.setProperty("picocli.color.optionParams", "magenta");
-        assertEquals(ansi.new Text("@|blue <main class>|@ [@|blink -v|@] [@|blink -c|@=@|magenta <count>|@] @|red FILE|@..." + LINESEP),
-                new Help(CommandSpec.forAnnotatedObject(new App(), CommandLine.defaultFactory()), explicit).synopsis(0));
+        help = new Help(CommandSpec.forAnnotatedObject(new App(), CommandLine.defaultFactory()), explicit);
+        assertEquals(ansi.new Text("Usage: @|blue <main class>|@ [@|blink -v|@] [@|blink -c|@=@|magenta <count>|@] @|red FILE|@..." + LINESEP),
+                help.sections("synopsis").render(help));
     }
 
     @Test
@@ -3309,7 +3302,7 @@ public class CommandLineHelpTest {
         try {
             new CommandLine(new App(), new InnerClassFactory(this));
         } catch (InitializationException ex) {
-            assertEquals("picocli.CommandLine$Help is not a valid subcommand. Did you mean picocli.CommandLine$HelpCommand?", ex.getMessage());
+            assertEquals("picocli.Help is not a valid subcommand. Did you mean picocli.CommandLine$HelpCommand?", ex.getMessage());
         }
     }
     @Test
@@ -3674,9 +3667,9 @@ public class CommandLineHelpTest {
             }
             Help help = new Help(new App(), Help.Ansi.OFF);
             assertEquals(String.format(
-                    "<best-app-ever> [--another-long-option-name=<another-long-option-value>] [--fourth-long-option-name=<fourth-long-option-value>] [--long-option-name=<long-option-value>]%n" +
-                            "                [--third-long-option-name=<third-long-option-value>]%n"),
-                    help.synopsis(0));
+                    "Usage: <best-app-ever> [--another-long-option-name=<another-long-option-value>] [--fourth-long-option-name=<fourth-long-option-value>] [--long-option-name=<long-option-value>]%n" +
+                    "                       [--third-long-option-name=<third-long-option-value>]%n"),
+                    help.sections("synopsis").render(help));
         } finally {
             System.setProperty("picocli.usage.width", String.valueOf(UsageMessageSpec.DEFAULT_USAGE_WIDTH));
         }

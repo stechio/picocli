@@ -30,10 +30,10 @@ public class CommandLineDefaultProviderTest {
         private String optionStringFieldWithoutDefaultNorInitialValue;
         @Option(names = "-b", description = "Default: ${DEFAULT-VALUE}", defaultValue = "Annotated default value")
         private String optionStringFieldWithAnnotatedDefault;
-        @Option(names = "-c", description = "Default: ${DEFAULT-VALUE}", showDefaultValue = CommandLine.Help.Visibility.ALWAYS)
+        @Option(names = "-c", description = "Default: ${DEFAULT-VALUE}", showDefaultValue = Help.Visibility.ALWAYS)
         private String optionStringFieldWithInitDefault = "Initial default value";
 
-        @Parameters(arity = "0..1", description = "Default: ${DEFAULT-VALUE}", showDefaultValue = CommandLine.Help.Visibility.ALWAYS)
+        @Parameters(arity = "0..1", description = "Default: ${DEFAULT-VALUE}", showDefaultValue = Help.Visibility.ALWAYS)
         private String paramStringFieldWithoutDefaultNorInitialValue;
         @Parameters(arity = "0..1", description = "Default: ${DEFAULT-VALUE}", defaultValue = "Annotated default value")
         private String paramStringFieldWithAnnotatedDefault;
@@ -175,7 +175,7 @@ public class CommandLineDefaultProviderTest {
                 "                   Default: Default provider string value%n" +
                 "  -d= <string>   Default: Default provider string value%n");
         CommandLine cmd = new CommandLine(App.class);
-        assertEquals(expected, cmd.getUsageMessage(CommandLine.Help.Ansi.OFF));
+        assertEquals(expected, cmd.getUsageMessage(Help.Ansi.OFF));
     }
 
     @Test
@@ -203,7 +203,7 @@ public class CommandLineDefaultProviderTest {
                 return "XYZ";
             }
         });
-        assertEquals(expected2, cmd.getUsageMessage(CommandLine.Help.Ansi.OFF));
+        assertEquals(expected2, cmd.getUsageMessage(Help.Ansi.OFF));
     }
 
     @Test
@@ -231,6 +231,6 @@ public class CommandLineDefaultProviderTest {
                 throw new IllegalStateException("abc");
             }
         });
-        assertEquals(expected2, cmd.getUsageMessage(CommandLine.Help.Ansi.OFF));
+        assertEquals(expected2, cmd.getUsageMessage(Help.Ansi.OFF));
     }
 }

@@ -15,15 +15,14 @@
  */
 package picocli;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.contrib.java.lang.system.ProvideSystemProperty;
-import org.junit.contrib.java.lang.system.SystemErrRule;
-import org.junit.contrib.java.lang.system.SystemOutRule;
-import picocli.CommandLine.Mixin;
-import picocli.CommandLineTest.CompactFields;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static picocli.CommandLineTest.verifyCompact;
+import static picocli.HelpTestUtil.setTraceLevel;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -34,16 +33,23 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static org.junit.Assert.*;
-import static picocli.CommandLine.Command;
-import static picocli.CommandLine.IParseResultHandler;
-import static picocli.CommandLine.MissingParameterException;
-import static picocli.CommandLine.Model;
-import static picocli.CommandLine.Option;
-import static picocli.CommandLine.Parameters;
-import static picocli.CommandLine.UnmatchedArgumentException;
-import static picocli.CommandLineTest.verifyCompact;
-import static picocli.HelpTestUtil.setTraceLevel;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.contrib.java.lang.system.ProvideSystemProperty;
+import org.junit.contrib.java.lang.system.SystemErrRule;
+import org.junit.contrib.java.lang.system.SystemOutRule;
+
+import picocli.CommandLine.Command;
+import picocli.CommandLine.IParseResultHandler;
+import picocli.CommandLine.MissingParameterException;
+import picocli.CommandLine.Mixin;
+import picocli.CommandLine.Model;
+import picocli.CommandLine.Option;
+import picocli.CommandLine.Parameters;
+import picocli.CommandLine.UnmatchedArgumentException;
+import picocli.CommandLineTest.CompactFields;
 
 /**
  * Tests for {@code @Command} methods.
@@ -267,7 +273,7 @@ public class CommandLineCommandMethodTest {
         assertEquals(22, result);
 
         // verify same result with result handler
-        List<Object> results = new CommandLine.RunLast().handleParseResult(parsed, System.out, CommandLine.Help.Ansi.OFF);
+        List<Object> results = new CommandLine.RunLast().handleParseResult(parsed, System.out, Help.Ansi.OFF);
         assertEquals(1, results.size());
         assertEquals(22L, results.get(0));
     }
@@ -308,7 +314,7 @@ public class CommandLineCommandMethodTest {
         assertEquals(30, result);
 
         // verify same result with result handler
-        List<Object> results = new CommandLine.RunLast().handleParseResult(parsed, System.out, CommandLine.Help.Ansi.OFF);
+        List<Object> results = new CommandLine.RunLast().handleParseResult(parsed, System.out, Help.Ansi.OFF);
         assertEquals(1, results.size());
         assertEquals(30L, results.get(0));
     }
@@ -347,7 +353,7 @@ public class CommandLineCommandMethodTest {
         assertEquals(15, result);
 
         // verify same result with result handler
-        List<Object> results = new CommandLine.RunLast().handleParseResult(parsed, System.out, CommandLine.Help.Ansi.OFF);
+        List<Object> results = new CommandLine.RunLast().handleParseResult(parsed, System.out, Help.Ansi.OFF);
         assertEquals(1, results.size());
         assertEquals(15L, results.get(0));
     }
@@ -382,7 +388,7 @@ public class CommandLineCommandMethodTest {
         assertEquals(3, result);
 
         // verify same result with result handler
-        List<Object> results = new CommandLine.RunLast().handleParseResult(parsed, System.out, CommandLine.Help.Ansi.OFF);
+        List<Object> results = new CommandLine.RunLast().handleParseResult(parsed, System.out, Help.Ansi.OFF);
         assertEquals(1, results.size());
         assertEquals(3L, results.get(0));
     }

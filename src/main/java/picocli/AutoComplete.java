@@ -93,7 +93,7 @@ public class AutoComplete {
 
                 if (commandName == null) {
                     commandName = commandLine.getCommandName(); //new CommandLine.Help(commandLine.commandDescriptor).commandName;
-                    if (CommandLine.Help.DEFAULT_COMMAND_NAME.equals(commandName)) {
+                    if (Help.DEFAULT_COMMAND_NAME.equals(commandName)) {
                         commandName = cls.getSimpleName().toLowerCase();
                     }
                 }

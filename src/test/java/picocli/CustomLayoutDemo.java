@@ -15,16 +15,16 @@
  */
 package picocli;
 
-import picocli.CommandLine.Help.Ansi.Text;
-import picocli.CommandLine.Help.Column;
-import picocli.CommandLine.Help.IOptionRenderer;
-import picocli.CommandLine.Help.IParameterRenderer;
-import picocli.CommandLine.Help.Layout;
-import picocli.CommandLine.Help.TextTable;
+import picocli.Help.Ansi.Text;
+import picocli.Help.Column;
+import picocli.Help.IOptionRenderer;
+import picocli.Help.IParameterRenderer;
+import picocli.Help.Layout;
+import picocli.Help.TextTable;
 
 import static picocli.CommandLine.*;
 import static picocli.CommandLine.Model.*;
-import static picocli.CommandLine.Help.Column.Overflow.*;
+import static picocli.Help.Column.Overflow.*;
 
 /**
  * Demonstrates how the CommandLine.Help API can be used to create custom layouts for usage help messages.
@@ -168,10 +168,10 @@ public class CustomLayoutDemo implements Runnable {
 
         Help help = new Help(new Zip(), ansi);
         StringBuilder sb = new StringBuilder();
-        sb.append(help.description()); // show the first 6 lines, including copyright, description and usage
+        sb.append(help.sections("description").renderBody(help)); // show the first 6 lines, including copyright, description and usage
 
         // Note that we don't sort the options, so they appear in the order the fields are declared in the Zip class.
-        layout.addOptions(help.options(), help.parameterLabelRenderer());
+        layout.addOptions(help.commandSpec().options(), help.parameterLabelRenderer());
         sb.append(layout); // finally, copy the options details help text into the StringBuilder
 
         return sb.toString();
@@ -183,7 +183,7 @@ public class CustomLayoutDemo implements Runnable {
     public static String createNetstatUsageFormat(Help.Ansi ansi) {
         @Command(name = "NETSTAT",
                 separator = " ",
-                abbreviateSynopsis = true,
+                abbreviateSynopsis = false,
                 header = "Displays protocol statistics and current TCP/IP network connections.%n")
         class Netstat {
             @Option(names="-a", description="Displays all connections and listening ports.")
@@ -238,8 +238,9 @@ public class CustomLayoutDemo implements Runnable {
         }
         StringBuilder sb = new StringBuilder();
         Help help = new Help(new Netstat(), ansi);
-        help.synopsisHeading("");
-        sb.append(help.header()).append(help.detailedSynopsis(0, null, false));
+        help.commandSpec().commandLine(new CommandLine(help.commandSpec()).setPosixClusteredShortOptionsAllowed(false));
+        help.commandSpec().usageMessage().synopsisHeading("");
+        sb.append(help.sections("header").render(help)).append(help.sections("synopsis").render(help));
         sb.append(System.getProperty("line.separator"));
 
         TextTable textTable = TextTable.forColumns(ansi,
@@ -251,8 +252,8 @@ public class CustomLayoutDemo implements Runnable {
                 textTable,
                 Help.createMinimalOptionRenderer(),
                 Help.createMinimalParameterRenderer());
-        layout.addOptions(help.options(), help.parameterLabelRenderer());
-        layout.addPositionalParameters(help.positionalParameters(), Help.createMinimalParamLabelRenderer());
+        layout.addOptions(help.commandSpec().options(), help.parameterLabelRenderer());
+        layout.addPositionalParameters(help.commandSpec().positionalParameters(), Help.createMinimalParamLabelRenderer());
         sb.append(layout);
         return sb.toString();
     }

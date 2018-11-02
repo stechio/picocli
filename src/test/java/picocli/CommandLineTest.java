@@ -15,12 +15,16 @@
  */
 package picocli;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.contrib.java.lang.system.ProvideSystemProperty;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static picocli.HelpTestUtil.setTraceLevel;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -32,7 +36,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.net.InetAddress;
 import java.net.Socket;
@@ -59,30 +62,33 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.Assert.*;
-import static picocli.CommandLine.Command;
-import static picocli.CommandLine.DuplicateOptionAnnotationsException;
-import static picocli.CommandLine.Help;
-import static picocli.CommandLine.HelpCommand;
-import static picocli.CommandLine.IFactory;
-import static picocli.CommandLine.IParseResultHandler;
-import static picocli.CommandLine.ITypeConverter;
-import static picocli.CommandLine.IVersionProvider;
-import static picocli.CommandLine.InitializationException;
-import static picocli.CommandLine.MissingParameterException;
-import static picocli.CommandLine.MissingTypeConverterException;
-import static picocli.CommandLine.Mixin;
-import static picocli.CommandLine.Model;
-import static picocli.CommandLine.Option;
-import static picocli.CommandLine.OverwrittenOptionException;
-import static picocli.CommandLine.ParameterException;
-import static picocli.CommandLine.ParameterIndexGapException;
-import static picocli.CommandLine.Parameters;
-import static picocli.CommandLine.ParseResult;
-import static picocli.CommandLine.RunAll;
-import static picocli.CommandLine.Unmatched;
-import static picocli.CommandLine.UnmatchedArgumentException;
-import static picocli.HelpTestUtil.setTraceLevel;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.contrib.java.lang.system.ProvideSystemProperty;
+
+import picocli.CommandLine.Command;
+import picocli.CommandLine.DuplicateOptionAnnotationsException;
+import picocli.CommandLine.HelpCommand;
+import picocli.CommandLine.IFactory;
+import picocli.CommandLine.IParseResultHandler;
+import picocli.CommandLine.ITypeConverter;
+import picocli.CommandLine.IVersionProvider;
+import picocli.CommandLine.InitializationException;
+import picocli.CommandLine.MissingParameterException;
+import picocli.CommandLine.MissingTypeConverterException;
+import picocli.CommandLine.Mixin;
+import picocli.CommandLine.Model;
+import picocli.CommandLine.Option;
+import picocli.CommandLine.OverwrittenOptionException;
+import picocli.CommandLine.ParameterException;
+import picocli.CommandLine.ParameterIndexGapException;
+import picocli.CommandLine.Parameters;
+import picocli.CommandLine.ParseResult;
+import picocli.CommandLine.RunAll;
+import picocli.CommandLine.Unmatched;
+import picocli.CommandLine.UnmatchedArgumentException;
 
 /**
  * Tests for the CommandLine argument parsing interpreter functionality.

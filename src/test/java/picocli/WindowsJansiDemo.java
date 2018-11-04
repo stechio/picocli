@@ -17,7 +17,7 @@ package picocli;
 
 import org.fusesource.jansi.AnsiConsole;
 import picocli.CommandLine.Command;
-import picocli.Help.Ansi;
+import picocli.help.Ansi;
 
 /**
  * Demonstrates usage help with ansi colors on Windows DOS (without Cygwin or MSYS(2)).

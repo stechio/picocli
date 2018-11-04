@@ -13,38 +13,36 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package picocli;
+package picocli.help;
 
-import picocli.Help.Ansi.Text;
-import picocli.Help.Column;
-import picocli.Help.IOptionRenderer;
-import picocli.Help.IParameterRenderer;
-import picocli.Help.Layout;
-import picocli.Help.TextTable;
-
-import static picocli.CommandLine.*;
-import static picocli.CommandLine.Model.*;
-import static picocli.Help.Column.Overflow.*;
+import picocli.CommandLine;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Model.ArgSpec;
+import picocli.CommandLine.Option;
+import picocli.CommandLine.Parameters;
+import picocli.help.Help.IOptionRenderer;
+import picocli.help.Help.IParameterRenderer;
+import picocli.help.TextTable.Column;
 
 /**
- * Demonstrates how the CommandLine.Help API can be used to create custom layouts for usage help messages.
+ * Demonstrates how the CommandLine.Help API can be used to create custom layouts for usage help
+ * messages.
  */
-@Command(name = "picocli.CustomLayoutDemo", description = "Demonstrates picocli custom layouts.",
-        footer = {
+@Command(name = "picocli.CustomLayoutDemo", description = "Demonstrates picocli custom layouts.", footer = {
         "Run with -Dpicocli.ansi=true  to force picocli to use ansi codes,",
         "or  with -Dpicocli.ansi=false to force picocli to NOT use ansi codes.",
-        "By default picocli will use ansi codes if the platform supports it."
-        }
-)
+        "By default picocli will use ansi codes if the platform supports it." })
 public class CustomLayoutDemo implements Runnable {
     public static void main(String[] args) {
         CommandLine.run(new CustomLayoutDemo(), System.err, args);
     }
 
-    @Option(names = {"-z", "--zip"}, description = "Show usage help for a layout with 2 options per row.")
+    @Option(names = { "-z",
+            "--zip" }, description = "Show usage help for a layout with 2 options per row.")
     private boolean showZip;
 
-    @Option(names = {"-n", "--netstat"}, description = "Show usage help for a layout with a narrow options column and a wide description column. Descriptions that wrap to the next row are not indented.")
+    @Option(names = { "-n",
+            "--netstat" }, description = "Show usage help for a layout with a narrow options column and a wide description column. Descriptions that wrap to the next row are not indented.")
     private boolean showNetstat;
 
     public void run() {
@@ -52,20 +50,22 @@ public class CustomLayoutDemo implements Runnable {
             CommandLine.usage(this, System.err);
             return;
         }
-        if (showZip)     { System.out.println(createZipUsageFormat(Help.Ansi.AUTO)); }
-        if (showNetstat) { System.out.println(createNetstatUsageFormat(Help.Ansi.AUTO)); }
+        if (showZip) {
+            System.out.println(createZipUsageFormat(Ansi.AUTO));
+        }
+        if (showNetstat) {
+            System.out.println(createNetstatUsageFormat(Ansi.AUTO));
+        }
     }
 
-
-    public static String createZipUsageFormat(Help.Ansi ansi) {
+    public static String createZipUsageFormat(Ansi ansi) {
         @Command(description = {
                 "Copyright (c) 1990-2008 Info-ZIP - Type 'zip \"-L\"' for software license.",
                 "Zip 3.0 (July 5th 2008). Command:",
                 "@|bold zip|@ [@|yellow -options|@] [@|yellow -b|@ @|underline path|@] [@|yellow -t|@ @|underline mmddyyyy|@] [@|yellow -n|@ @|underline suffixes|@] [@|yellow zipfile|@ @|underline list|@] [@|yellow -xi|@ @|underline list|@]",
                 "  The default action is to add or replace zipfile entries from list, which",
                 "  can include the special name - to compress standard input.",
-                "  If @|yellow zipfile|@ and @|yellow list|@ are omitted, zip compresses stdin to stdout."}
-        )
+                "  If @|yellow zipfile|@ and @|yellow list|@ are omitted, zip compresses stdin to stdout." })
         class Zip {
             @Option(names = "-f", description = "freshen: only changed files")
             boolean freshen;
@@ -128,9 +128,8 @@ public class CustomLayoutDemo implements Runnable {
         class TwoOptionsPerRowLayout extends Layout { // define a custom layout
             TextTable.Cell previous = new TextTable.Cell(0, 0);
 
-            private TwoOptionsPerRowLayout(Help.ColorScheme colorScheme, TextTable textTable,
-                                           IOptionRenderer optionRenderer,
-                                           IParameterRenderer parameterRenderer) {
+            private TwoOptionsPerRowLayout(ColorScheme colorScheme, TextTable textTable,
+                    IOptionRenderer optionRenderer, IParameterRenderer parameterRenderer) {
                 super(colorScheme, textTable, optionRenderer, parameterRenderer);
             }
 
@@ -155,40 +154,37 @@ public class CustomLayoutDemo implements Runnable {
                 }
             }
         }
-        TextTable textTable = TextTable.forColumns(ansi,
-                new Column(5, 2, TRUNCATE), // values should fit
-                new Column(30, 2, SPAN), // overflow into adjacent columns
-                new Column(4, 1, TRUNCATE), // values should fit again
-                new Column(39, 2, WRAP));
-        TwoOptionsPerRowLayout layout = new TwoOptionsPerRowLayout(
-                Help.defaultColorScheme(ansi),
-                textTable,
-                Help.createMinimalOptionRenderer(),
-                Help.createMinimalParameterRenderer());
 
         Help help = new Help(new Zip(), ansi);
+
+        TextTable textTable = TextTable.forColumns(ansi, new Column(5, 2, Column.Overflow.TRUNCATE), // values should fit
+                new Column(30, 2, Column.Overflow.SPAN), // overflow into adjacent columns
+                new Column(4, 1, Column.Overflow.TRUNCATE), // values should fit again
+                new Column(39, 2, Column.Overflow.WRAP));
+        TwoOptionsPerRowLayout layout = new TwoOptionsPerRowLayout(Help.defaultColorScheme(ansi),
+                textTable, help.rendering().minimalOption(), help.rendering().minimalParameter());
+
         StringBuilder sb = new StringBuilder();
         sb.append(help.sections("description").renderBody(help)); // show the first 6 lines, including copyright, description and usage
 
         // Note that we don't sort the options, so they appear in the order the fields are declared in the Zip class.
-        layout.addOptions(help.commandSpec().options(), help.parameterLabelRenderer());
+        layout.addOptions(help.commandSpec().options(), help.rendering().paramLabel());
         sb.append(layout); // finally, copy the options details help text into the StringBuilder
 
         return sb.toString();
     }
 
     /** for Netstat test */
-    private enum Protocol {IP, IPv6, ICMP, ICMPv6, TCP, TCPv6, UDP, UDPv6}
+    private enum Protocol {
+        IP, IPv6, ICMP, ICMPv6, TCP, TCPv6, UDP, UDPv6
+    }
 
-    public static String createNetstatUsageFormat(Help.Ansi ansi) {
-        @Command(name = "NETSTAT",
-                separator = " ",
-                abbreviateSynopsis = false,
-                header = "Displays protocol statistics and current TCP/IP network connections.%n")
+    public static String createNetstatUsageFormat(Ansi ansi) {
+        @Command(name = "NETSTAT", separator = " ", abbreviateSynopsis = false, header = "Displays protocol statistics and current TCP/IP network connections.%n")
         class Netstat {
-            @Option(names="-a", description="Displays all connections and listening ports.")
+            @Option(names = "-a", description = "Displays all connections and listening ports.")
             boolean displayAll;
-            @Option(names="-b", description="Displays the executable involved in creating each connection or "
+            @Option(names = "-b", description = "Displays the executable involved in creating each connection or "
                     + "listening port. In some cases well-known executables host "
                     + "multiple independent components, and in these cases the "
                     + "sequence of components involved in creating the connection "
@@ -198,35 +194,34 @@ public class CustomLayoutDemo implements Runnable {
                     + "can be time-consuming and will fail unless you have sufficient "
                     + "permissions.")
             boolean displayExecutable;
-            @Option(names="-e", description="Displays Ethernet statistics. This may be combined with the -s option.")
+            @Option(names = "-e", description = "Displays Ethernet statistics. This may be combined with the -s option.")
             boolean displayEthernetStats;
-            @Option(names="-f", description="Displays Fully Qualified Domain Names (FQDN) for foreign addresses.")
+            @Option(names = "-f", description = "Displays Fully Qualified Domain Names (FQDN) for foreign addresses.")
             boolean displayFQCN;
-            @Option(names="-n", description="Displays addresses and port numbers in numerical form.")
+            @Option(names = "-n", description = "Displays addresses and port numbers in numerical form.")
             boolean displayNumerical;
-            @Option(names="-o", description="Displays the owning process ID associated with each connection.")
+            @Option(names = "-o", description = "Displays the owning process ID associated with each connection.")
             boolean displayOwningProcess;
-            @Option(names="-p", paramLabel = "proto",
-                    description="Shows connections for the protocol specified by proto; proto "
-                            + "may be any of: TCP, UDP, TCPv6, or UDPv6.  If used with the -s "
-                            + "option to display per-protocol statistics, proto may be any of: "
-                            + "IP, IPv6, ICMP, ICMPv6, TCP, TCPv6, UDP, or UDPv6.")
+            @Option(names = "-p", paramLabel = "proto", description = "Shows connections for the protocol specified by proto; proto "
+                    + "may be any of: TCP, UDP, TCPv6, or UDPv6.  If used with the -s "
+                    + "option to display per-protocol statistics, proto may be any of: "
+                    + "IP, IPv6, ICMP, ICMPv6, TCP, TCPv6, UDP, or UDPv6.")
             Protocol proto;
-            @Option(names="-q", description="Displays all connections, listening ports, and bound "
+            @Option(names = "-q", description = "Displays all connections, listening ports, and bound "
                     + "nonlistening TCP ports. Bound nonlistening ports may or may not "
                     + "be associated with an active connection.")
             boolean query;
-            @Option(names="-r", description="Displays the routing table.")
+            @Option(names = "-r", description = "Displays the routing table.")
             boolean displayRoutingTable;
-            @Option(names="-s", description="Displays per-protocol statistics.  By default, statistics are "
+            @Option(names = "-s", description = "Displays per-protocol statistics.  By default, statistics are "
                     + "shown for IP, IPv6, ICMP, ICMPv6, TCP, TCPv6, UDP, and UDPv6; "
                     + "the -p option may be used to specify a subset of the default.")
             boolean displayStatistics;
-            @Option(names="-t", description="Displays the current connection offload state.")
+            @Option(names = "-t", description = "Displays the current connection offload state.")
             boolean displayOffloadState;
-            @Option(names="-x", description="Displays NetworkDirect connections, listeners, and shared endpoints.")
+            @Option(names = "-x", description = "Displays NetworkDirect connections, listeners, and shared endpoints.")
             boolean displayNetDirect;
-            @Option(names="-y", description="Displays the TCP connection template for all connections. "
+            @Option(names = "-y", description = "Displays the TCP connection template for all connections. "
                     + "Cannot be combined with the other options.")
             boolean displayTcpConnectionTemplate;
             @Parameters(arity = "0..1", paramLabel = "interval", description = ""
@@ -238,22 +233,21 @@ public class CustomLayoutDemo implements Runnable {
         }
         StringBuilder sb = new StringBuilder();
         Help help = new Help(new Netstat(), ansi);
-        help.commandSpec().commandLine(new CommandLine(help.commandSpec()).setPosixClusteredShortOptionsAllowed(false));
+        help.commandSpec().parser().posixClusteredShortOptionsAllowed(false);
         help.commandSpec().usageMessage().synopsisHeading("");
-        sb.append(help.sections("header").render(help)).append(help.sections("synopsis").render(help));
+        sb.append(help.sections("header").render(help))
+                .append(help.sections("synopsis").render(help));
         sb.append(System.getProperty("line.separator"));
 
         TextTable textTable = TextTable.forColumns(ansi,
-                new Column(15, 2, TRUNCATE),
-                new Column(65, 1, WRAP));
+                new Column(15, 2, Column.Overflow.TRUNCATE),
+                new Column(65, 1, Column.Overflow.WRAP));
         textTable.indentWrappedLines = 0;
-        Layout layout = new Layout(
-                Help.defaultColorScheme(ansi),
-                textTable,
-                Help.createMinimalOptionRenderer(),
-                Help.createMinimalParameterRenderer());
-        layout.addOptions(help.commandSpec().options(), help.parameterLabelRenderer());
-        layout.addPositionalParameters(help.commandSpec().positionalParameters(), Help.createMinimalParamLabelRenderer());
+        Layout layout = new Layout(Help.defaultColorScheme(ansi), textTable,
+                help.rendering().minimalOption(), help.rendering().minimalParameter());
+        layout.addOptions(help.commandSpec().options(), help.rendering().paramLabel());
+        layout.addPositionalParameters(help.commandSpec().positionalParameters(),
+                help.rendering().minimalParamLabel());
         sb.append(layout);
         return sb.toString();
     }

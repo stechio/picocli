@@ -27,12 +27,13 @@ import org.junit.contrib.java.lang.system.SystemErrRule;
 import org.junit.contrib.java.lang.system.SystemOutRule;
 import picocli.CommandLine.*;
 import picocli.CommandLine.Model.*;
-import picocli.Help.Ansi;
+import picocli.help.Ansi;
+import picocli.help.Help;
 
 import static org.junit.Assert.*;
-import static picocli.HelpTestUtil.setTraceLevel;
-import static picocli.HelpTestUtil.usageString;
-import static picocli.HelpTestUtil.versionString;
+import static picocli.help.HelpTestUtil.setTraceLevel;
+import static picocli.help.HelpTestUtil.usageString;
+import static picocli.help.HelpTestUtil.versionString;
 
 
 public class CommandLineModelTest {

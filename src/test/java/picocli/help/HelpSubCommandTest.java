@@ -1,6 +1,14 @@
-package picocli;
+package picocli.help;
 
 import org.junit.Test;
+
+import picocli.CommandLine;
+import picocli.CommandLineTest;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Model;
+import picocli.CommandLine.Model.CommandSpec;
+import picocli.CommandLine.Model.OptionSpec;
+import picocli.help.Help;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -8,7 +16,7 @@ import java.io.PrintStream;
 import static org.junit.Assert.assertEquals;
 import static picocli.CommandLine.*;
 import static picocli.CommandLine.Model.*;
-import static picocli.HelpTestUtil.usageString;
+import static picocli.help.HelpTestUtil.usageString;
 
 
 public class HelpSubCommandTest {
@@ -23,7 +31,7 @@ public class HelpSubCommandTest {
 
         CommandLine commandLine = new CommandLine(spec);
 
-        String actual = usageString(commandLine, Help.Ansi.OFF);
+        String actual = usageString(commandLine, Ansi.OFF);
         String expected = String.format("" +
                 "Usage: <main class> [-h] [COMMAND]%n" +
                 "  -h, --help   show help and exit%n" +
@@ -45,7 +53,7 @@ public class HelpSubCommandTest {
 
         CommandLine commandLine = new CommandLine(spec);
 
-        String actual = usageString(commandLine, Help.Ansi.OFF);
+        String actual = usageString(commandLine, Ansi.OFF);
         String expected = String.format("" +
                 "Usage: <main class> [OPTIONS] [COMMAND]%n" +
                 "  -h, --help   show help and exit%n" +
@@ -83,9 +91,9 @@ public class HelpSubCommandTest {
         CommandLine commandLine = new CommandLine(new TopLevelCommand());
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        commandLine.usage(new PrintStream(baos), Help.defaultColorScheme(Help.Ansi.ON).commands(Help.Ansi.Style.underline)); // add underline
+        commandLine.usage(new PrintStream(baos), Help.defaultColorScheme(Ansi.ON).commands(Ansi.Style.underline)); // add underline
         
-        String expected = Help.Ansi.ON.new Text(String.format("" +
+        String expected = new Text(Ansi.ON, String.format("" +
                 "Usage: @|bold,underline top|@ [COMMAND]%n" +
                 "top level command%n" +
                 "Commands:%n" +
@@ -99,9 +107,9 @@ public class HelpSubCommandTest {
         CommandLine commandLine = new CommandLine(new TopLevelCommand());
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        commandLine.getSubcommands().get("sub").usage(new PrintStream(baos), Help.defaultColorScheme(Help.Ansi.ON).commands(Help.Ansi.Style.underline)); // add underline
+        commandLine.getSubcommands().get("sub").usage(new PrintStream(baos), Help.defaultColorScheme(Ansi.ON).commands(Ansi.Style.underline)); // add underline
 
-        String expected = Help.Ansi.ON.new Text(String.format("" +
+        String expected = new Text(Ansi.ON, String.format("" +
                 "Usage: @|bold,underline top sub|@ [COMMAND]%n" +
                 "I'm subcommand No. 1!%n" +
                 "Commands:%n" +

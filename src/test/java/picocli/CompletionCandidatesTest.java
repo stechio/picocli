@@ -16,7 +16,7 @@
 package picocli;
 
 import static org.junit.Assert.assertEquals;
-import static picocli.HelpTestUtil.usageString;
+import static picocli.help.HelpTestUtil.usageString;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -36,6 +36,7 @@ import picocli.CommandLine.Model.OptionSpec;
 import picocli.CommandLine.Model.PositionalParamSpec;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
+import picocli.help.Ansi;
 
 /**
  * Tests valid values-related functionality.
@@ -206,7 +207,7 @@ public class CompletionCandidatesTest {
                 "                         Default={key1=veryveryverylonglonglongvaluevaluevalue,%n" +
                 "                           key2=very2very2very2longlonglongvaluevaluevalue2,%n" +
                 "                           key3=very3very3very3longlonglongvaluevaluevalue3}%n", new File("/a/b/c"));
-        String actual = usageString(new CommandLine(new App(), new InnerClassFactory(this)), Help.Ansi.OFF);
+        String actual = usageString(new CommandLine(new App(), new InnerClassFactory(this)), Ansi.OFF);
         assertEquals(expected, actual);
     }
 

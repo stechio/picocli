@@ -333,6 +333,7 @@ public class Demo implements Runnable {
                     "are what you would commit by running git commit; the second and third are what you could " +
                     "commit by running git add before running git commit."
     )
+    public
     class GitStatus {
         @Option(names = {"-s", "--short"}, description = "Give the output in the short-format")
         boolean shortFormat;
@@ -366,6 +367,7 @@ public class Demo implements Runnable {
             header = "Record changes to the repository.",
             description = "Stores the current contents of the index in a new commit " +
                     "along with a log message from the user describing the changes.")
+    public
     class GitCommit { // end::GitCommit-declaration[]
         @Option(names = {"-a", "--all"},
                 description = "Tell the command to automatically stage files that have been modified " +
@@ -441,7 +443,7 @@ public class Demo implements Runnable {
         assert  status.mode == GitStatusMode.no : "status -u=no";
     }
 
-    static CommandLine mainCommand() {
+    public static CommandLine mainCommand() {
         CommandLine commandLine = new CommandLine(new Git());
         commandLine.addSubcommand("help", new CommandLine.HelpCommand());
         commandLine.addSubcommand("status", new GitStatus());
@@ -470,7 +472,7 @@ public class Demo implements Runnable {
             throw new InternalError(ex.toString());
         }
     }
-    static final String EXPECTED_USAGE_MAIN = "Usage: git [-hV] [--git-dir=<gitDir>] [COMMAND]%n" +
+    public static final String EXPECTED_USAGE_MAIN = "Usage: git [-hV] [--git-dir=<gitDir>] [COMMAND]%n" +
             "Git is a fast, scalable, distributed revision control system with an unusually%n" +
             "rich command set that provides both high-level operations and full access to%n" +
             "internals.%n" +
@@ -497,7 +499,7 @@ public class Demo implements Runnable {
             "  rebase    Forward-port local commits to the updated upstream head.%n" +
             "  tag       Create, list, delete or verify a tag object signed with GPG.%n";
 
-    static final String EXPECTED_USAGE_MAIN_ANSI = "Usage: \u001B[1mgit\u001B[21m\u001B[0m [\u001B[33m-hV\u001B[39m\u001B[0m] [\u001B[33m--git-dir\u001B[39m\u001B[0m=\u001B[3m<gitDir>\u001B[23m\u001B[0m] [COMMAND]%n" +
+    public static final String EXPECTED_USAGE_MAIN_ANSI = "Usage: \u001B[1mgit\u001B[21m\u001B[0m [\u001B[33m-hV\u001B[39m\u001B[0m] [\u001B[33m--git-dir\u001B[39m\u001B[0m=\u001B[3m<gitDir>\u001B[23m\u001B[0m] [COMMAND]%n" +
             "Git is a fast, scalable, distributed revision control system with an unusually%n" +
             "rich command set that provides both high-level operations and full access to%n" +
             "internals.%n" +
@@ -532,7 +534,7 @@ public class Demo implements Runnable {
             throw new InternalError(ex.toString());
         }
     }
-    static final String EXPECTED_USAGE_GITSTATUS = "Show the working tree status.%n" +
+    public static final String EXPECTED_USAGE_GITSTATUS = "Show the working tree status.%n" +
             "Usage: git-status [<options>...] [--] [<pathspec>...]%n" +
             "Displays paths that have differences between the index file and the current%n" +
             "HEAD commit, paths that have differences between the working tree and the index%n" +
@@ -553,7 +555,7 @@ public class Demo implements Runnable {
             "                             directories.%n" +
             "                             Default: all%n";
 
-    static final String EXPECTED_USAGE_GITSTATUS_ANSI = "Show the working tree status.%n" +
+    public static final String EXPECTED_USAGE_GITSTATUS_ANSI = "Show the working tree status.%n" +
             "Usage: @|bold git-status|@ [@|yellow <options>|@...] [--] [@|yellow <pathspec>|@...]%n" +
             "Displays paths that have differences between the index file and the current%n" +
             "HEAD commit, paths that have differences between the working tree and the index%n" +
@@ -585,7 +587,7 @@ public class Demo implements Runnable {
             throw new InternalError(ex.toString());
         }
     }
-    static final String EXPECTED_USAGE_GITCOMMIT = "Usage:%n" +
+    public static final String EXPECTED_USAGE_GITCOMMIT = "Usage:%n" +
             "%n" +
             "Record changes to the repository.%n" +
             "%n" +
@@ -626,7 +628,7 @@ public class Demo implements Runnable {
             "                            options are given, their values are concatenated as%n" +
             "                            separate paragraphs.%n";
 
-    static final String EXPECTED_USAGE_GITCOMMIT_ANSI = "@|bold,underline Usage:|@%n" +
+    public static final String EXPECTED_USAGE_GITCOMMIT_ANSI = "@|bold,underline Usage:|@%n" +
             "%n" +
             "Record changes to the repository.%n" +
             "%n" +

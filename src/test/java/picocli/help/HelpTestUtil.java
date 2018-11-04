@@ -13,14 +13,13 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package picocli;
-
-import picocli.Help;
-import picocli.Help.Ansi;
-import picocli.Help.Ansi.Text;
+package picocli.help;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+
+import picocli.CommandLine;
+import picocli.help.Help;
 
 import static org.junit.Assert.assertEquals;
 
@@ -68,7 +67,7 @@ public class HelpTestUtil {
     public static Text[] textArray(Ansi ansi, String... str) {
         Text[] result = new Text[str.length];
         for (int i = 0; i < str.length; i++) {
-            result[i] = str[i] == null ? Ansi.EMPTY_TEXT : ansi.new Text(str[i]);
+            result[i] = str[i] == null ? Ansi.EMPTY_TEXT : new Text(ansi, str[i]);
         }
         return result;
     }

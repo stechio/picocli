@@ -6,6 +6,8 @@ import org.junit.Test;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.IDefaultValueProvider;
 import picocli.CommandLine.Model.ArgSpec;
+import picocli.help.Ansi;
+import picocli.help.Help;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
@@ -175,7 +177,7 @@ public class CommandLineDefaultProviderTest {
                 "                   Default: Default provider string value%n" +
                 "  -d= <string>   Default: Default provider string value%n");
         CommandLine cmd = new CommandLine(App.class);
-        assertEquals(expected, cmd.getUsageMessage(Help.Ansi.OFF));
+        assertEquals(expected, cmd.getUsageMessage(Ansi.OFF));
     }
 
     @Test
@@ -203,7 +205,7 @@ public class CommandLineDefaultProviderTest {
                 return "XYZ";
             }
         });
-        assertEquals(expected2, cmd.getUsageMessage(Help.Ansi.OFF));
+        assertEquals(expected2, cmd.getUsageMessage(Ansi.OFF));
     }
 
     @Test
@@ -231,6 +233,6 @@ public class CommandLineDefaultProviderTest {
                 throw new IllegalStateException("abc");
             }
         });
-        assertEquals(expected2, cmd.getUsageMessage(Help.Ansi.OFF));
+        assertEquals(expected2, cmd.getUsageMessage(Ansi.OFF));
     }
 }

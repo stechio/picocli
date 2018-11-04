@@ -15,13 +15,36 @@
  */
 package picocli;
 
-import java.io.*;
+import static picocli.CommandLine.Model.ArgsReflection.abbreviate;
+
+import java.io.BufferedReader;
+import java.io.Console;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.LineNumberReader;
+import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.StreamTokenizer;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.lang.reflect.*;
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Proxy;
+import java.lang.reflect.Type;
+import java.lang.reflect.WildcardType;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.InetAddress;
@@ -32,26 +55,62 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
-import java.text.BreakIterator;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Currency;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.IdentityHashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.Stack;
+import java.util.TimeZone;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 
-import picocli.CommandLine.Model.*;
+import picocli.CommandLine.IExceptionHandler;
+import picocli.CommandLine.IFactory;
+import picocli.CommandLine.IParseResultHandler;
+import picocli.CommandLine.Model.ArgSpec;
+import picocli.CommandLine.Model.ArgsReflection;
+import picocli.CommandLine.Model.CommandSpec;
+import picocli.CommandLine.Model.Messages;
+import picocli.CommandLine.Model.MethodParam;
 import picocli.CommandLine.Model.OptionSpec;
+import picocli.CommandLine.Model.ParserSpec;
 import picocli.CommandLine.Model.PositionalParamSpec;
-import picocli.Help.Ansi;
-import picocli.Help.ColorScheme;
-
-import static java.util.Locale.ENGLISH;
-import static picocli.CommandLine.Model.ArgsReflection.abbreviate;
-import static picocli.Help.Column.Overflow.SPAN;
-import static picocli.Help.Column.Overflow.TRUNCATE;
-import static picocli.Help.Column.Overflow.WRAP;
+import picocli.CommandLine.Model.TypedMember;
+import picocli.CommandLine.Model.UnmatchedArgsBinding;
+import picocli.CommandLine.Model.UsageMessageSpec;
+import picocli.help.Ansi;
+import picocli.help.ColorScheme;
+import picocli.help.Help;
+import picocli.help.Layout;
+import picocli.help.Text;
+import picocli.help.TextTable;
+import picocli.util.Assert;
+import picocli.util.Utils;
 
 /**
  * <p>
@@ -149,7 +208,7 @@ public class CommandLine {
     private final Tracer tracer = new Tracer();
     private final CommandSpec commandSpec;
     private final Interpreter interpreter;
-    final IFactory factory;
+    public final IFactory factory;
     private IHelpFactory helpFactory;
 
     /**
@@ -774,7 +833,7 @@ public class CommandLine {
          * @throws ExecutionException if a problem occurred while processing the parse results; use
          *      {@link ExecutionException#getCommandLine()} to get the command or subcommand where processing failed
          */
-        List<Object> handleParseResult(List<CommandLine> parsedCommands, PrintStream out, Help.Ansi ansi) throws ExecutionException;
+        List<Object> handleParseResult(List<CommandLine> parsedCommands, PrintStream out, Ansi ansi) throws ExecutionException;
     }
 
     /**
@@ -787,7 +846,7 @@ public class CommandLine {
      * methods to take some next step after the command line was successfully parsed.
      * </p><p>
      * This interface replaces the {@link IParseResultHandler} interface; it takes the parse result as a {@code ParseResult}
-     * object instead of a List of {@code CommandLine} objects, and it has the freedom to select the {@link Help.Ansi} style
+     * object instead of a List of {@code CommandLine} objects, and it has the freedom to select the {@link Ansi} style
      * to use and what {@code PrintStreams} to print to.
      * </p>
      * @param <R> the return type of this handler
@@ -828,7 +887,7 @@ public class CommandLine {
          * @param args the command line arguments that could not be parsed
          * @return a list of results, or an empty list if there are no results
          */
-        List<Object> handleException(ParameterException ex, PrintStream out, Help.Ansi ansi, String... args);
+        List<Object> handleException(ParameterException ex, PrintStream out, Ansi ansi, String... args);
     }
     /**
      * Classes implementing this interface know how to handle {@code ParameterExceptions} (usually from invalid user input)
@@ -876,7 +935,7 @@ public class CommandLine {
      * @param <T> The type of the handler subclass; for fluent API method chaining
      * @since 3.0 */
     public static abstract class AbstractHandler<R, T extends AbstractHandler<R, T>> {
-        private Help.Ansi ansi = Help.Ansi.AUTO;
+        private Ansi ansi = Ansi.AUTO;
         private Integer exitCode;
         private PrintStream out = System.out;
         private PrintStream err = System.err;
@@ -892,7 +951,7 @@ public class CommandLine {
          * messages (which may include a usage help message) when an unexpected error occurs.</p> */
         public PrintStream err()     { return err; }
         /** Returns the ANSI style to use. Defaults to {@code Help.Ansi.AUTO}, unless {@link #useAnsi(CommandLine.Help.Ansi)} was called with a different setting. */
-        public Help.Ansi ansi()      { return ansi; }
+        public Ansi ansi()      { return ansi; }
         /** Returns the exit code to use as the termination status, or {@code null} (the default) if the handler should
          * not call {@link System#exit(int)} after processing completes.
          * @see #andExit(int) */
@@ -920,7 +979,7 @@ public class CommandLine {
         public T useErr(PrintStream err)   { this.err =  Assert.notNull(err, "err");   return self(); }
         /** Sets the ANSI style to use.
          * @see #ansi() */
-        public T useAnsi(Help.Ansi ansi)   { this.ansi = Assert.notNull(ansi, "ansi"); return self(); }
+        public T useAnsi(Ansi ansi)   { this.ansi = Assert.notNull(ansi, "ansi"); return self(); }
         /** Indicates that the handler should call {@link System#exit(int)} after processing completes and sets the exit code to use as the termination status. */
         public T andExit(int exitCode)     { this.exitCode = exitCode; return self(); }
     }
@@ -938,7 +997,7 @@ public class CommandLine {
      * @since 2.0 */
     @SuppressWarnings("deprecation")
     public static class DefaultExceptionHandler<R> extends AbstractHandler<R, DefaultExceptionHandler<R>> implements IExceptionHandler, IExceptionHandler2<R> {
-        public List<Object> handleException(ParameterException ex, PrintStream out, Help.Ansi ansi, String... args) {
+        public List<Object> handleException(ParameterException ex, PrintStream out, Ansi ansi, String... args) {
             internalHandleParseException(ex, out, ansi, args); return Collections.<Object>emptyList(); }
 
         /** Prints the message of the specified exception, followed by the usage message for the command or subcommand
@@ -951,7 +1010,7 @@ public class CommandLine {
         public R handleParseException(ParameterException ex, String[] args) {
             internalHandleParseException(ex, err(), ansi(), args); return returnResultOrExit(null); }
 
-        private void internalHandleParseException(ParameterException ex, PrintStream out, Help.Ansi ansi, String[] args) {
+        private void internalHandleParseException(ParameterException ex, PrintStream out, Ansi ansi, String[] args) {
             out.println(ex.getMessage());
             if (!UnmatchedArgumentException.printSuggestions(ex, out)) {
                 ex.getCommandLine().usage(out, ansi);
@@ -971,7 +1030,7 @@ public class CommandLine {
 
     /** @deprecated use {@link #printHelpIfRequested(List, PrintStream, PrintStream, Help.Ansi)} instead
      * @since 2.0 */
-    @Deprecated public static boolean printHelpIfRequested(List<CommandLine> parsedCommands, PrintStream out, Help.Ansi ansi) {
+    @Deprecated public static boolean printHelpIfRequested(List<CommandLine> parsedCommands, PrintStream out, Ansi ansi) {
         return printHelpIfRequested(parsedCommands, out, out, ansi);
     }
 
@@ -979,7 +1038,7 @@ public class CommandLine {
      * {@code parseResult.asCommandLineList(), System.out, System.err, Help.Ansi.AUTO}.
      * @since 3.0 */
     public static boolean printHelpIfRequested(ParseResult parseResult) {
-        return printHelpIfRequested(parseResult.asCommandLineList(), System.out, System.err, Help.Ansi.AUTO);
+        return printHelpIfRequested(parseResult.asCommandLineList(), System.out, System.err, Ansi.AUTO);
     }
     /**
      * Helper method that may be useful when processing the list of {@code CommandLine} objects that result from successfully
@@ -1004,7 +1063,7 @@ public class CommandLine {
      * @return {@code true} if help was printed, {@code false} otherwise
      * @see IHelpCommandInitializable
      * @since 3.0 */
-    public static boolean printHelpIfRequested(List<CommandLine> parsedCommands, PrintStream out, PrintStream err, Help.Ansi ansi) {
+    public static boolean printHelpIfRequested(List<CommandLine> parsedCommands, PrintStream out, PrintStream err, Ansi ansi) {
         return printHelpIfRequested(parsedCommands, out, err, Help.defaultColorScheme(ansi));
     }
     /**
@@ -1030,18 +1089,18 @@ public class CommandLine {
      * @return {@code true} if help was printed, {@code false} otherwise
      * @see IHelpCommandInitializable
      * @since 3.6 */
-    public static boolean printHelpIfRequested(List<CommandLine> parsedCommands, PrintStream out, PrintStream err, Help.ColorScheme colorScheme) {
+    public static boolean printHelpIfRequested(List<CommandLine> parsedCommands, PrintStream out, PrintStream err, ColorScheme colorScheme) {
         for (int i = 0; i < parsedCommands.size(); i++) {
             CommandLine parsed = parsedCommands.get(i);
             if (parsed.isUsageHelpRequested()) {
                 parsed.usage(out, colorScheme);
                 return true;
             } else if (parsed.isVersionHelpRequested()) {
-                parsed.printVersionHelp(out, colorScheme.ansi);
+                parsed.printVersionHelp(out, colorScheme.ansi());
                 return true;
             } else if (parsed.getCommandSpec().helpCommand()) {
                 if (parsed.getCommand() instanceof IHelpCommandInitializable) {
-                    ((IHelpCommandInitializable) parsed.getCommand()).init(parsed, colorScheme.ansi, out, err);
+                    ((IHelpCommandInitializable) parsed.getCommand()).init(parsed, colorScheme.ansi(), out, err);
                 }
                 execute(parsed, new ArrayList<Object>());
                 return true;
@@ -1167,7 +1226,7 @@ public class CommandLine {
          * @throws ExecutionException if a problem occurred while processing the parse results; use
          *      {@link ExecutionException#getCommandLine()} to get the command or subcommand where processing failed
          */
-        public List<Object> handleParseResult(List<CommandLine> parsedCommands, PrintStream out, Help.Ansi ansi) {
+        public List<Object> handleParseResult(List<CommandLine> parsedCommands, PrintStream out, Ansi ansi) {
             if (printHelpIfRequested(parsedCommands, out, err(), ansi)) { return returnResultOrExit(Collections.emptyList()); }
             return returnResultOrExit(execute(parsedCommands.get(0), new ArrayList<Object>()));
         }
@@ -1240,7 +1299,7 @@ public class CommandLine {
          * @throws ExecutionException if a problem occurred while processing the parse results; use
          *      {@link ExecutionException#getCommandLine()} to get the command or subcommand where processing failed
          */
-        public List<Object> handleParseResult(List<CommandLine> parsedCommands, PrintStream out, Help.Ansi ansi) {
+        public List<Object> handleParseResult(List<CommandLine> parsedCommands, PrintStream out, Ansi ansi) {
             if (printHelpIfRequested(parsedCommands, out, err(), ansi)) { return returnResultOrExit(Collections.emptyList()); }
             return returnResultOrExit(execute(parsedCommands.get(parsedCommands.size() - 1), new ArrayList<Object>()));
         }
@@ -1282,7 +1341,7 @@ public class CommandLine {
          * @throws ExecutionException if a problem occurred while processing the parse results; use
          *      {@link ExecutionException#getCommandLine()} to get the command or subcommand where processing failed
          */
-        public List<Object> handleParseResult(List<CommandLine> parsedCommands, PrintStream out, Help.Ansi ansi) {
+        public List<Object> handleParseResult(List<CommandLine> parsedCommands, PrintStream out, Ansi ansi) {
             if (printHelpIfRequested(parsedCommands, out, err(), ansi)) { return returnResultOrExit(Collections.emptyList()); }
             List<Object> result = new ArrayList<Object>();
             for (CommandLine parsed : parsedCommands) {
@@ -1315,7 +1374,7 @@ public class CommandLine {
     /** @deprecated use {@link #parseWithHandler(IParseResultHandler2,  String[])} instead
      * @since 2.0 */
     @Deprecated public List<Object> parseWithHandler(IParseResultHandler handler, PrintStream out, String... args) {
-        return parseWithHandlers(handler, out, Help.Ansi.AUTO, defaultExceptionHandler(), args);
+        return parseWithHandlers(handler, out, Ansi.AUTO, defaultExceptionHandler(), args);
     }
     /**
      * Returns the result of calling {@link #parseWithHandlers(IParseResultHandler2,  IExceptionHandler2, String...)} with
@@ -1359,7 +1418,7 @@ public class CommandLine {
 
     /** @deprecated use {@link #parseWithHandlers(IParseResultHandler2, IExceptionHandler2, String...)} instead
      * @since 2.0 */
-    @Deprecated public List<Object> parseWithHandlers(IParseResultHandler handler, PrintStream out, Help.Ansi ansi, IExceptionHandler exceptionHandler, String... args) {
+    @Deprecated public List<Object> parseWithHandlers(IParseResultHandler handler, PrintStream out, Ansi ansi, IExceptionHandler exceptionHandler, String... args) {
         try {
             List<CommandLine> result = parse(args);
             return handler.handleParseResult(result, out, ansi);
@@ -1440,7 +1499,7 @@ public class CommandLine {
      * @param ansi whether the usage message should contain ANSI escape codes or not
      * @throws IllegalArgumentException if the specified command object does not have a {@link Command}, {@link Option} or {@link Parameters} annotation
      */
-    public static void usage(Object command, PrintStream out, Help.Ansi ansi) {
+    public static void usage(Object command, PrintStream out, Ansi ansi) {
         toCommandLine(command, new DefaultFactory()).usage(out, ansi);
     }
 
@@ -1452,22 +1511,22 @@ public class CommandLine {
      * @param colorScheme the {@code ColorScheme} defining the styles for options, parameters and commands when ANSI is enabled
      * @throws IllegalArgumentException if the specified command object does not have a {@link Command}, {@link Option} or {@link Parameters} annotation
      */
-    public static void usage(Object command, PrintStream out, Help.ColorScheme colorScheme) {
+    public static void usage(Object command, PrintStream out, ColorScheme colorScheme) {
         toCommandLine(command, new DefaultFactory()).usage(out, colorScheme);
     }
 
     /**
-     * Delegates to {@link #usage(PrintStream, Help.Ansi)} with the {@linkplain Help.Ansi#AUTO platform default}.
+     * Delegates to {@link #usage(PrintStream, Help.Ansi)} with the {@linkplain Ansi#AUTO platform default}.
      * @param out the printStream to print to
      * @see #usage(PrintStream, Help.ColorScheme)
      */
-    public void usage(PrintStream out) { usage(out, Help.Ansi.AUTO); }
+    public void usage(PrintStream out) { usage(out, Ansi.AUTO); }
     /**
-     * Delegates to {@link #usage(PrintWriter, Help.Ansi)} with the {@linkplain Help.Ansi#AUTO platform default}.
+     * Delegates to {@link #usage(PrintWriter, Help.Ansi)} with the {@linkplain Ansi#AUTO platform default}.
      * @param writer the PrintWriter to print to
      * @see #usage(PrintWriter, Help.ColorScheme)
      * @since 3.0 */
-    public void usage(PrintWriter writer) { usage(writer, Help.Ansi.AUTO); }
+    public void usage(PrintWriter writer) { usage(writer, Ansi.AUTO); }
 
     /**
      * Delegates to {@link #usage(PrintStream, Help.ColorScheme)} with the {@linkplain Help#defaultColorScheme(CommandLine.Help.Ansi) default color scheme}.
@@ -1475,10 +1534,10 @@ public class CommandLine {
      * @param ansi whether the usage message should include ANSI escape codes or not
      * @see #usage(PrintStream, Help.ColorScheme)
      */
-    public void usage(PrintStream out, Help.Ansi ansi) { usage(out, Help.defaultColorScheme(ansi)); }
+    public void usage(PrintStream out, Ansi ansi) { usage(out, Help.defaultColorScheme(ansi)); }
     /** Similar to {@link #usage(PrintStream, Help.Ansi)} but with the specified {@code PrintWriter} instead of a {@code PrintStream}.
      * @since 3.0 */
-    public void usage(PrintWriter writer, Help.Ansi ansi) { usage(writer, Help.defaultColorScheme(ansi)); }
+    public void usage(PrintWriter writer, Ansi ansi) { usage(writer, Help.defaultColorScheme(ansi)); }
 
     /**
      * Prints a usage help message for the annotated command class to the specified {@code PrintStream}.
@@ -1506,18 +1565,18 @@ public class CommandLine {
      * the program name, text of section headings and section contents, and some aspects of the auto-generated sections
      * of the usage help message.
      * <p>To customize the auto-generated sections of the usage help message, like how option details are displayed,
-     * instantiate a {@link Help} object and use a {@link Help.TextTable} with more of fewer columns, a custom
-     * {@linkplain Help.Layout layout}, and/or a custom option {@linkplain Help.IOptionRenderer renderer}
+     * instantiate a {@link Help} object and use a {@link TextTable} with more of fewer columns, a custom
+     * {@linkplain Layout layout}, and/or a custom option {@linkplain Help.IOptionRenderer renderer}
      * for ultimate control over which aspects of an Option or Field are displayed where.</p>
      * @param out the {@code PrintStream} to print the usage help message to
      * @param colorScheme the {@code ColorScheme} defining the styles for options, parameters and commands when ANSI is enabled
      */
-    public void usage(PrintStream out, Help.ColorScheme colorScheme) {
+    public void usage(PrintStream out, ColorScheme colorScheme) {
         out.print(getUsageMessage(colorScheme));
     }
     /** Similar to {@link #usage(PrintStream, Help.ColorScheme)}, but with the specified {@code PrintWriter} instead of a {@code PrintStream}.
      * @since 3.0 */
-    public void usage(PrintWriter writer, Help.ColorScheme colorScheme) {
+    public void usage(PrintWriter writer, ColorScheme colorScheme) {
         writer.print(getUsageMessage(colorScheme));
     }
     /** Similar to {@link #usage(PrintStream)}, but returns the usage help message as a String instead of printing it to the {@code PrintStream}.
@@ -1527,22 +1586,22 @@ public class CommandLine {
     }
     /** Similar to {@link #usage(PrintStream, Help.Ansi)}, but returns the usage help message as a String instead of printing it to the {@code PrintStream}.
      * @since 3.2 */
-    public String getUsageMessage(Help.Ansi ansi) {
+    public String getUsageMessage(Ansi ansi) {
         return helpFactory().createHelp(getCommandSpec(), Help.defaultColorScheme(ansi)).buildUsageMessage();
     }
     /** Similar to {@link #usage(PrintStream, Help.ColorScheme)}, but returns the usage help message as a String instead of printing it to the {@code PrintStream}.
      * @since 3.2 */
-    public String getUsageMessage(Help.ColorScheme colorScheme) {
+    public String getUsageMessage(ColorScheme colorScheme) {
         return helpFactory().createHelp(getCommandSpec(), colorScheme).buildUsageMessage();
     }
 
     /**
-     * Delegates to {@link #printVersionHelp(PrintStream, Help.Ansi)} with the {@linkplain Help.Ansi#AUTO platform default}.
+     * Delegates to {@link #printVersionHelp(PrintStream, Help.Ansi)} with the {@linkplain Ansi#AUTO platform default}.
      * @param out the printStream to print to
      * @see #printVersionHelp(PrintStream, Help.Ansi)
      * @since 0.9.8
      */
-    public void printVersionHelp(PrintStream out) { printVersionHelp(out, Help.Ansi.AUTO); }
+    public void printVersionHelp(PrintStream out) { printVersionHelp(out, Ansi.AUTO); }
 
     /**
      * Prints version information from the {@link Command#version()} annotation to the specified {@code PrintStream}.
@@ -1555,9 +1614,9 @@ public class CommandLine {
      * @see #isVersionHelpRequested()
      * @since 0.9.8
      */
-    public void printVersionHelp(PrintStream out, Help.Ansi ansi) {
+    public void printVersionHelp(PrintStream out, Ansi ansi) {
         for (String versionInfo : getCommandSpec().version()) {
-            out.println(ansi.new Text(versionInfo));
+            out.println(new Text(ansi, versionInfo));
         }
     }
     /**
@@ -1573,15 +1632,15 @@ public class CommandLine {
      * @see #isVersionHelpRequested()
      * @since 1.0.0
      */
-    public void printVersionHelp(PrintStream out, Help.Ansi ansi, Object... params) {
+    public void printVersionHelp(PrintStream out, Ansi ansi, Object... params) {
         for (String versionInfo : getCommandSpec().version()) {
-            out.println(ansi.new Text(String.format(versionInfo, params)));
+            out.println(new Text(ansi, String.format(versionInfo, params)));
         }
     }
 
     /**
      * Delegates to {@link #call(Callable, PrintStream, PrintStream, Help.Ansi, String...)} with {@code System.out} for
-     * requested usage help messages, {@code System.err} for diagnostic error messages, and {@link Help.Ansi#AUTO}.
+     * requested usage help messages, {@code System.err} for diagnostic error messages, and {@link Ansi#AUTO}.
      * @param callable the command to call when {@linkplain #parseArgs(String...) parsing} succeeds.
      * @param args the command line arguments to parse
      * @param <C> the annotated object must implement Callable
@@ -1594,12 +1653,12 @@ public class CommandLine {
      * @since 3.0
      */
     public static <C extends Callable<T>, T> T call(C callable, String... args) {
-        return call(callable, System.out, System.err, Help.Ansi.AUTO, args);
+        return call(callable, System.out, System.err, Ansi.AUTO, args);
     }
 
     /**
      * Delegates to {@link #call(Callable, PrintStream, PrintStream, Help.Ansi, String...)} with {@code System.err} for
-     * diagnostic error messages and {@link Help.Ansi#AUTO}.
+     * diagnostic error messages and {@link Ansi#AUTO}.
      * @param callable the command to call when {@linkplain #parseArgs(String...) parsing} succeeds.
      * @param out the printStream to print the usage help message to when the user requested help
      * @param args the command line arguments to parse
@@ -1613,7 +1672,7 @@ public class CommandLine {
      * @see RunLast
      */
     public static <C extends Callable<T>, T> T call(C callable, PrintStream out, String... args) {
-        return call(callable, out, System.err, Help.Ansi.AUTO, args);
+        return call(callable, out, System.err, Ansi.AUTO, args);
     }
     /**
      * Delegates to {@link #call(Callable, PrintStream, PrintStream, Help.Ansi, String...)} with {@code System.err} for diagnostic error messages.
@@ -1630,7 +1689,7 @@ public class CommandLine {
      * @see #parseWithHandlers(IParseResultHandler2, IExceptionHandler2, String...)
      * @see RunLast
      */
-    public static <C extends Callable<T>, T> T call(C callable, PrintStream out, Help.Ansi ansi, String... args) {
+    public static <C extends Callable<T>, T> T call(C callable, PrintStream out, Ansi ansi, String... args) {
         return call(callable, out, System.err, ansi, args);
     }
     /**
@@ -1668,7 +1727,7 @@ public class CommandLine {
      * @see RunLast
      * @since 3.0
      */
-    public static <C extends Callable<T>, T> T call(C callable, PrintStream out, PrintStream err, Help.Ansi ansi, String... args) {
+    public static <C extends Callable<T>, T> T call(C callable, PrintStream out, PrintStream err, Ansi ansi, String... args) {
         CommandLine cmd = new CommandLine(callable);
         List<Object> results = cmd.parseWithHandlers(new RunLast().useOut(out).useAnsi(ansi), new DefaultExceptionHandler<List<Object>>().useErr(err).useAnsi(ansi), args);
         @SuppressWarnings("unchecked") T result = results == null || results.isEmpty() ? null : (T) results.get(0);
@@ -1676,7 +1735,7 @@ public class CommandLine {
     }
     /**
      * Delegates to {@link #call(Class, IFactory, PrintStream, PrintStream, Help.Ansi, String...)} with {@code System.out} for
-     * requested usage help messages, {@code System.err} for diagnostic error messages, and {@link Help.Ansi#AUTO}.
+     * requested usage help messages, {@code System.err} for diagnostic error messages, and {@link Ansi#AUTO}.
      * @param callableClass class of the command to call when {@linkplain #parseArgs(String...) parsing} succeeds.
      * @param factory the factory responsible for instantiating the specified callable class and potentially inject other components
      * @param args the command line arguments to parse
@@ -1690,11 +1749,11 @@ public class CommandLine {
      * @since 3.2
      */
     public static <C extends Callable<T>, T> T call(Class<C> callableClass, IFactory factory, String... args) {
-        return call(callableClass, factory, System.out, System.err, Help.Ansi.AUTO, args);
+        return call(callableClass, factory, System.out, System.err, Ansi.AUTO, args);
     }
     /**
      * Delegates to {@link #call(Class, IFactory, PrintStream, PrintStream, Help.Ansi, String...)} with
-     * {@code System.err} for diagnostic error messages, and {@link Help.Ansi#AUTO}.
+     * {@code System.err} for diagnostic error messages, and {@link Ansi#AUTO}.
      * @param callableClass class of the command to call when {@linkplain #parseArgs(String...) parsing} succeeds.
      * @param factory the factory responsible for instantiating the specified callable class and potentially injecting other components
      * @param out the printStream to print the usage help message to when the user requested help
@@ -1709,7 +1768,7 @@ public class CommandLine {
      * @since 3.2
      */
     public static <C extends Callable<T>, T> T call(Class<C> callableClass, IFactory factory, PrintStream out, String... args) {
-        return call(callableClass, factory, out, System.err, Help.Ansi.AUTO, args);
+        return call(callableClass, factory, out, System.err, Ansi.AUTO, args);
     }
     /**
      * Delegates to {@link #call(Class, IFactory, PrintStream, PrintStream, Help.Ansi, String...)} with
@@ -1728,7 +1787,7 @@ public class CommandLine {
      * @see #parseWithHandlers(IParseResultHandler2, IExceptionHandler2, String...)
      * @since 3.2
      */
-    public static <C extends Callable<T>, T> T call(Class<C> callableClass, IFactory factory, PrintStream out, Help.Ansi ansi, String... args) {
+    public static <C extends Callable<T>, T> T call(Class<C> callableClass, IFactory factory, PrintStream out, Ansi ansi, String... args) {
         return call(callableClass, factory, out, System.err, ansi, args);
     }
     /**
@@ -1767,7 +1826,7 @@ public class CommandLine {
      * @see #parseWithHandlers(IParseResultHandler2, IExceptionHandler2, String...)
      * @since 3.2
      */
-    public static <C extends Callable<T>, T> T call(Class<C> callableClass, IFactory factory, PrintStream out, PrintStream err, Help.Ansi ansi, String... args) {
+    public static <C extends Callable<T>, T> T call(Class<C> callableClass, IFactory factory, PrintStream out, PrintStream err, Ansi ansi, String... args) {
         CommandLine cmd = new CommandLine(callableClass, factory);
         List<Object> results = cmd.parseWithHandlers(new RunLast().useOut(out).useAnsi(ansi), new DefaultExceptionHandler<List<Object>>().useErr(err).useAnsi(ansi), args);
         @SuppressWarnings("unchecked") T result = results == null || results.isEmpty() ? null : (T) results.get(0);
@@ -1776,7 +1835,7 @@ public class CommandLine {
 
     /**
      * Delegates to {@link #run(Runnable, PrintStream, PrintStream, Help.Ansi, String...)} with {@code System.out} for
-     * requested usage help messages, {@code System.err} for diagnostic error messages, and {@link Help.Ansi#AUTO}.
+     * requested usage help messages, {@code System.err} for diagnostic error messages, and {@link Ansi#AUTO}.
      * @param runnable the command to run when {@linkplain #parseArgs(String...) parsing} succeeds.
      * @param args the command line arguments to parse
      * @param <R> the annotated object must implement Runnable
@@ -1788,11 +1847,11 @@ public class CommandLine {
      * @since 3.0
      */
     public static <R extends Runnable> void run(R runnable, String... args) {
-        run(runnable, System.out, System.err, Help.Ansi.AUTO, args);
+        run(runnable, System.out, System.err, Ansi.AUTO, args);
     }
 
     /**
-     * Delegates to {@link #run(Runnable, PrintStream, PrintStream, Help.Ansi, String...)} with {@code System.err} for diagnostic error messages and {@link Help.Ansi#AUTO}.
+     * Delegates to {@link #run(Runnable, PrintStream, PrintStream, Help.Ansi, String...)} with {@code System.err} for diagnostic error messages and {@link Ansi#AUTO}.
      * @param runnable the command to run when {@linkplain #parseArgs(String...) parsing} succeeds.
      * @param out the printStream to print the usage help message to when the user requested help
      * @param args the command line arguments to parse
@@ -1804,7 +1863,7 @@ public class CommandLine {
      * @see RunLast
      */
     public static <R extends Runnable> void run(R runnable, PrintStream out, String... args) {
-        run(runnable, out, System.err, Help.Ansi.AUTO, args);
+        run(runnable, out, System.err, Ansi.AUTO, args);
     }
     /**
      * Delegates to {@link #run(Runnable, PrintStream, PrintStream, Help.Ansi, String...)} with {@code System.err} for diagnostic error messages.
@@ -1819,7 +1878,7 @@ public class CommandLine {
      * @see #parseWithHandlers(IParseResultHandler2, IExceptionHandler2, String...)
      * @see RunLast
      */
-    public static <R extends Runnable> void run(R runnable, PrintStream out, Help.Ansi ansi, String... args) {
+    public static <R extends Runnable> void run(R runnable, PrintStream out, Ansi ansi, String... args) {
         run(runnable, out, System.err, ansi, args);
     }
     /**
@@ -1856,13 +1915,13 @@ public class CommandLine {
      * @see #run(Class, IFactory, PrintStream, PrintStream, Help.Ansi, String...)
      * @since 3.0
      */
-    public static <R extends Runnable> void run(R runnable, PrintStream out, PrintStream err, Help.Ansi ansi, String... args) {
+    public static <R extends Runnable> void run(R runnable, PrintStream out, PrintStream err, Ansi ansi, String... args) {
         CommandLine cmd = new CommandLine(runnable);
         cmd.parseWithHandlers(new RunLast().useOut(out).useAnsi(ansi), new DefaultExceptionHandler<List<Object>>().useErr(err).useAnsi(ansi), args);
     }
     /**
      * Delegates to {@link #run(Class, IFactory, PrintStream, PrintStream, Help.Ansi, String...)} with {@code System.out} for
-     * requested usage help messages, {@code System.err} for diagnostic error messages, and {@link Help.Ansi#AUTO}.
+     * requested usage help messages, {@code System.err} for diagnostic error messages, and {@link Ansi#AUTO}.
      * @param runnableClass class of the command to run when {@linkplain #parseArgs(String...) parsing} succeeds.
      * @param factory the factory responsible for instantiating the specified Runnable class and potentially injecting other components
      * @param args the command line arguments to parse
@@ -1875,11 +1934,11 @@ public class CommandLine {
      * @since 3.2
      */
     public static <R extends Runnable> void run(Class<R> runnableClass, IFactory factory, String... args) {
-        run(runnableClass, factory, System.out, System.err, Help.Ansi.AUTO, args);
+        run(runnableClass, factory, System.out, System.err, Ansi.AUTO, args);
     }
     /**
      * Delegates to {@link #run(Class, IFactory, PrintStream, PrintStream, Help.Ansi, String...)} with
-     * {@code System.err} for diagnostic error messages, and {@link Help.Ansi#AUTO}.
+     * {@code System.err} for diagnostic error messages, and {@link Ansi#AUTO}.
      * @param runnableClass class of the command to run when {@linkplain #parseArgs(String...) parsing} succeeds.
      * @param factory the factory responsible for instantiating the specified Runnable class and potentially injecting other components
      * @param out the printStream to print the usage help message to when the user requested help
@@ -1893,7 +1952,7 @@ public class CommandLine {
      * @since 3.2
      */
     public static <R extends Runnable> void run(Class<R> runnableClass, IFactory factory, PrintStream out, String... args) {
-        run(runnableClass, factory, out, System.err, Help.Ansi.AUTO, args);
+        run(runnableClass, factory, out, System.err, Ansi.AUTO, args);
     }
     /**
      * Delegates to {@link #run(Class, IFactory, PrintStream, PrintStream, Help.Ansi, String...)} with
@@ -1911,7 +1970,7 @@ public class CommandLine {
      * @see RunLast
      * @since 3.2
      */
-    public static <R extends Runnable> void run(Class<R> runnableClass, IFactory factory, PrintStream out, Help.Ansi ansi, String... args) {
+    public static <R extends Runnable> void run(Class<R> runnableClass, IFactory factory, PrintStream out, Ansi ansi, String... args) {
         run(runnableClass, factory, out, System.err, ansi, args);
     }
     /**
@@ -1950,14 +2009,14 @@ public class CommandLine {
      * @see RunLast
      * @since 3.2
      */
-    public static <R extends Runnable> void run(Class<R> runnableClass, IFactory factory, PrintStream out, PrintStream err, Help.Ansi ansi, String... args) {
+    public static <R extends Runnable> void run(Class<R> runnableClass, IFactory factory, PrintStream out, PrintStream err, Ansi ansi, String... args) {
         CommandLine cmd = new CommandLine(runnableClass, factory);
         cmd.parseWithHandlers(new RunLast().useOut(out).useAnsi(ansi), new DefaultExceptionHandler<List<Object>>().useErr(err).useAnsi(ansi), args);
     }
 
     /**
      * Delegates to {@link #invoke(String, Class, PrintStream, PrintStream, Help.Ansi, String...)} with {@code System.out} for
-     * requested usage help messages, {@code System.err} for diagnostic error messages, and {@link Help.Ansi#AUTO}.
+     * requested usage help messages, {@code System.err} for diagnostic error messages, and {@link Ansi#AUTO}.
      * @param methodName the {@code @Command}-annotated method to build a {@link CommandSpec} model from,
      *                   and run when {@linkplain #parseArgs(String...) parsing} succeeds.
      * @param cls the class where the {@code @Command}-annotated method is declared, or a subclass
@@ -1970,11 +2029,11 @@ public class CommandLine {
      * @since 3.6
      */
     public static Object invoke(String methodName, Class<?> cls, String... args) {
-        return invoke(methodName, cls, System.out, System.err, Help.Ansi.AUTO, args);
+        return invoke(methodName, cls, System.out, System.err, Ansi.AUTO, args);
     }
     /**
      * Delegates to {@link #invoke(String, Class, PrintStream, PrintStream, Help.Ansi, String...)} with the specified stream for
-     * requested usage help messages, {@code System.err} for diagnostic error messages, and {@link Help.Ansi#AUTO}.
+     * requested usage help messages, {@code System.err} for diagnostic error messages, and {@link Ansi#AUTO}.
      * @param methodName the {@code @Command}-annotated method to build a {@link CommandSpec} model from,
      *                   and run when {@linkplain #parseArgs(String...) parsing} succeeds.
      * @param cls the class where the {@code @Command}-annotated method is declared, or a subclass
@@ -1988,7 +2047,7 @@ public class CommandLine {
      * @since 3.6
      */
     public static Object invoke(String methodName, Class<?> cls, PrintStream out, String... args) {
-        return invoke(methodName, cls, out, System.err, Help.Ansi.AUTO, args);
+        return invoke(methodName, cls, out, System.err, Ansi.AUTO, args);
     }
     /**
      * Delegates to {@link #invoke(String, Class, PrintStream, PrintStream, Help.Ansi, String...)} with the specified stream for
@@ -2006,7 +2065,7 @@ public class CommandLine {
      * @see #parseWithHandlers(IParseResultHandler2, IExceptionHandler2, String...)
      * @since 3.6
      */
-    public static Object invoke(String methodName, Class<?> cls, PrintStream out, Help.Ansi ansi, String... args) {
+    public static Object invoke(String methodName, Class<?> cls, PrintStream out, Ansi ansi, String... args) {
         return invoke(methodName, cls, out, System.err, ansi, args);
     }
     /**
@@ -2035,7 +2094,7 @@ public class CommandLine {
      * @see #parseWithHandlers(IParseResultHandler2, IExceptionHandler2, String...)
      * @since 3.6
      */
-    public static Object invoke(String methodName, Class<?> cls, PrintStream out, PrintStream err, Help.Ansi ansi, String... args) {
+    public static Object invoke(String methodName, Class<?> cls, PrintStream out, PrintStream err, Ansi ansi, String... args) {
         List<Method> candidates = getCommandMethods(cls, methodName);
         if (candidates.size() != 1) { throw new InitializationException("Expected exactly one @Command-annotated method for " + cls.getName() + "::" + methodName + "(...), but got: " + candidates); }
         Method method = candidates.get(0);
@@ -2244,7 +2303,6 @@ public class CommandLine {
         }
         return this;
     }
-    static String str(String[] arr, int i) { return (arr == null || arr.length <= i) ? "" : arr[i]; }
     private static boolean isBoolean(Class<?> type) { return type == Boolean.class || type == Boolean.TYPE; }
     private static CommandLine toCommandLine(Object obj, IFactory factory) { return obj instanceof CommandLine ? (CommandLine) obj : new CommandLine(obj, factory);}
     private static boolean isMultiValue(Class<?> cls) { return cls.isArray() || Collection.class.isAssignableFrom(cls) || Map.class.isAssignableFrom(cls); }
@@ -3232,7 +3290,7 @@ public class CommandLine {
         <K> K create(Class<K> cls) throws Exception;
     }
     /** Returns a default {@link IFactory} implementation. Package-protected for testing purposes. */
-    static IFactory defaultFactory() { return new DefaultFactory(); }
+    public static IFactory defaultFactory() { return new DefaultFactory(); }
     public static class DefaultFactory implements IFactory {
         public <T> T create(Class<T> cls) throws Exception {
             try {
@@ -3264,7 +3322,7 @@ public class CommandLine {
     }
 
     public interface IHelpFactory {
-        public Help createHelp(CommandSpec commandSpec, Help.ColorScheme colorScheme);
+        public Help createHelp(CommandSpec commandSpec, ColorScheme colorScheme);
     }
 
     public static class HelpFactory implements IHelpFactory {
@@ -3530,7 +3588,7 @@ public class CommandLine {
          * @since 3.0 */
         public static class CommandSpec {
             /** Constant String holding the default program name: {@code "<main class>" }. */
-            static final String DEFAULT_COMMAND_NAME = "<main class>";
+            public static final String DEFAULT_COMMAND_NAME = "<main class>";
 
             /** Constant Boolean holding the default setting for whether this is a help command: <code>{@value}</code>.*/
             static final Boolean DEFAULT_IS_HELP_COMMAND = Boolean.FALSE;
@@ -4408,7 +4466,7 @@ public class CommandLine {
         public static class ParserSpec {
 
             /** Constant String holding the default separator between options and option parameters: <code>{@value}</code>.*/
-            static final String DEFAULT_SEPARATOR = "=";
+            public static final String DEFAULT_SEPARATOR = "=";
             private String separator;
             private boolean stopAtUnmatched = false;
             private boolean stopAtPositional = false;
@@ -4854,7 +4912,7 @@ public class CommandLine {
 
             /** Returns whether the default for this option or positional parameter should be shown, potentially overriding the specified global setting.
              * @param usageHelpShowDefaults whether the command's UsageMessageSpec is configured to show default values. */
-            protected boolean internalShowDefaultValue(boolean usageHelpShowDefaults) {
+            public boolean internalShowDefaultValue(boolean usageHelpShowDefaults) {
                 if (showDefaultValue() == Help.Visibility.ALWAYS)   { return true; }  // override global usage help setting
                 if (showDefaultValue() == Help.Visibility.NEVER)    { return false; } // override global usage help setting
                 if (initialValue == null && defaultValue() == null) { return false; } // no default value to show
@@ -5262,7 +5320,7 @@ public class CommandLine {
             @Override public boolean isOption()     { return true; }
             @Override public boolean isPositional() { return false; }
 
-            protected boolean internalShowDefaultValue(boolean usageMessageShowDefaults) {
+            public boolean internalShowDefaultValue(boolean usageMessageShowDefaults) {
                 return super.internalShowDefaultValue(usageMessageShowDefaults) && !help() && !versionHelp() && !usageHelp();
             }
 
@@ -5292,7 +5350,7 @@ public class CommandLine {
             public String longestName() { return Help.ShortestFirst.longestFirst(names.clone())[0]; }
 
             /** Returns the shortest {@linkplain #names() option name}. */
-            String shortestName() { return Help.ShortestFirst.sort(names.clone())[0]; }
+            public String shortestName() { return Help.ShortestFirst.sort(names.clone())[0]; }
 
             /** Returns whether this option disables validation of the other arguments.
              * @see Option#help()
@@ -5458,7 +5516,7 @@ public class CommandLine {
             /** Returns an index or range specifying which of the command line arguments should be assigned to this positional parameter.
              * @see Parameters#index() */
             public Range index()            { return index; }
-            Range capacity()        { return capacity; }
+            public Range capacity()        { return capacity; }
             public static Builder builder() { return new Builder(); }
 
             public int hashCode() {
@@ -7026,7 +7084,7 @@ public class CommandLine {
 
             if (argSpec.interactive()) {
                 String name = argSpec.isOption() ? ((OptionSpec) argSpec).longestName() : "position " + position;
-                String prompt = String.format("Enter value for %s (%s): ", name, str(argSpec.renderedDescription(), 0));
+                String prompt = String.format("Enter value for %s (%s): ", name, Utils.safeGet(argSpec.renderedDescription(), 0));
                 if (tracer.isDebug()) {tracer.debug("Reading value for %s from console...%n", name);}
                 char[] value = readPassword(prompt, false);
                 if (tracer.isDebug()) {tracer.debug("User entered '%s' for %s.%n", value, name);}
@@ -7884,7 +7942,7 @@ public class CommandLine {
         private CommandLine self;
         private PrintStream out;
         private PrintStream err;
-        private Help.Ansi ansi;
+        private Ansi ansi;
 
         /** Invokes {@link #usage(PrintStream, Help.Ansi) usage} for the specified command, or for the parent command. */
         public void run() {
@@ -7902,7 +7960,7 @@ public class CommandLine {
             }
         }
         /** {@inheritDoc} */
-        public void init(CommandLine helpCommandLine, Help.Ansi ansi, PrintStream out, PrintStream err) {
+        public void init(CommandLine helpCommandLine, Ansi ansi, PrintStream out, PrintStream err) {
             this.self = Assert.notNull(helpCommandLine, "helpCommandLine");
             this.ansi = Assert.notNull(ansi, "ansi");
             this.out  = Assert.notNull(out, "out");
@@ -7928,31 +7986,9 @@ public class CommandLine {
          * @param out the stream to print the usage help message to
          * @param err the error stream to print any diagnostic messages to, in addition to the output from the exception handler
          */
-        void init(CommandLine helpCommandLine, Help.Ansi ansi, PrintStream out, PrintStream err);
+        void init(CommandLine helpCommandLine, Ansi ansi, PrintStream out, PrintStream err);
     }
 
-    /**
-     * Utility class providing some defensive coding convenience methods.
-     */
-    public static final class Assert {
-        /**
-         * Throws a NullPointerException if the specified object is null.
-         * @param object the object to verify
-         * @param description error message
-         * @param <T> type of the object to check
-         * @return the verified object
-         */
-        static <T> T notNull(T object, String description) {
-            if (object == null) {
-                throw new NullPointerException(description);
-            }
-            return object;
-        }
-        static boolean equals(Object obj1, Object obj2) { return obj1 == null ? obj2 == null : obj1.equals(obj2); }
-        static int hashCode(Object obj) {return obj == null ? 0 : obj.hashCode(); }
-        static int hashCode(boolean bool) {return bool ? 1 : 0; }
-        private Assert() {} // private constructor: never instantiate
-    }
     private enum TraceLevel { OFF, WARN, INFO, DEBUG;
         public boolean isEnabled(TraceLevel other) { return ordinal() >= other.ordinal(); }
         private void print(Tracer tracer, String msg, Object... params) {

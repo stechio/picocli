@@ -37,6 +37,7 @@ allprojects {
         ivy
     }
     dependencies {
+        implementation "com.google.guava:guava:$guavaVersion"
         implementation "org.apache.commons:commons-lang3:$commonsLangVersion"
         implementation "org.apache.commons:commons-collections4:$commonsCollectionsVersion"
         compileOnly "org.codehaus.groovy:groovy-all:$groovyVersion"

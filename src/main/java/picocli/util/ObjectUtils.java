@@ -5,7 +5,9 @@ import java.util.Collection;
 import java.util.Map;
 
 /**
- * Functionalities yet not available as of current Apache Commons Lang3 3.8 release.
+ * Functionalities yet not available as of current Apache Commons Lang3 3.8.1 release.
+ * 
+ * TODO: Remove when ACL3 3.9 released.
  */
 class ObjectUtils {
     public static boolean isEmpty(final Object object) {

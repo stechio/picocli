@@ -18,6 +18,7 @@ package picocli;
 import org.junit.Test;
 import picocli.CommandLine.*;
 import picocli.CommandLine.Model.*;
+import picocli.help.Ansi;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -26,7 +27,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.concurrent.Callable;
 
 import static org.junit.Assert.*;
-import static picocli.HelpTestUtil.usageString;
+import static picocli.help.HelpTestUtil.usageString;
 
 public class CommandLineMixinTest {
 
@@ -204,7 +205,7 @@ public class CommandLineMixinTest {
                 "description from mixin%n" +
                 "Mixin Footer Heading%n" +
                 "Mixin Footer%n");
-        assertEquals(expected, usageString(commandLine, Help.Ansi.OFF));
+        assertEquals(expected, usageString(commandLine, Ansi.OFF));
     }
 
     static class CommandAttributesDontOverwriteReceiverAttributes {
@@ -307,7 +308,7 @@ public class CommandLineMixinTest {
                 "Receiver description%n" +
                 "Receiver Footer Heading%n" +
                 "Receiver Footer%n");
-        assertEquals(expected, usageString(commandLine, Help.Ansi.OFF));
+        assertEquals(expected, usageString(commandLine, Ansi.OFF));
     }
 
     static class SuperClassCommandAttributesDontOverwriteSubclassAttributes {
@@ -398,7 +399,7 @@ public class CommandLineMixinTest {
                 "description from mixinSub%n" +
                 "MixinSub Footer Heading%n" +
                 "MixinSub Footer%n");
-        assertEquals(expected, usageString(commandLine, Help.Ansi.OFF));
+        assertEquals(expected, usageString(commandLine, Ansi.OFF));
     }
 
     static class CombinesAttributes {
@@ -520,7 +521,7 @@ public class CommandLineMixinTest {
                 "      [<files>...]   some files%n" +
                 "ReceiverSuper Footer Heading%n" +
                 "ReceiverSuper Footer%n");
-        assertEquals(expected, usageString(commandLine, Help.Ansi.OFF));
+        assertEquals(expected, usageString(commandLine, Ansi.OFF));
     }
 
     static class InjectsOptionsAndParameters {
@@ -588,7 +589,7 @@ public class CommandLineMixinTest {
                 "      [<files>...]           parameters from mixin%n" +
                 "  -b, --beta=<beta>          Receiver option%n" +
                 "  -a, --alpha=<alpha>        option from mixin%n");
-        assertEquals(expects, usageString(commandLine, Help.Ansi.OFF));
+        assertEquals(expects, usageString(commandLine, Ansi.OFF));
     }
     @Test
     public void testMixinAnnotationParsesOptionsAndParameters() throws UnsupportedEncodingException {
@@ -666,7 +667,7 @@ public class CommandLineMixinTest {
                 "      [<receiverFiles>...]   parameters from receiver%n" +
                 "  -a, --alpha=<alpha>        option from mixin%n" +
                 "  -b, --beta=<beta>          Receiver option%n");
-        assertEquals(expects, usageString(commandLine, Help.Ansi.OFF));
+        assertEquals(expects, usageString(commandLine, Ansi.OFF));
     }
 
     @Test

@@ -22,6 +22,9 @@ import org.junit.contrib.java.lang.system.ProvideSystemProperty;
 import org.junit.contrib.java.lang.system.SystemErrRule;
 import org.junit.contrib.java.lang.system.SystemOutRule;
 
+import picocli.help.Ansi;
+import picocli.help.Text;
+
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
@@ -387,7 +390,7 @@ public class CommandLineParseWithHandlersTest {
 
     private static final String MYCALLABLE_INVALID_INPUT = INVALID_INPUT + MYCALLABLE_USAGE;
 
-    private static final String MYCALLABLE_USAGE_ANSI = Help.Ansi.ON.new Text(format("" +
+    private static final String MYCALLABLE_USAGE_ANSI = new Text(Ansi.ON, format("" +
             "Usage: @|bold mycmd|@ [@|yellow -hV|@] [@|yellow -x|@=@|italic <option>|@]%n" +
             "  @|yellow -h|@, @|yellow --help|@      Show this help message and exit.%n" +
             "  @|yellow -V|@, @|yellow --version|@   Print version information and exit.%n" +
@@ -409,21 +412,21 @@ public class CommandLineParseWithHandlersTest {
 
     @Test
     public void testCall3WithInvalidInput() {
-        CommandLine.call(new MyCallable(), System.out, Help.Ansi.ON, "invalid input");
+        CommandLine.call(new MyCallable(), System.out, Ansi.ON, "invalid input");
         assertEquals(INVALID_INPUT + MYCALLABLE_USAGE_ANSI, systemErrRule.getLog());
         assertEquals("", systemOutRule.getLog());
     }
 
     @Test
     public void testCall4WithInvalidInput() {
-        CommandLine.call(new MyCallable(), System.out, System.err, Help.Ansi.ON, "invalid input");
+        CommandLine.call(new MyCallable(), System.out, System.err, Ansi.ON, "invalid input");
         assertEquals(INVALID_INPUT + MYCALLABLE_USAGE_ANSI, systemErrRule.getLog());
         assertEquals("", systemOutRule.getLog());
     }
 
     @Test
     public void testCall4WithInvalidInput_ToStdout() {
-        CommandLine.call(new MyCallable(), System.out, System.out, Help.Ansi.ON, "invalid input");
+        CommandLine.call(new MyCallable(), System.out, System.out, Ansi.ON, "invalid input");
         assertEquals("", systemErrRule.getLog());
         assertEquals(INVALID_INPUT + MYCALLABLE_USAGE_ANSI, systemOutRule.getLog());
     }
@@ -458,14 +461,14 @@ public class CommandLineParseWithHandlersTest {
 
     @Test
     public void testCall3WithHelpRequest() {
-        CommandLine.call(new MyCallable(), System.out, Help.Ansi.ON, "--help");
+        CommandLine.call(new MyCallable(), System.out, Ansi.ON, "--help");
         assertEquals("", systemErrRule.getLog());
         assertEquals(MYCALLABLE_USAGE_ANSI, systemOutRule.getLog());
     }
 
     @Test
     public void testCall3WithHelpRequest_ToStderr() {
-        CommandLine.call(new MyCallable(), System.err, Help.Ansi.ON, "--help");
+        CommandLine.call(new MyCallable(), System.err, Ansi.ON, "--help");
         assertEquals(MYCALLABLE_USAGE_ANSI, systemErrRule.getLog());
         assertEquals("", systemOutRule.getLog());
     }
@@ -473,7 +476,7 @@ public class CommandLineParseWithHandlersTest {
     @Test
     public void testCall3WithHelpRequest_ToCustomStream() {
         StringPrintStream sps = new StringPrintStream();
-        CommandLine.call(new MyCallable(), sps.stream(), Help.Ansi.ON, "--help");
+        CommandLine.call(new MyCallable(), sps.stream(), Ansi.ON, "--help");
         assertEquals(MYCALLABLE_USAGE_ANSI, sps.toString());
         assertEquals("", systemErrRule.getLog());
         assertEquals("", systemOutRule.getLog());
@@ -481,14 +484,14 @@ public class CommandLineParseWithHandlersTest {
 
     @Test
     public void testCall4WithHelpRequest() {
-        CommandLine.call(new MyCallable(), System.out, System.err, Help.Ansi.ON, "--help");
+        CommandLine.call(new MyCallable(), System.out, System.err, Ansi.ON, "--help");
         assertEquals("", systemErrRule.getLog());
         assertEquals(MYCALLABLE_USAGE_ANSI, systemOutRule.getLog());
     }
 
     @Test
     public void testCall4WithHelpRequest_ToStderr() {
-        CommandLine.call(new MyCallable(), System.err, System.out, Help.Ansi.ON, "--help");
+        CommandLine.call(new MyCallable(), System.err, System.out, Ansi.ON, "--help");
         assertEquals(MYCALLABLE_USAGE_ANSI, systemErrRule.getLog());
         assertEquals("", systemOutRule.getLog());
     }
@@ -496,7 +499,7 @@ public class CommandLineParseWithHandlersTest {
     @Test
     public void testCall4WithHelpRequest_ToCustomStream() {
         StringPrintStream sps = new StringPrintStream();
-        CommandLine.call(new MyCallable(), sps.stream(), System.out, Help.Ansi.ON, "--help");
+        CommandLine.call(new MyCallable(), sps.stream(), System.out, Ansi.ON, "--help");
         assertEquals(MYCALLABLE_USAGE_ANSI, sps.toString());
         assertEquals("", systemErrRule.getLog());
         assertEquals("", systemOutRule.getLog());
@@ -519,21 +522,21 @@ public class CommandLineParseWithHandlersTest {
 
     @Test
     public void testRun3WithInvalidInput() {
-        CommandLine.run(new MyRunnable(), System.out, Help.Ansi.ON, "invalid input");
+        CommandLine.run(new MyRunnable(), System.out, Ansi.ON, "invalid input");
         assertEquals(INVALID_INPUT + MYCALLABLE_USAGE_ANSI, systemErrRule.getLog());
         assertEquals("", systemOutRule.getLog());
     }
 
     @Test
     public void testRun4WithInvalidInput() {
-        CommandLine.run(new MyRunnable(), System.out, System.err, Help.Ansi.ON, "invalid input");
+        CommandLine.run(new MyRunnable(), System.out, System.err, Ansi.ON, "invalid input");
         assertEquals(INVALID_INPUT + MYCALLABLE_USAGE_ANSI, systemErrRule.getLog());
         assertEquals("", systemOutRule.getLog());
     }
 
     @Test
     public void testRun4WithInvalidInput_ToStdout() {
-        CommandLine.run(new MyRunnable(), System.out, System.out, Help.Ansi.ON, "invalid input");
+        CommandLine.run(new MyRunnable(), System.out, System.out, Ansi.ON, "invalid input");
         assertEquals("", systemErrRule.getLog());
         assertEquals(INVALID_INPUT + MYCALLABLE_USAGE_ANSI, systemOutRule.getLog());
     }
@@ -554,14 +557,14 @@ public class CommandLineParseWithHandlersTest {
 
     @Test
     public void testRun3WithHelpRequest() {
-        CommandLine.run(new MyRunnable(), System.out, Help.Ansi.ON, "--help");
+        CommandLine.run(new MyRunnable(), System.out, Ansi.ON, "--help");
         assertEquals("", systemErrRule.getLog());
         assertEquals(MYCALLABLE_USAGE_ANSI, systemOutRule.getLog());
     }
 
     @Test
     public void testRun3WithHelpRequest_ToStderr() {
-        CommandLine.run(new MyRunnable(), System.err, Help.Ansi.ON, "--help");
+        CommandLine.run(new MyRunnable(), System.err, Ansi.ON, "--help");
         assertEquals(MYCALLABLE_USAGE_ANSI, systemErrRule.getLog());
         assertEquals("", systemOutRule.getLog());
     }
@@ -569,7 +572,7 @@ public class CommandLineParseWithHandlersTest {
     @Test
     public void testRun3WithHelpRequest_ToCustomStream() {
         StringPrintStream sps = new StringPrintStream();
-        CommandLine.run(new MyRunnable(), sps.stream(), Help.Ansi.ON, "--help");
+        CommandLine.run(new MyRunnable(), sps.stream(), Ansi.ON, "--help");
         assertEquals(MYCALLABLE_USAGE_ANSI, sps.toString());
         assertEquals("", systemErrRule.getLog());
         assertEquals("", systemOutRule.getLog());
@@ -577,14 +580,14 @@ public class CommandLineParseWithHandlersTest {
 
     @Test
     public void testRun4WithHelpRequest() {
-        CommandLine.run(new MyRunnable(), System.out, System.err, Help.Ansi.ON, "--help");
+        CommandLine.run(new MyRunnable(), System.out, System.err, Ansi.ON, "--help");
         assertEquals("", systemErrRule.getLog());
         assertEquals(MYCALLABLE_USAGE_ANSI, systemOutRule.getLog());
     }
 
     @Test
     public void testRun4WithHelpRequest_ToStderr() {
-        CommandLine.run(new MyRunnable(), System.err, System.out, Help.Ansi.ON, "--help");
+        CommandLine.run(new MyRunnable(), System.err, System.out, Ansi.ON, "--help");
         assertEquals(MYCALLABLE_USAGE_ANSI, systemErrRule.getLog());
         assertEquals("", systemOutRule.getLog());
     }
@@ -592,7 +595,7 @@ public class CommandLineParseWithHandlersTest {
     @Test
     public void testRun4WithHelpRequest_ToCustomStream() {
         StringPrintStream sps = new StringPrintStream();
-        CommandLine.run(new MyRunnable(), sps.stream(), System.out, Help.Ansi.ON, "--help");
+        CommandLine.run(new MyRunnable(), sps.stream(), System.out, Ansi.ON, "--help");
         assertEquals(MYCALLABLE_USAGE_ANSI, sps.toString());
         assertEquals("", systemErrRule.getLog());
         assertEquals("", systemOutRule.getLog());
@@ -603,8 +606,8 @@ public class CommandLineParseWithHandlersTest {
         Runnable[] variations = new Runnable[] {
                 new Runnable() {public void run() {CommandLine.call(MyCallable.class, new InnerClassFactory(this), "-x", "a");}},
                 new Runnable() {public void run() {CommandLine.call(MyCallable.class, new InnerClassFactory(this), System.out, "-x", "a");}},
-                new Runnable() {public void run() {CommandLine.call(MyCallable.class, new InnerClassFactory(this), System.out, Help.Ansi.OFF, "-x", "a");}},
-                new Runnable() {public void run() {CommandLine.call(MyCallable.class, new InnerClassFactory(this), System.out, System.out, Help.Ansi.OFF, "-x", "a");}},
+                new Runnable() {public void run() {CommandLine.call(MyCallable.class, new InnerClassFactory(this), System.out, Ansi.OFF, "-x", "a");}},
+                new Runnable() {public void run() {CommandLine.call(MyCallable.class, new InnerClassFactory(this), System.out, System.out, Ansi.OFF, "-x", "a");}},
         };
         for (Runnable r : variations) {
             try {
@@ -628,8 +631,8 @@ public class CommandLineParseWithHandlersTest {
         final PrintStream ps = new PrintStream(baos);
         Runnable[] variations = new Runnable[] {
                 new Runnable() {public void run() {CommandLine.call(MyCallable.class, new InnerClassFactory(this), ps, "--version");}},
-                new Runnable() {public void run() {CommandLine.call(MyCallable.class, new InnerClassFactory(this), ps, Help.Ansi.OFF, "--version");}},
-                new Runnable() {public void run() {CommandLine.call(MyCallable.class, new InnerClassFactory(this), ps, System.out, Help.Ansi.OFF, "--version");}},
+                new Runnable() {public void run() {CommandLine.call(MyCallable.class, new InnerClassFactory(this), ps, Ansi.OFF, "--version");}},
+                new Runnable() {public void run() {CommandLine.call(MyCallable.class, new InnerClassFactory(this), ps, System.out, Ansi.OFF, "--version");}},
         };
         for (Runnable r : variations) {
             assertEquals("", baos.toString());
@@ -652,7 +655,7 @@ public class CommandLineParseWithHandlersTest {
         Runnable[] variations = new Runnable[] {
                 new Runnable() {public void run() {CommandLine.call(MyCallable.class, new InnerClassFactory(this), "-x");}},
                 new Runnable() {public void run() {CommandLine.call(MyCallable.class, new InnerClassFactory(this), System.out, "-x");}},
-                new Runnable() {public void run() {CommandLine.call(MyCallable.class, new InnerClassFactory(this), System.out, Help.Ansi.OFF, "-x");}},
+                new Runnable() {public void run() {CommandLine.call(MyCallable.class, new InnerClassFactory(this), System.out, Ansi.OFF, "-x");}},
         };
         for (Runnable r : variations) {
             assertEquals("", systemErrRule.getLog());
@@ -669,7 +672,7 @@ public class CommandLineParseWithHandlersTest {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         final PrintStream ps = new PrintStream(baos);
-        CommandLine.call(MyCallable.class, new InnerClassFactory(this), System.out, ps, Help.Ansi.OFF, "-x");
+        CommandLine.call(MyCallable.class, new InnerClassFactory(this), System.out, ps, Ansi.OFF, "-x");
         assertEquals(expected, baos.toString());
         assertEquals("", systemOutRule.getLog());
         assertEquals("", systemErrRule.getLog());
@@ -680,8 +683,8 @@ public class CommandLineParseWithHandlersTest {
         Runnable[] variations = new Runnable[] {
                 new Runnable() {public void run() {CommandLine.run(MyRunnable.class, new InnerClassFactory(this), "-x", "a");}},
                 new Runnable() {public void run() {CommandLine.run(MyRunnable.class, new InnerClassFactory(this), System.out, "-x", "a");}},
-                new Runnable() {public void run() {CommandLine.run(MyRunnable.class, new InnerClassFactory(this), System.out, Help.Ansi.OFF, "-x", "a");}},
-                new Runnable() {public void run() {CommandLine.run(MyRunnable.class, new InnerClassFactory(this), System.out, System.out, Help.Ansi.OFF, "-x", "a");}},
+                new Runnable() {public void run() {CommandLine.run(MyRunnable.class, new InnerClassFactory(this), System.out, Ansi.OFF, "-x", "a");}},
+                new Runnable() {public void run() {CommandLine.run(MyRunnable.class, new InnerClassFactory(this), System.out, System.out, Ansi.OFF, "-x", "a");}},
         };
         for (Runnable r : variations) {
             try {
@@ -705,8 +708,8 @@ public class CommandLineParseWithHandlersTest {
         final PrintStream ps = new PrintStream(baos);
         Runnable[] variations = new Runnable[] {
                 new Runnable() {public void run() {CommandLine.run(MyRunnable.class, new InnerClassFactory(this), ps, "--version");}},
-                new Runnable() {public void run() {CommandLine.run(MyRunnable.class, new InnerClassFactory(this), ps, Help.Ansi.OFF, "--version");}},
-                new Runnable() {public void run() {CommandLine.run(MyRunnable.class, new InnerClassFactory(this), ps, System.out, Help.Ansi.OFF, "--version");}},
+                new Runnable() {public void run() {CommandLine.run(MyRunnable.class, new InnerClassFactory(this), ps, Ansi.OFF, "--version");}},
+                new Runnable() {public void run() {CommandLine.run(MyRunnable.class, new InnerClassFactory(this), ps, System.out, Ansi.OFF, "--version");}},
         };
         for (Runnable r : variations) {
             assertEquals("", baos.toString());
@@ -729,7 +732,7 @@ public class CommandLineParseWithHandlersTest {
         Runnable[] variations = new Runnable[] {
                 new Runnable() {public void run() {CommandLine.run(MyRunnable.class, new InnerClassFactory(this), "-x");}},
                 new Runnable() {public void run() {CommandLine.run(MyRunnable.class, new InnerClassFactory(this), System.out, "-x");}},
-                new Runnable() {public void run() {CommandLine.run(MyRunnable.class, new InnerClassFactory(this), System.out, Help.Ansi.OFF, "-x");}},
+                new Runnable() {public void run() {CommandLine.run(MyRunnable.class, new InnerClassFactory(this), System.out, Ansi.OFF, "-x");}},
         };
         for (Runnable r : variations) {
             assertEquals("", systemErrRule.getLog());
@@ -746,7 +749,7 @@ public class CommandLineParseWithHandlersTest {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         final PrintStream ps = new PrintStream(baos);
-        CommandLine.run(MyRunnable.class, new InnerClassFactory(this), System.out, ps, Help.Ansi.OFF, "-x");
+        CommandLine.run(MyRunnable.class, new InnerClassFactory(this), System.out, ps, Ansi.OFF, "-x");
         assertEquals(expected, baos.toString());
         assertEquals("", systemOutRule.getLog());
         assertEquals("", systemErrRule.getLog());

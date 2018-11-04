@@ -29,6 +29,7 @@ import java.util.Map;
 
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Model.PositionalParamSpec;
+import picocli.help.Help;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 import picocli.CommandLine.Model.ArgSpec;

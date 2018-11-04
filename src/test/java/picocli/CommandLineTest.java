@@ -24,7 +24,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static picocli.HelpTestUtil.setTraceLevel;
+import static picocli.help.HelpTestUtil.setTraceLevel;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -89,6 +89,8 @@ import picocli.CommandLine.ParseResult;
 import picocli.CommandLine.RunAll;
 import picocli.CommandLine.Unmatched;
 import picocli.CommandLine.UnmatchedArgumentException;
+import picocli.help.Ansi;
+import picocli.help.Help;
 
 /**
  * Tests for the CommandLine argument parsing interpreter functionality.
@@ -2518,13 +2520,13 @@ public class CommandLineTest {
     @Test(expected = InitializationException.class)
     public void testUsageObjectPrintstreamAnsiRequiresAnnotatedCommand() {
         class App { }
-        CommandLine.usage(new App(), System.out, Help.Ansi.OFF);
+        CommandLine.usage(new App(), System.out, Ansi.OFF);
     }
 
     @Test(expected = InitializationException.class)
     public void testUsageObjectPrintstreamColorschemeRequiresAnnotatedCommand() {
         class App { }
-        CommandLine.usage(new App(), System.out, Help.defaultColorScheme(Help.Ansi.OFF));
+        CommandLine.usage(new App(), System.out, Help.defaultColorScheme(Ansi.OFF));
     }
 
     @Test(expected = InitializationException.class)

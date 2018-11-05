@@ -119,7 +119,7 @@ public class Help {
             for (OptionSpec option : help.commandSpec().options()) {
                 Text[][] values = optionRenderer.render(option, help.rendering().paramLabel(),
                         help.colorScheme());
-                int len = values[0][3].length;
+                int len = values[0][3].length();
                 if (len < Help.defaultOptionsColumnWidth - 3) {
                     max = Math.max(max, len);
                 }
@@ -128,7 +128,7 @@ public class Help {
             for (PositionalParamSpec positional : help.commandSpec().positionalParameters()) {
                 Text[][] values = paramRenderer.render(positional, help.rendering().paramLabel(),
                         help.colorScheme());
-                int len = values[0][3].length;
+                int len = values[0][3].length();
                 if (len < Help.defaultOptionsColumnWidth - 3) {
                     max = Math.max(max, len);
                 }
@@ -196,7 +196,7 @@ public class Help {
                             .append(parameterLabelRenderer.renderParameterLabel(option,
                                     scheme.ansi(), scheme.optionParamStyles));
                     return new Text[][] { { optionText, new Text(scheme.ansi(),
-                            option.description().length == 0 ? "" : option.description()[0]) } };
+                            Utils.isEmpty(option.description()) ? "" : option.description()[0]) } };
                 }
             };
         }
@@ -210,7 +210,7 @@ public class Help {
                     return new Text[][] { {
                             parameterLabelRenderer.renderParameterLabel(param, scheme.ansi(),
                                     scheme.parameterStyles),
-                            new Text(scheme.ansi(), param.description().length == 0 ? ""
+                            new Text(scheme.ansi(), Utils.isEmpty(param.description()) ? ""
                                     : param.description()[0]) } };
                 }
             };
@@ -602,7 +602,6 @@ public class Help {
             }
             return synopsis;
         }
-
     }
 
     public static class Section<T> {
@@ -936,10 +935,10 @@ public class Help {
                     scheme.optionParamStyles);
 
             // if no long option, fill in the space between the short option name and the param label value
-            if (paramLabelText.length > 0 && longOption.length() == 0) {
+            if (!paramLabelText.isEmpty() && longOption.isEmpty()) {
                 sep = renderer.separator();
                 // #181 paramLabelText may be =LABEL or [=LABEL...]
-                int sepStart = paramLabelText.plainString().indexOf(sep);
+                int sepStart = paramLabelText.toPlainString().indexOf(sep);
                 paramLabelText = paramLabelText.substring(0, sepStart)
                         .append(paramLabelText.substring(sepStart + sep.length()));
             }
@@ -1267,7 +1266,7 @@ public class Help {
     private static Text[] createDescriptionFirstLines(ColorScheme scheme, ArgSpec arg,
             String[] description, boolean[] showDefault) {
         Text[] result = new Text(scheme.ansi(), Utils.safeGet(description, 0)).splitLines();
-        if (result.length == 0 || (result.length == 1 && result[0].plain.length() == 0)) {
+        if (result.length == 0 || (result.length == 1 && result[0].isEmpty())) {
             if (showDefault[0]) {
                 result = new Text[] {
                         new Text(scheme.ansi(), "  Default: " + arg.defaultValueString()) };

@@ -11,8 +11,7 @@ import java.util.List;
 public enum Ansi {
     /**
      * Only emit ANSI escape codes if the platform supports it and system property
-     * {@code "picocli.ansi"} is not set to any value other than {@code "true"} (case
-     * insensitive).
+     * {@code "picocli.ansi"} is not set to any value other than {@code "true"} (case insensitive).
      */
     AUTO,
     /** Forced ON: always emit ANSI escape code regardless of the platform. */
@@ -41,23 +40,22 @@ public enum Ansi {
     }
 
     /**
-     * A set of pre-defined ANSI escape code styles and colors, and a set of convenience methods
-     * for parsing text with embedded markup style names, as well as convenience methods for
-     * converting styles to strings with embedded escape codes.
+     * A set of pre-defined ANSI escape code styles and colors, and a set of convenience methods for
+     * parsing text with embedded markup style names, as well as convenience methods for converting
+     * styles to strings with embedded escape codes.
      */
     public enum Style implements IStyle {
         reset(0, 0), bold(1, 21), faint(2, 22), italic(3, 23), underline(4, 24), blink(5,
-                25), reverse(7, 27), fg_black(30, 39), fg_red(31, 39), fg_green(32,
-                        39), fg_yellow(33, 39), fg_blue(34, 39), fg_magenta(35, 39), fg_cyan(36,
-                                39), fg_white(37, 39), bg_black(40, 49), bg_red(41,
-                                        49), bg_green(42, 49), bg_yellow(43, 49), bg_blue(44,
-                                                49), bg_magenta(45,
-                                                        49), bg_cyan(46, 49), bg_white(47, 49),;
+                25), reverse(7, 27), fg_black(30, 39), fg_red(31, 39), fg_green(32, 39), fg_yellow(
+                        33, 39), fg_blue(34, 39), fg_magenta(35, 39), fg_cyan(36, 39), fg_white(37,
+                                39), bg_black(40, 49), bg_red(41, 49), bg_green(42,
+                                        49), bg_yellow(43, 49), bg_blue(44, 49), bg_magenta(45,
+                                                49), bg_cyan(46, 49), bg_white(47, 49),;
         /**
-         * Parses the specified style markup and returns the associated style. The markup may be
-         * one of the Style enum value names, or it may be one of the Style enum value names
-         * when {@code "bg_"} is prepended, or it may be one of the indexed colors in the 256
-         * color palette.
+         * Parses the specified style markup and returns the associated style. The markup may be one
+         * of the Style enum value names, or it may be one of the Style enum value names when
+         * {@code "bg_"} is prepended, or it may be one of the indexed colors in the 256 color
+         * palette.
          * 
          * @param str
          *            the case-insensitive style markup to convert, e.g. {@code "blue"} or
@@ -78,10 +76,10 @@ public enum Ansi {
         }
 
         /**
-         * Parses the specified style markup and returns the associated style. The markup may be
-         * one of the Style enum value names, or it may be one of the Style enum value names
-         * when {@code "fg_"} is prepended, or it may be one of the indexed colors in the 256
-         * color palette.
+         * Parses the specified style markup and returns the associated style. The markup may be one
+         * of the Style enum value names, or it may be one of the Style enum value names when
+         * {@code "fg_"} is prepended, or it may be one of the indexed colors in the 256 color
+         * palette.
          * 
          * @param str
          *            the case-insensitive style markup to convert, e.g. {@code "blue"} or
@@ -133,8 +131,8 @@ public enum Ansi {
 
         /**
          * Parses the specified comma-separated sequence of style descriptors and returns the
-         * associated styles. For each markup, strings starting with {@code "bg("} are delegated
-         * to {@link #bg(String)}, others are delegated to {@link #bg(String)}.
+         * associated styles. For each markup, strings starting with {@code "bg("} are delegated to
+         * {@link #bg(String)}, others are delegated to {@link #bg(String)}.
          * 
          * @param commaSeparatedCodes
          *            one or more descriptors, e.g. {@code "bg(blue),underline,red"}
@@ -146,12 +144,10 @@ public enum Ansi {
             for (int i = 0; i < codes.length; ++i) {
                 if (codes[i].toLowerCase(ENGLISH).startsWith("fg(")) {
                     int end = codes[i].indexOf(')');
-                    styles[i] = Style
-                            .fg(codes[i].substring(3, end < 0 ? codes[i].length() : end));
+                    styles[i] = Style.fg(codes[i].substring(3, end < 0 ? codes[i].length() : end));
                 } else if (codes[i].toLowerCase(ENGLISH).startsWith("bg(")) {
                     int end = codes[i].indexOf(')');
-                    styles[i] = Style
-                            .bg(codes[i].substring(3, end < 0 ? codes[i].length() : end));
+                    styles[i] = Style.bg(codes[i].substring(3, end < 0 ? codes[i].length() : end));
                 } else {
                     styles[i] = Style.fg(codes[i]);
                 }
@@ -180,8 +176,8 @@ public enum Ansi {
     }
 
     /**
-     * Defines a palette map of 216 colors: 6 * 6 * 6 cube (216 colors): 16 + 36 * r + 6 * g + b
-     * (0 &lt;= r, g, b &lt;= 5).
+     * Defines a palette map of 216 colors: 6 * 6 * 6 cube (216 colors): 16 + 36 * r + 6 * g + b (0
+     * &lt;= r, g, b &lt;= 5).
      */
     static class Palette256Color implements IStyle {
         private final int fgbg;
@@ -264,8 +260,8 @@ public enum Ansi {
     }
 
     /**
-     * Returns a new Text object where all the specified styles are applied to the full length
-     * of the specified plain text.
+     * Returns a new Text object where all the specified styles are applied to the full length of
+     * the specified plain text.
      * 
      * @param plainText
      *            the string to apply all styles to. Must not contain markup!
@@ -274,23 +270,17 @@ public enum Ansi {
      * @return a new Text object
      */
     public Text apply(String plainText, List<IStyle> styles) {
-        if (plainText.length() == 0)
-            return new Text(this, 0);
-        Text result = new Text(this, plainText.length());
-        IStyle[] all = styles.toArray(new IStyle[styles.size()]);
-        result.sections.add(new Text.StyledSection(0, plainText.length(), Style.on(all),
-                Style.off(reverse(all)) + Style.reset.off()));
-        result.plain.append(plainText);
-        result.length = result.plain.length();
+        Text result = new Text(this, plainText, styles);
+        result.maxLength = plainText.length();
         return result;
     }
 
     /**
      * Returns {@code true} if ANSI escape codes should be emitted, {@code false} otherwise.
      * 
-     * @return ON: {@code true}, OFF: {@code false}, AUTO: if system property
-     *         {@code "picocli.ansi"} is defined then return its boolean value, otherwise return
-     *         whether the platform supports ANSI escape codes
+     * @return ON: {@code true}, OFF: {@code false}, AUTO: if system property {@code "picocli.ansi"}
+     *         is defined then return its boolean value, otherwise return whether the platform
+     *         supports ANSI escape codes
      */
     public boolean enabled() {
         if (this == ON)
@@ -314,8 +304,8 @@ public enum Ansi {
     }
 
     /**
-     * Returns a new Text object for this Ansi mode, encapsulating the specified string which
-     * may contain markup like {@code @|bg(red),white,underline some text|@}.
+     * Returns a new Text object for this Ansi mode, encapsulating the specified string which may
+     * contain markup like {@code @|bg(red),white,underline some text|@}.
      * <p>
      * Calling {@code toString()} on the returned Text will either include ANSI escape codes (if
      * this Ansi mode is ON), or suppress ANSI escape codes (if this Ansi mode is OFF).

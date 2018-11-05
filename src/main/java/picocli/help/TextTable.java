@@ -148,13 +148,9 @@ public class TextTable {
     }
 
     private static int copy(Text value, Text destination, int offset) {
-        int length = Math.min(value.length, destination.maxLength - offset);
-        value.copy(value.from, length, destination, offset);
+        int length = Math.min(value.length(), destination.maxLength - offset);
+        value.copy(0, length, destination, offset);
         return length;
-    }
-
-    private static int length(Text str) {
-        return str.length; // TODO count some characters as double length
     }
 
     /** The column definitions of this table. */
@@ -274,8 +270,9 @@ public class TextTable {
         if (row > rowCount() - 1)
             throw new IllegalArgumentException(
                     "Cannot write to row " + row + ": rowCount=" + rowCount());
-        if (value == null || value.plain.length() == 0)
+        if (value == null || value.isEmpty())
             return new Cell(col, row);
+
         Column column = columns[col];
         int indent = column.indent;
         switch (column.overflow) {
@@ -291,16 +288,16 @@ public class TextTable {
                             : copy(value, textAt(row, col), indent);
                     value = value.substring(charsWritten);
                     indent = 0;
-                    if (value.length > 0) { // value did not fit in column
+                    if (value.length() > 0) { // value did not fit in column
                         ++col; // write remainder of value in next column
                     }
-                    if (value.length > 0 && col >= columns.length) { // we filled up all columns on this row
+                    if (value.length() > 0 && col >= columns.length) { // we filled up all columns on this row
                         addEmptyRow();
                         row++;
                         col = startColumn;
                         indent = column.indent + indentWrappedLines;
                     }
-                } while (value.length > 0);
+                } while (value.length() > 0);
                 return new Cell(col, row);
             case WRAP:
                 BreakIterator lineBreakIterator = BreakIterator.getLineInstance();
@@ -308,11 +305,11 @@ public class TextTable {
                     int charsWritten = copy(lineBreakIterator, value, textAt(row, col), indent);
                     value = value.substring(charsWritten);
                     indent = column.indent + indentWrappedLines;
-                    if (value.length > 0) { // value did not fit in column
+                    if (value.length() > 0) { // value did not fit in column
                         ++row; // write remainder of value in next row
                         addEmptyRow();
                     }
-                } while (value.length > 0);
+                } while (value.length() > 0);
                 return new Cell(col, row);
         }
         throw new IllegalStateException(column.overflow.toString());
@@ -360,7 +357,7 @@ public class TextTable {
         for (int i = 0; i < columnValues.size(); i++) {
             Text column = columnValues.get(i);
             row.append(column.toString());
-            row.append(new String(Help.spaces(columns[i % columnCount].width - column.length)));
+            row.append(new String(Help.spaces(columns[i % columnCount].width - column.length())));
             if (i % columnCount == columnCount - 1) {
                 int lastChar = row.length() - 1;
                 while (lastChar >= 0 && row.charAt(lastChar) == ' ') {
@@ -376,18 +373,18 @@ public class TextTable {
 
     private int copy(BreakIterator line, Text text, Text columnValue, int offset) {
         // Deceive the BreakIterator to ensure no line breaks after '-' character
-        line.setText(text.plainString().replace("-", "\u00ff"));
+        line.setText(text.toPlainString().replace("-", "\u00ff"));
         int done = 0;
         for (int start = line.first(), end = line
                 .next(); end != BreakIterator.DONE; start = end, end = line.next()) {
             Text word = text.substring(start, end); //.replace("\u00ff", "-"); // not needed
-            if (columnValue.maxLength >= offset + done + length(word)) {
+            if (columnValue.maxLength >= offset + done + word.length()) {
                 done += copy(word, columnValue, offset + done); // TODO messages length
             } else {
                 break;
             }
         }
-        if (done == 0 && length(text) > columnValue.maxLength) {
+        if (done == 0 && text.length() > columnValue.maxLength) {
             // The value is a single word that is too big to be written to the column. Write as much as we can.
             done = copy(text, columnValue, offset);
         }

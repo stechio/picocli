@@ -3,6 +3,7 @@ package picocli.help;
 import java.util.ArrayList;
 import java.util.List;
 
+import picocli.help.Ansi.IStyle;
 import picocli.help.Ansi.Style;
 
 /**
@@ -18,25 +19,33 @@ public class Text implements Appendable, Cloneable {
     static class StyledSection {
         int startIndex, length;
         String startStyles, endStyles;
-    
+
         StyledSection(int start, int len, String style1, String style2) {
             startIndex = start;
             length = len;
             startStyles = style1;
             endStyles = style2;
         }
-    
+
         StyledSection withStartIndex(int newStart) {
             return new StyledSection(newStart, length, startStyles, endStyles);
         }
     }
 
+    private static final String StyledSectionEndTag = "|@";
+    private static final String StyledSectionStartTag = "@|";
+
+    int maxLength;
+
     private final Ansi ansi;
-    final int maxLength;
-    int from;
-    int length;
-    StringBuilder plain = new StringBuilder();
-    List<StyledSection> sections = new ArrayList<>();
+    private int from;
+    private int length;
+    private StringBuilder plain = new StringBuilder();
+    private List<StyledSection> sections = new ArrayList<>();
+    /**
+     * Whether the buffer mapping (substring) doesn't reach its actual ending.
+     */
+    private boolean fragmented;
 
     /**
      * Constructs a Text with the specified max length (for use in a TextTable Column).
@@ -55,57 +64,63 @@ public class Text implements Appendable, Cloneable {
      * Constructs a Text with the specified String, which may contain markup like
      * {@code @|bg(red),white,underline some text|@}.
      * 
-     * @param input
+     * @param styledText
      *            the string with markup to parse
      * @param ansi
      *            TODO
      */
-    public Text(Ansi ansi, String input) {
-        this.ansi = ansi;
-        maxLength = -1;
-        plain.setLength(0);
+    public Text(Ansi ansi, String styledText) {
+        this(ansi, -1);
         int i = 0;
-
         while (true) {
-            int j = input.indexOf("@|", i);
+            int j = styledText.indexOf(StyledSectionStartTag, i);
             if (j == -1) {
                 if (i == 0) {
-                    plain.append(input);
+                    plain.append(styledText);
                     length = plain.length();
                     return;
                 }
-                plain.append(input.substring(i, input.length()));
+                plain.append(styledText.substring(i, styledText.length()));
                 length = plain.length();
                 return;
             }
-            plain.append(input.substring(i, j));
-            int k = input.indexOf("|@", j);
+            plain.append(styledText.substring(i, j));
+            int k = styledText.indexOf(StyledSectionEndTag, j);
             if (k == -1) {
-                plain.append(input);
+                plain.append(styledText);
                 length = plain.length();
                 return;
             }
 
             j += 2;
-            String spec = input.substring(j, k);
+            String spec = styledText.substring(j, k);
             String[] items = spec.split(" ", 2);
             if (items.length == 1) {
-                plain.append(input);
+                plain.append(styledText);
                 length = plain.length();
                 return;
             }
 
-            Ansi.IStyle[] styles = Style.parse(items[0]);
-            addStyledSection(plain.length(), items[1].length(), Style.on(styles),
-                    Style.off(Ansi.reverse(styles)) + Style.reset.off());
+            addStyledSection(plain.length(), items[1].length(), Style.parse(items[0]));
             plain.append(items[1]);
             i = k + 2;
         }
     }
 
+    public Text(Ansi ansi, String plainText, List<IStyle> styles) {
+        this(ansi, -1);
+        if (plainText.length() > 0) {
+            addStyledSection(0, plainText.length(), styles.toArray(new IStyle[styles.size()]));
+            plain.append(plainText);
+            length = plain.length();
+        }
+    }
+
     @Override
     public Text append(char c) {
-        prepareAppend();
+        if (fragmented) {
+            defragment();
+        }
         plain.append(c);
         length++;
         return this;
@@ -114,13 +129,15 @@ public class Text implements Appendable, Cloneable {
     @Override
     public Text append(CharSequence value) {
         String valueString = value.toString();
-        if (valueString.indexOf("@|") < 0) {
-            prepareAppend();
+        if (valueString.indexOf(StyledSectionStartTag) < 0) {
+            if (fragmented) {
+                defragment();
+            }
             plain.append(valueString);
             length += valueString.length();
             return this;
         } else
-            return append(new Text(this.ansi, valueString));
+            return append(new Text(ansi, valueString));
     }
 
     @Override
@@ -138,7 +155,9 @@ public class Text implements Appendable, Cloneable {
      * @since 3.0
      */
     public Text append(Text other) {
-        prepareAppend();
+        if (fragmented) {
+            defragment();
+        }
         plain.append(other.plain.toString().substring(other.from, other.from + other.length));
         for (StyledSection section : other.sections) {
             int index = length + section.startIndex - other.from;
@@ -178,6 +197,8 @@ public class Text implements Appendable, Cloneable {
      *            indentation (padding)
      */
     public void copy(int from, int length, Text destination, int offset) {
+        // Map to internal from!
+        from += this.from;
         if (destination.length < offset) {
             for (int i = destination.length; i < offset; i++) {
                 destination.plain.append(' ');
@@ -202,13 +223,12 @@ public class Text implements Appendable, Cloneable {
         return toString().hashCode();
     }
 
-    /**
-     * Returns the plain text without any formatting.
-     * 
-     * @return the plain text without any formatting
-     */
-    public String plainString() {
-        return plain.toString().substring(from, from + length);
+    public boolean isEmpty() {
+        return length == 0;
+    }
+
+    public int length() {
+        return length;
     }
 
     public Text[] splitLines() {
@@ -255,6 +275,12 @@ public class Text implements Appendable, Cloneable {
      * @return a new Text instance that is a substring of this Text
      */
     public Text substring(int start, int end) {
+        if (start < 0) {
+            start = 0;
+        }
+        if (end > length) {
+            end = length;
+        }
         Text result;
         try {
             result = (Text) super.clone();
@@ -263,18 +289,24 @@ public class Text implements Appendable, Cloneable {
         }
         result.from = from + start;
         result.length = end - start;
+        result.fragmented = result.length < result.plain.length() - result.from;
         return result;
+    }
+
+    /**
+     * Returns the plain text without any formatting.
+     */
+    public String toPlainString() {
+        return plain.toString().substring(from, from + length);
     }
 
     /**
      * Returns a String representation of the text with ANSI escape codes embedded, unless ANSI is
      * {@linkplain Ansi#enabled()} not enabled}, in which case the plain text is returned.
-     * 
-     * @return a String representation of the text with ANSI escape codes embedded (if enabled)
      */
     @Override
     public String toString() {
-        if (!this.ansi.enabled())
+        if (!ansi.enabled())
             return plain.toString().substring(from, from + length);
         if (length == 0)
             return "";
@@ -300,23 +332,16 @@ public class Text implements Appendable, Cloneable {
         return sb.toString();
     }
 
-    private void addStyledSection(int start, int length, String startStyle, String endStyle) {
-        sections.add(new StyledSection(start, length, startStyle, endStyle));
+    private void addStyledSection(int start, int length, IStyle[] styles) {
+        sections.add(new StyledSection(start, length, Style.on(styles),
+                Style.off(Ansi.reverse(styles)) + Style.reset.off()));
     }
 
-    private StyledSection findSectionContaining(int index) {
-        for (StyledSection section : sections) {
-            if (index >= section.startIndex && index < section.startIndex + section.length)
-                return section;
-        }
-        return null;
-    }
-
-    private void prepareAppend() {
+    private void defragment() {
         /*
          * NOTE: Buffer is reallocated only if its mapping is noncontiguous with the new appendage.
          */
-        if (length < plain.length() - from) {
+        if (fragmented) {
             plain = new StringBuilder(plain.toString().substring(from, from + length));
             List<StyledSection> newSections = new ArrayList<>();
             for (StyledSection section : sections) {
@@ -325,6 +350,15 @@ public class Text implements Appendable, Cloneable {
             from = 0;
             length = plain.length();
             sections = newSections;
+            fragmented = false;
         }
+    }
+
+    private StyledSection findSectionContaining(int index) {
+        for (StyledSection section : sections) {
+            if (index >= section.startIndex && index < section.startIndex + section.length)
+                return section;
+        }
+        return null;
     }
 }

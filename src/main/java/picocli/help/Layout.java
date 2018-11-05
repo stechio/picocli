@@ -6,8 +6,8 @@ import picocli.CommandLine;
 import picocli.CommandLine.Model.ArgSpec;
 import picocli.CommandLine.Model.OptionSpec;
 import picocli.CommandLine.Model.PositionalParamSpec;
-import picocli.help.Help.DefaultOptionRenderer;
-import picocli.help.Help.DefaultParameterRenderer;
+import picocli.help.Help.OptionRenderer;
+import picocli.help.Help.ParameterRenderer;
 import picocli.help.Help.IOptionRenderer;
 import picocli.help.Help.IParameterRenderer;
 import picocli.util.Assert;
@@ -16,9 +16,9 @@ import picocli.util.Assert;
  * Use a Layout to format usage help text for options and parameters in tabular format.
  * <p>
  * Delegates to the renderers to create {@link Text} values for the annotated fields, and uses a
- * {@link TextTable} to display these values in tabular format. Layout is responsible for
- * deciding which values to display where in the table. By default, Layout shows one option or
- * parameter per table row.
+ * {@link TextTable} to display these values in tabular format. Layout is responsible for deciding
+ * which values to display where in the table. By default, Layout shows one option or parameter per
+ * table row.
  * </p>
  * <p>
  * Customize by overriding the {@link #layout(CommandLine.Model.ArgSpec, Text[][])} method.
@@ -35,28 +35,38 @@ public class Layout {
     protected Help.IParameterRenderer parameterRenderer;
 
     /**
+     * Constructs a Layout with the specified color scheme, a new default TextTable, the
+     * {@linkplain Help#createDefaultOptionRenderer() default option renderer}, and the
+     * {@linkplain Help#createDefaultParameterRenderer() default parameter renderer}.
+     * 
+     * @param colorScheme
+     *            the color scheme to use for common, auto-generated parts of the usage help message
+     */
+    public Layout(ColorScheme colorScheme, int tableWidth) {
+        this(colorScheme, TextTable.forDefaultColumns(colorScheme.ansi(), tableWidth));
+    }
+
+    /**
      * Constructs a Layout with the specified color scheme, the specified TextTable, the
      * {@linkplain Help#createDefaultOptionRenderer() default option renderer}, and the
      * {@linkplain Help#createDefaultParameterRenderer() default parameter renderer}.
      * 
      * @param colorScheme
-     *            the color scheme to use for common, auto-generated parts of the usage help
-     *            message
+     *            the color scheme to use for common, auto-generated parts of the usage help message
      * @param textTable
      *            the TextTable to lay out parts of the usage help message in tabular format
      */
     public Layout(ColorScheme colorScheme, TextTable textTable) {
-        this(colorScheme, textTable, new DefaultOptionRenderer(false, " "),
-                new DefaultParameterRenderer(false, " "));
+        this(colorScheme, textTable, new OptionRenderer(false, " "),
+                new ParameterRenderer(false, " "));
     }
 
     /**
-     * Constructs a Layout with the specified color scheme, the specified TextTable, the
-     * specified option renderer and the specified parameter renderer.
+     * Constructs a Layout with the specified color scheme, the specified TextTable, the specified
+     * option renderer and the specified parameter renderer.
      * 
      * @param colorScheme
-     *            the color scheme to use for common, auto-generated parts of the usage help
-     *            message
+     *            the color scheme to use for common, auto-generated parts of the usage help message
      * @param optionRenderer
      *            the object responsible for rendering Options to Text
      * @param parameterRenderer
@@ -64,8 +74,8 @@ public class Layout {
      * @param textTable
      *            the TextTable to lay out parts of the usage help message in tabular format
      */
-    public Layout(ColorScheme colorScheme, TextTable textTable,
-            Help.IOptionRenderer optionRenderer, Help.IParameterRenderer parameterRenderer) {
+    public Layout(ColorScheme colorScheme, TextTable textTable, Help.IOptionRenderer optionRenderer,
+            Help.IParameterRenderer parameterRenderer) {
         this.colorScheme = Assert.notNull(colorScheme, "colorScheme");
         this.table = Assert.notNull(textTable, "textTable");
         this.optionRenderer = Assert.notNull(optionRenderer, "optionRenderer");
@@ -73,23 +83,10 @@ public class Layout {
     }
 
     /**
-     * Constructs a Layout with the specified color scheme, a new default TextTable, the
-     * {@linkplain Help#createDefaultOptionRenderer() default option renderer}, and the
-     * {@linkplain Help#createDefaultParameterRenderer() default parameter renderer}.
-     * 
-     * @param colorScheme
-     *            the color scheme to use for common, auto-generated parts of the usage help
-     *            message
-     */
-    public Layout(ColorScheme colorScheme, int tableWidth) {
-        this(colorScheme, TextTable.forDefaultColumns(colorScheme.ansi(), tableWidth));
-    }
-
-    /**
-     * Delegates to the {@link #optionRenderer option renderer} of this layout to obtain text
-     * values for the specified {@link OptionSpec}, and then calls the
-     * {@link #layout(CommandLine.Model.ArgSpec, Text[][])} method to write these text values
-     * into the correct cells in the TextTable.
+     * Delegates to the {@link #optionRenderer option renderer} of this layout to obtain text values
+     * for the specified {@link OptionSpec}, and then calls the
+     * {@link #layout(CommandLine.Model.ArgSpec, Text[][])} method to write these text values into
+     * the correct cells in the TextTable.
      * 
      * @param option
      *            the option argument
@@ -112,8 +109,7 @@ public class Layout {
      *            object that knows how to render option parameters
      * @since 3.0
      */
-    public void addOptions(List<OptionSpec> options,
-            Help.IParamLabelRenderer paramLabelRenderer) {
+    public void addOptions(List<OptionSpec> options, Help.IParamLabelRenderer paramLabelRenderer) {
         for (OptionSpec option : options) {
             if (!option.hidden()) {
                 addOption(option, paramLabelRenderer);
@@ -122,10 +118,10 @@ public class Layout {
     }
 
     /**
-     * Delegates to the {@link #parameterRenderer parameter renderer} of this layout to obtain
-     * text values for the specified {@linkplain PositionalParamSpec positional parameter}, and
-     * then calls {@link #layout(CommandLine.Model.ArgSpec, Text[][])} to write these text
-     * values into the correct cells in the TextTable.
+     * Delegates to the {@link #parameterRenderer parameter renderer} of this layout to obtain text
+     * values for the specified {@linkplain PositionalParamSpec positional parameter}, and then
+     * calls {@link #layout(CommandLine.Model.ArgSpec, Text[][])} to write these text values into
+     * the correct cells in the TextTable.
      * 
      * @param param
      *            the positional parameter
@@ -161,8 +157,7 @@ public class Layout {
 
     /**
      * Copies the specified text values into the correct cells in the {@link TextTable}. This
-     * implementation delegates to {@link TextTable#addRowValues(Text...)} for each row of
-     * values.
+     * implementation delegates to {@link TextTable#addRowValues(Text...)} for each row of values.
      * <p>
      * Subclasses may override.
      * </p>

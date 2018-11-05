@@ -1328,7 +1328,7 @@ public class CommandLineHelpTest {
 
     @Test
     public void testCreateDefaultOptionRenderer_ReturnsDefaultOptionRenderer() {
-        assertEquals(Help.DefaultOptionRenderer.class,
+        assertEquals(Help.OptionRenderer.class,
                 new Help(new UsageDemo()).rendering().option().getClass());
     }
 
@@ -1555,7 +1555,7 @@ public class CommandLineHelpTest {
 
     @Test
     public void testCreateDefaultParameterRenderer_ReturnsDefaultParameterRenderer() {
-        assertEquals(Help.DefaultParamLabelRenderer.class,
+        assertEquals(Help.ParamLabelRenderer.class,
                 new Help(new UsageDemo()).rendering().paramLabel().getClass());
     }
 
@@ -1600,7 +1600,7 @@ public class CommandLineHelpTest {
 
         /*
          * NOTE: The original implementation used to create distinct renderer instances over the
-         * same Help instance, but it didn't make sense since each DefaultParamLabelRenderer kept a
+         * same Help instance, but it didn't make sense since each ParamLabelRenderer kept a
          * reference to the SAME CommandSpec, invariably resulting in identical output.
          */
         Help withLabel = new Help(new WithLabel());
@@ -1701,7 +1701,7 @@ public class CommandLineHelpTest {
         }
         /*
          * NOTE: The original implementation used to create distinct renderer instances over the
-         * same Help instance, but it didn't make sense since each DefaultParamLabelRenderer kept a
+         * same Help instance, but it didn't make sense since each ParamLabelRenderer kept a
          * reference to the SAME CommandSpec, invariably resulting in identical output.
          */
         Help withLabel = new Help(new App(), Ansi.OFF);

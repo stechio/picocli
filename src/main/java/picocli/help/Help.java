@@ -115,7 +115,7 @@ public class Help {
 
         protected int getNameColumnWidth(Help help) {
             int max = 0;
-            IOptionRenderer optionRenderer = new DefaultOptionRenderer(false, " ");
+            IOptionRenderer optionRenderer = new OptionRenderer(false, " ");
             for (OptionSpec option : help.commandSpec().options()) {
                 Text[][] values = optionRenderer.render(option, help.rendering().paramLabel(),
                         help.colorScheme());
@@ -124,7 +124,7 @@ public class Help {
                     max = Math.max(max, len);
                 }
             }
-            IParameterRenderer paramRenderer = new DefaultParameterRenderer(false, " ");
+            IParameterRenderer paramRenderer = new ParameterRenderer(false, " ");
             for (PositionalParamSpec positional : help.commandSpec().positionalParameters()) {
                 Text[][] values = paramRenderer.render(positional, help.rendering().paramLabel(),
                         help.colorScheme());
@@ -188,32 +188,22 @@ public class Help {
 
         @Override
         public IOptionRenderer createMinimalOptionRenderer() {
-            return new IOptionRenderer() {
-                @Override
-                public Text[][] render(OptionSpec option,
-                        Help.IParamLabelRenderer parameterLabelRenderer, ColorScheme scheme) {
-                    Text optionText = scheme.optionText(option.names()[0])
-                            .append(parameterLabelRenderer.renderParameterLabel(option,
-                                    scheme.ansi(), scheme.optionParamStyles));
-                    return new Text[][] { { optionText, new Text(scheme.ansi(),
-                            Utils.isEmpty(option.description()) ? "" : option.description()[0]) } };
-                }
+            return (option, parameterLabelRenderer, scheme) -> {
+               Text optionText = scheme.optionText(option.names()[0])
+                .append(parameterLabelRenderer.renderParameterLabel(option,
+                        scheme.ansi(), scheme.optionParamStyles));
+               return new Text[][] { { optionText, new Text(scheme.ansi(),
+                Utils.isEmpty(option.description()) ? "" : option.description()[0]) } };
             };
         }
 
         @Override
         public IParameterRenderer createMinimalParameterRenderer() {
-            return new Help.IParameterRenderer() {
-                @Override
-                public Text[][] render(PositionalParamSpec param,
-                        Help.IParamLabelRenderer parameterLabelRenderer, ColorScheme scheme) {
-                    return new Text[][] { {
-                            parameterLabelRenderer.renderParameterLabel(param, scheme.ansi(),
-                                    scheme.parameterStyles),
-                            new Text(scheme.ansi(), Utils.isEmpty(param.description()) ? ""
-                                    : param.description()[0]) } };
-                }
-            };
+            return (param, parameterLabelRenderer, scheme) -> new Text[][] { {
+                    parameterLabelRenderer.renderParameterLabel(param, scheme.ansi(),
+                            scheme.parameterStyles),
+                    new Text(scheme.ansi(), Utils.isEmpty(param.description()) ? ""
+                            : param.description()[0]) } };
         }
 
         @Override
@@ -239,7 +229,7 @@ public class Help {
 
         @Override
         public IOptionRenderer createOptionRenderer() {
-            return new DefaultOptionRenderer(commandSpec.usageMessage().showDefaultValues(),
+            return new OptionRenderer(commandSpec.usageMessage().showDefaultValues(),
                     "" + commandSpec.usageMessage().requiredOptionMarker());
         }
 
@@ -250,13 +240,13 @@ public class Help {
 
         @Override
         public IParameterRenderer createParameterRenderer() {
-            return new DefaultParameterRenderer(commandSpec.usageMessage().showDefaultValues(),
+            return new ParameterRenderer(commandSpec.usageMessage().showDefaultValues(),
                     "" + commandSpec.usageMessage().requiredOptionMarker());
         }
 
         @Override
         public IParamLabelRenderer createParamLabelRenderer() {
-            return new DefaultParamLabelRenderer(commandSpec);
+            return new ParamLabelRenderer(commandSpec);
         }
 
         @Override
@@ -884,7 +874,7 @@ public class Help {
     }
 
     /**
-     * The DefaultOptionRenderer converts {@link OptionSpec Options} to five columns of text to
+     * The OptionRenderer converts {@link OptionSpec Options} to five columns of text to
      * match the default {@linkplain TextTable TextTable} column layout. The first row of values
      * looks like this:
      * <ol>
@@ -901,12 +891,12 @@ public class Help {
      * option.description()[i]}}.
      * </p>
      */
-    static class DefaultOptionRenderer implements Help.IOptionRenderer {
+    static class OptionRenderer implements Help.IOptionRenderer {
         private String requiredMarker = " ";
         private boolean showDefaultValues;
         private String sep;
 
-        public DefaultOptionRenderer(boolean showDefaultValues, String requiredMarker) {
+        public OptionRenderer(boolean showDefaultValues, String requiredMarker) {
             this.showDefaultValues = showDefaultValues;
             this.requiredMarker = Assert.notNull(requiredMarker, "requiredMarker");
         }
@@ -973,7 +963,7 @@ public class Help {
     }
 
     /**
-     * The DefaultParameterRenderer converts {@linkplain PositionalParamSpec positional parameters}
+     * The ParameterRenderer converts {@linkplain PositionalParamSpec positional parameters}
      * to five columns of text to match the default {@linkplain TextTable TextTable} column layout.
      * The first row of values looks like this:
      * <ol>
@@ -989,11 +979,11 @@ public class Help {
      * param.description()[i]}}.
      * </p>
      */
-    static class DefaultParameterRenderer implements Help.IParameterRenderer {
+    static class ParameterRenderer implements Help.IParameterRenderer {
         private String requiredMarker = " ";
         private boolean showDefaultValues;
 
-        public DefaultParameterRenderer(boolean showDefaultValues, String requiredMarker) {
+        public ParameterRenderer(boolean showDefaultValues, String requiredMarker) {
             this.showDefaultValues = showDefaultValues;
             this.requiredMarker = Assert.notNull(requiredMarker, "requiredMarker");
         }
@@ -1031,17 +1021,17 @@ public class Help {
     }
 
     /**
-     * DefaultParamLabelRenderer separates option parameters from their {@linkplain OptionSpec
+     * ParamLabelRenderer separates option parameters from their {@linkplain OptionSpec
      * option names} with a {@linkplain ParserSpec#separator() separator} string, and, unless
      * {@link ArgSpec#hideParamSyntax()} is true, surrounds optional values with {@code '['} and
      * {@code ']'} characters and uses ellipses ("...") to indicate that any number of values is
      * allowed for options or parameters with variable arity.
      */
-    static class DefaultParamLabelRenderer implements Help.IParamLabelRenderer {
+    static class ParamLabelRenderer implements Help.IParamLabelRenderer {
         private final CommandSpec commandSpec;
 
-        /** Constructs a new DefaultParamLabelRenderer with the specified separator string. */
-        public DefaultParamLabelRenderer(CommandSpec commandSpec) {
+        /** Constructs a new ParamLabelRenderer with the specified separator string. */
+        public ParamLabelRenderer(CommandSpec commandSpec) {
             this.commandSpec = Assert.notNull(commandSpec, "commandSpec");
         }
 

@@ -71,6 +71,7 @@ public class Text implements Appendable, Cloneable {
      */
     public Text(Ansi ansi, String styledText) {
         this(ansi, -1);
+
         int i = 0;
         while (true) {
             int j = styledText.indexOf(StyledSectionStartTag, i);
@@ -109,7 +110,8 @@ public class Text implements Appendable, Cloneable {
 
     public Text(Ansi ansi, String plainText, List<IStyle> styles) {
         this(ansi, -1);
-        if (plainText.length() > 0) {
+
+        if (!plainText.isEmpty()) {
             addStyledSection(0, plainText.length(), styles.toArray(new IStyle[styles.size()]));
             plain.append(plainText);
             length = plain.length();
@@ -339,7 +341,7 @@ public class Text implements Appendable, Cloneable {
 
     private void defragment() {
         /*
-         * NOTE: Buffer is reallocated only if its mapping is noncontiguous with the new appendage.
+         * NOTE: Buffer is reallocated only if its mapping is noncontiguous to the new appendage.
          */
         if (fragmented) {
             plain = new StringBuilder(plain.toString().substring(from, from + length));

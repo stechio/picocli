@@ -236,6 +236,15 @@ public enum Ansi {
         }
     }
 
+    static <T> T[] reverse(T[] all) {
+        for (int i = 0; i < all.length / 2; i++) {
+            T temp = all[i];
+            all[i] = all[all.length - i - 1];
+            all[all.length - i - 1] = temp;
+        }
+        return all;
+    }
+
     private static boolean ansiPossible() {
         return (ISATTY && (!isWindows || isXterm || hasOsType)) || isJansiConsoleInstalled();
     }
@@ -248,15 +257,6 @@ public enum Ansi {
         } catch (Exception reflectionFailed) {
             return false;
         }
-    }
-
-    static <T> T[] reverse(T[] all) {
-        for (int i = 0; i < all.length / 2; i++) {
-            T temp = all[i];
-            all[i] = all[all.length - i - 1];
-            all[all.length - i - 1] = temp;
-        }
-        return all;
     }
 
     /**

@@ -3,10 +3,6 @@ package picocli.util;
 import org.apache.commons.lang3.StringUtils;
 
 public class Utils {
-    public static String safeGet(String[] array, int index) {
-        return ObjectUtilsX.safeEmptyGet(array, index);
-    }
-
     /**
      * Almost the same behaviour as {@link ObjectUtils#isEmpty(Object)}, since String arrays are
      * considered empty also when all their items are empty.
@@ -31,5 +27,9 @@ public class Utils {
 
     public static boolean isNotEmpty(final Object object) {
         return !isEmpty(object);
+    }
+
+    public static String safeGet(String[] array, int index) {
+        return ObjectUtilsX.safeEmptyGet(array, index);
     }
 }

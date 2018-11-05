@@ -4,15 +4,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import picocli.help.Ansi.IStyle;
 import picocli.help.Ansi.Style;
 import picocli.util.Assert;
 
 /**
- * All usage help message are generated with a color scheme that assigns certain styles and
- * colors to common parts of a usage message: the command name, options, positional parameters
- * and option parameters. Users may customize these styles by creating Help with a custom color
- * scheme.
+ * All usage help message are generated with a color scheme that assigns certain styles and colors
+ * to common parts of a usage message: the command name, options, positional parameters and option
+ * parameters. Users may customize these styles by creating Help with a custom color scheme.
  * <p>
  * Note that these options and styles may not be rendered if ANSI escape codes are not
  * {@linkplain Ansi#enabled() enabled}.
@@ -94,8 +92,8 @@ public class ColorScheme {
     }
 
     /**
-     * Adds the specified styles to the registered styles for option parameters in this color
-     * scheme and returns this color scheme.
+     * Adds the specified styles to the registered styles for option parameters in this color scheme
+     * and returns this color scheme.
      * 
      * @param styles
      *            the styles to add to the registered styles for option parameters in this color
@@ -142,8 +140,8 @@ public class ColorScheme {
     }
 
     /**
-     * Adds the specified styles to the registered styles for positional parameters in this
-     * color scheme and returns this color scheme.
+     * Adds the specified styles to the registered styles for positional parameters in this color
+     * scheme and returns this color scheme.
      * 
      * @param styles
      *            the styles to add to registered the styles for parameters in this color scheme

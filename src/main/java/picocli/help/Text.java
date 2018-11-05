@@ -7,115 +7,93 @@ import picocli.help.Ansi.IStyle;
 import picocli.help.Ansi.Style;
 
 /**
- * Encapsulates rich text with styles and colors. Text objects may be constructed with Strings
- * containing markup like {@code @|bg(red),white,underline some text|@}, and this class converts the
- * markup to ANSI escape codes.
+ * Encapsulates rich text with styles and colors.
  * <p>
- * Internally keeps both an enriched and a plain text representation to allow layout components to
- * calculate text width while remaining unaware of the embedded ANSI escape codes.
+ * Text objects may be constructed with strings containing markup like
+ * '{@code @|bg(red),white,underline some text|@}': this class converts that markup to ANSI escape
+ * codes.
+ * </p>
+ * <p>
+ * Markup is transparent to text indexing as, internally, plain text representation is kept separate
+ * from style mapping.
  * </p>
  */
 public class Text implements Appendable, Cloneable {
-    static class StyledSection {
-        int startIndex, length;
-        String startStyles, endStyles;
+    private static class StyledChunk {
+        private int startIndex, length;
+        private String startStyles, endStyles;
 
-        StyledSection(int start, int len, String style1, String style2) {
+        StyledChunk(int start, int len, String style1, String style2) {
             startIndex = start;
             length = len;
             startStyles = style1;
             endStyles = style2;
         }
 
-        StyledSection withStartIndex(int newStart) {
-            return new StyledSection(newStart, length, startStyles, endStyles);
+        StyledChunk withStartIndex(int newStart) {
+            return new StyledChunk(newStart, length, startStyles, endStyles);
         }
     }
 
-    private static final String StyledSectionEndTag = "|@";
-    private static final String StyledSectionStartTag = "@|";
+    private static final String StyledChunkEndTag = "|@";
+    private static final String StyledChunkInternalSeparator = " ";
+    private static final String StyledChunkStartTag = "@|";
 
     int maxLength;
 
     private final Ansi ansi;
-    private int from;
-    private int length;
-    private StringBuilder plain = new StringBuilder();
-    private List<StyledSection> sections = new ArrayList<>();
     /**
      * Whether the buffer mapping (substring) doesn't reach its actual ending.
      */
     private boolean fragmented;
+    private int from;
+    private int length;
+    private StringBuilder plainTextBuffer = new StringBuilder();
+    private List<StyledChunk> styledChunks = new ArrayList<>();
+
+    /**
+     * Constructs a Text with the specified string, which may contain markup like
+     * {@code @|bg(red),white,underline some text|@}.
+     * 
+     * @param ansi
+     * @param styledText
+     *            Marked-up string.
+     */
+    public Text(Ansi ansi, CharSequence styledText) {
+        this(ansi, -1);
+
+        append(styledText);
+    }
+
+    /**
+     * Constructs a Text with the specified literal string.
+     * 
+     * @param ansi
+     * @param plainText
+     *            String without markup.
+     * @param styles
+     *            Styles to apply to the whole string.
+     */
+    public Text(Ansi ansi, CharSequence plainText, List<IStyle> styles) {
+        this(ansi, -1);
+
+        if (plainText.length() > 0) {
+            addStyledChunk(0, plainText.length(), styles.toArray(new IStyle[styles.size()]));
+            plainTextBuffer.append(plainText);
+            length = plainTextBuffer.length();
+        }
+    }
 
     /**
      * Constructs a Text with the specified max length (for use in a TextTable Column).
      * 
+     * @param ansi
      * @param maxLength
      *            max length of this text
-     * @param ansi
-     *            TODO
      */
     public Text(Ansi ansi, int maxLength) {
         this.ansi = ansi;
         this.maxLength = maxLength;
-    }
-
-    /**
-     * Constructs a Text with the specified String, which may contain markup like
-     * {@code @|bg(red),white,underline some text|@}.
-     * 
-     * @param styledText
-     *            the string with markup to parse
-     * @param ansi
-     *            TODO
-     */
-    public Text(Ansi ansi, String styledText) {
-        this(ansi, -1);
-
-        int i = 0;
-        while (true) {
-            int j = styledText.indexOf(StyledSectionStartTag, i);
-            if (j == -1) {
-                if (i == 0) {
-                    plain.append(styledText);
-                    length = plain.length();
-                    return;
-                }
-                plain.append(styledText.substring(i, styledText.length()));
-                length = plain.length();
-                return;
-            }
-            plain.append(styledText.substring(i, j));
-            int k = styledText.indexOf(StyledSectionEndTag, j);
-            if (k == -1) {
-                plain.append(styledText);
-                length = plain.length();
-                return;
-            }
-
-            j += 2;
-            String spec = styledText.substring(j, k);
-            String[] items = spec.split(" ", 2);
-            if (items.length == 1) {
-                plain.append(styledText);
-                length = plain.length();
-                return;
-            }
-
-            addStyledSection(plain.length(), items[1].length(), Style.parse(items[0]));
-            plain.append(items[1]);
-            i = k + 2;
-        }
-    }
-
-    public Text(Ansi ansi, String plainText, List<IStyle> styles) {
-        this(ansi, -1);
-
-        if (!plainText.isEmpty()) {
-            addStyledSection(0, plainText.length(), styles.toArray(new IStyle[styles.size()]));
-            plain.append(plainText);
-            length = plain.length();
-        }
     }
 
     @Override
@@ -123,28 +101,74 @@ public class Text implements Appendable, Cloneable {
         if (fragmented) {
             defragment();
         }
-        plain.append(c);
+        plainTextBuffer.append(c);
         length++;
         return this;
     }
 
     @Override
-    public Text append(CharSequence value) {
-        String valueString = value.toString();
-        if (valueString.indexOf(StyledSectionStartTag) < 0) {
+    public Text append(CharSequence styledText) {
+        if (styledText.length() > 0) {
             if (fragmented) {
                 defragment();
             }
-            plain.append(valueString);
-            length += valueString.length();
-            return this;
-        } else
-            return append(new Text(ansi, valueString));
+
+            String styledTextString = styledText.toString();
+            int chunkStart = 0;
+            while (true) {
+                /*
+                 * NOTE: <STYLED_CHUNK> ::= <START_TAG> <STYLES> <SPACE> <PLAIN_TEXT> <END_TAG>
+                 */
+                int styledChunkStart = styledTextString.indexOf(StyledChunkStartTag, chunkStart);
+                // No more styled chunks?
+                if (styledChunkStart == -1) {
+                    // Add terminal plain chunk!
+                    plainTextBuffer.append(
+                            styledTextString.substring(chunkStart, styledTextString.length()));
+                    break;
+                }
+
+                // Add intermediate plain chunk!
+                plainTextBuffer.append(styledTextString.substring(chunkStart, styledChunkStart));
+
+                int styledChunkEnd = styledTextString.indexOf(StyledChunkEndTag, styledChunkStart);
+                if (styledChunkEnd == -1) {
+                    /*
+                     * NOTE: No conversion without closing tag.
+                     */
+                    // Add malformed marked-up chunk!
+                    plainTextBuffer.append(styledTextString.substring(styledChunkStart));
+                    break;
+                }
+
+                String styledChunk = styledTextString.substring(styledChunkStart + 2,
+                        styledChunkEnd);
+                String[] styledChunkParts = styledChunk.split(StyledChunkInternalSeparator, 2);
+                // Text exists within the marked-up chunk?
+                if (styledChunkParts.length == 2) {
+                    // Add marked-up chunk!
+                    addStyledChunk(plainTextBuffer.length(), styledChunkParts[1].length(),
+                            Style.parse(styledChunkParts[0]));
+                    plainTextBuffer.append(styledChunkParts[1]);
+                } else {
+                    /*
+                     * NOTE: No conversion without space separator.
+                     */
+                    // Add empty marked-up chunk!
+                    plainTextBuffer.append(
+                            styledTextString.substring(styledChunkStart, styledChunkEnd + 2));
+                }
+
+                chunkStart = styledChunkEnd + 2;
+            }
+            length = plainTextBuffer.length() - from;
+        }
+        return this;
     }
 
     @Override
-    public Text append(CharSequence csq, int start, int end) {
-        return append(csq.subSequence(start, end));
+    public Text append(CharSequence styledText, int start, int end) {
+        return append(new Text(ansi, styledText).substring(start, end));
     }
 
     /**
@@ -160,12 +184,13 @@ public class Text implements Appendable, Cloneable {
         if (fragmented) {
             defragment();
         }
-        plain.append(other.plain.toString().substring(other.from, other.from + other.length));
-        for (StyledSection section : other.sections) {
-            int index = length + section.startIndex - other.from;
-            sections.add(section.withStartIndex(index));
+        plainTextBuffer.append(
+                other.plainTextBuffer.toString().substring(other.from, other.from + other.length));
+        for (StyledChunk styledChunk : other.styledChunks) {
+            int index = length + styledChunk.startIndex - other.from;
+            styledChunks.add(styledChunk.withStartIndex(index));
         }
-        length = plain.length() - from;
+        length = plainTextBuffer.length() - from;
         return this;
     }
 
@@ -180,8 +205,8 @@ public class Text implements Appendable, Cloneable {
         } catch (CloneNotSupportedException e) {
             throw new IllegalStateException(e);
         }
-        clone.plain = new StringBuilder(plain);
-        clone.sections = new ArrayList<>(sections);
+        clone.plainTextBuffer = new StringBuilder(plainTextBuffer);
+        clone.styledChunks = new ArrayList<>(styledChunks);
         return clone;
     }
 
@@ -190,29 +215,29 @@ public class Text implements Appendable, Cloneable {
      * markup.
      * 
      * @param from
-     *            start of the substring
+     *            Substring start.
      * @param length
-     *            length of the substring
+     *            Substring length.
      * @param destination
-     *            destination Text to modify
+     *            Target text.
      * @param offset
-     *            indentation (padding)
+     *            Padding.
      */
     public void copy(int from, int length, Text destination, int offset) {
-        // Map to internal from!
-        from += this.from;
+        from += this.from /* NOTE: Maps to internal from. */;
         if (destination.length < offset) {
             for (int i = destination.length; i < offset; i++) {
-                destination.plain.append(' ');
+                destination.plainTextBuffer.append(' ');
             }
             destination.length = offset;
         }
-        for (StyledSection section : sections) {
-            destination.sections
-                    .add(section.withStartIndex(section.startIndex - from + destination.length));
+        for (StyledChunk styledChunk : styledChunks) {
+            destination.styledChunks.add(
+                    styledChunk.withStartIndex(styledChunk.startIndex - from + destination.length));
         }
-        destination.plain.append(plain.toString().substring(from, from + length));
-        destination.length = destination.plain.length();
+        destination.plainTextBuffer
+                .append(plainTextBuffer.toString().substring(from, from + length));
+        destination.length = destination.plainTextBuffer.length() - destination.from;
     }
 
     @Override
@@ -235,32 +260,32 @@ public class Text implements Appendable, Cloneable {
 
     public Text[] splitLines() {
         List<Text> result = new ArrayList<>();
-        boolean trailingEmptyString = plain.length() == 0;
+        boolean trailingEmptyString = plainTextBuffer.length() == 0;
         int start = 0, end = 0;
-        for (int i = 0; i < plain.length(); i++, end = i) {
-            char c = plain.charAt(i);
+        for (int i = 0; i < plainTextBuffer.length(); i++, end = i) {
+            char c = plainTextBuffer.charAt(i);
             boolean eol = c == '\n';
-            eol |= (c == '\r' && i + 1 < plain.length() && plain.charAt(i + 1) == '\n' && ++i > 0); // \r\n
+            eol |= (c == '\r' && i + 1 < plainTextBuffer.length()
+                    && plainTextBuffer.charAt(i + 1) == '\n' && ++i > 0); // \r\n
             eol |= c == '\r';
             if (eol) {
                 result.add(this.substring(start, end));
-                trailingEmptyString = i == plain.length() - 1;
+                trailingEmptyString = i == plainTextBuffer.length() - 1;
                 start = i + 1;
             }
         }
-        if (start < plain.length() || trailingEmptyString) {
-            result.add(this.substring(start, plain.length()));
+        if (start < plainTextBuffer.length() || trailingEmptyString) {
+            result.add(this.substring(start, plainTextBuffer.length()));
         }
         return result.toArray(new Text[result.size()]);
     }
 
     /**
-     * Returns a new {@code Text} instance that is a substring of this Text. Does not modify this
-     * instance!
+     * Returns a new {@code Text} instance that is a substring of this Text.
      * 
      * @param start
-     *            index in the plain text where to start the substring
-     * @return a new Text instance that is a substring of this Text
+     *            Index in the plain text where to start the substring
+     * @return a new Text instance that is a substring of this Text.
      */
     public Text substring(int start) {
         return substring(start, length);
@@ -291,7 +316,7 @@ public class Text implements Appendable, Cloneable {
         }
         result.from = from + start;
         result.length = end - start;
-        result.fragmented = result.length < result.plain.length() - result.from;
+        result.fragmented = result.length < result.plainTextBuffer.length() - result.from;
         return result;
     }
 
@@ -299,7 +324,7 @@ public class Text implements Appendable, Cloneable {
      * Returns the plain text without any formatting.
      */
     public String toPlainString() {
-        return plain.toString().substring(from, from + length);
+        return plainTextBuffer.toString().substring(from, from + length);
     }
 
     /**
@@ -309,24 +334,24 @@ public class Text implements Appendable, Cloneable {
     @Override
     public String toString() {
         if (!ansi.enabled())
-            return plain.toString().substring(from, from + length);
+            return plainTextBuffer.toString().substring(from, from + length);
         if (length == 0)
             return "";
-        StringBuilder sb = new StringBuilder(plain.length() + 20 * sections.size());
-        StyledSection current = null;
-        int end = Math.min(from + length, plain.length());
+        StringBuilder sb = new StringBuilder(plainTextBuffer.length() + 20 * styledChunks.size());
+        StyledChunk current = null;
+        int end = Math.min(from + length, plainTextBuffer.length());
         for (int i = from; i < end; i++) {
-            StyledSection section = findSectionContaining(i);
-            if (section != current) {
+            StyledChunk styledChunk = findStyledChunkOf(i);
+            if (styledChunk != current) {
                 if (current != null) {
                     sb.append(current.endStyles);
                 }
-                if (section != null) {
-                    sb.append(section.startStyles);
+                if (styledChunk != null) {
+                    sb.append(styledChunk.startStyles);
                 }
-                current = section;
+                current = styledChunk;
             }
-            sb.append(plain.charAt(i));
+            sb.append(plainTextBuffer.charAt(i));
         }
         if (current != null) {
             sb.append(current.endStyles);
@@ -334,8 +359,8 @@ public class Text implements Appendable, Cloneable {
         return sb.toString();
     }
 
-    private void addStyledSection(int start, int length, IStyle[] styles) {
-        sections.add(new StyledSection(start, length, Style.on(styles),
+    private void addStyledChunk(int start, int length, IStyle[] styles) {
+        styledChunks.add(new StyledChunk(start, length, Style.on(styles),
                 Style.off(Ansi.reverse(styles)) + Style.reset.off()));
     }
 
@@ -344,22 +369,24 @@ public class Text implements Appendable, Cloneable {
          * NOTE: Buffer is reallocated only if its mapping is noncontiguous to the new appendage.
          */
         if (fragmented) {
-            plain = new StringBuilder(plain.toString().substring(from, from + length));
-            List<StyledSection> newSections = new ArrayList<>();
-            for (StyledSection section : sections) {
-                newSections.add(section.withStartIndex(section.startIndex - from));
+            plainTextBuffer = new StringBuilder(
+                    plainTextBuffer.toString().substring(from, from + length));
+            List<StyledChunk> newStyledChunks = new ArrayList<>();
+            for (StyledChunk styledChunk : styledChunks) {
+                newStyledChunks.add(styledChunk.withStartIndex(styledChunk.startIndex - from));
             }
             from = 0;
-            length = plain.length();
-            sections = newSections;
+            length = plainTextBuffer.length();
+            styledChunks = newStyledChunks;
             fragmented = false;
         }
     }
 
-    private StyledSection findSectionContaining(int index) {
-        for (StyledSection section : sections) {
-            if (index >= section.startIndex && index < section.startIndex + section.length)
-                return section;
+    private StyledChunk findStyledChunkOf(int index) {
+        for (StyledChunk styledChunk : styledChunks) {
+            if (index >= styledChunk.startIndex
+                    && index < styledChunk.startIndex + styledChunk.length)
+                return styledChunk;
         }
         return null;
     }

@@ -18,6 +18,7 @@ package picocli.help;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Model.ArgSpec;
+import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 import picocli.help.Help.IOptionRenderer;
@@ -155,7 +156,7 @@ public class CustomLayoutDemo implements Runnable {
             }
         }
 
-        Help help = new Help(new Zip(), ansi);
+        Help help = new Help(CommandSpec.forAnnotatedObject(new Zip()), ansi);
 
         TextTable textTable = TextTable.forColumns(ansi, new Column(5, 2, Column.Overflow.TRUNCATE), // values should fit
                 new Column(30, 2, Column.Overflow.SPAN), // overflow into adjacent columns
@@ -232,7 +233,7 @@ public class CustomLayoutDemo implements Runnable {
             int interval;
         }
         StringBuilder sb = new StringBuilder();
-        Help help = new Help(new Netstat(), ansi);
+        Help help = new Help(CommandSpec.forAnnotatedObject(new Netstat()), ansi);
         help.commandSpec().parser().posixClusteredShortOptionsAllowed(false);
         help.commandSpec().usageMessage().synopsisHeading("");
         sb.append(help.sections("header").render(help))

@@ -16,7 +16,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
-import picocli.CommandLine.DefaultFactory;
 import picocli.CommandLine.Model.ArgSpec;
 import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.Model.OptionSpec;
@@ -189,11 +188,10 @@ public class Help {
         @Override
         public IOptionRenderer createMinimalOptionRenderer() {
             return (option, parameterLabelRenderer, scheme) -> {
-               Text optionText = scheme.optionText(option.names()[0])
-                .append(parameterLabelRenderer.renderParameterLabel(option,
-                        scheme.ansi(), scheme.optionParamStyles));
-               return new Text[][] { { optionText, new Text(scheme.ansi(),
-                Utils.isEmpty(option.description()) ? "" : option.description()[0]) } };
+                Text optionText = scheme.optionText(option.names()[0]).append(parameterLabelRenderer
+                        .renderParameterLabel(option, scheme.ansi(), scheme.optionParamStyles));
+                return new Text[][] { { optionText, new Text(scheme.ansi(),
+                        Utils.isEmpty(option.description()) ? "" : option.description()[0]) } };
             };
         }
 
@@ -202,8 +200,8 @@ public class Help {
             return (param, parameterLabelRenderer, scheme) -> new Text[][] { {
                     parameterLabelRenderer.renderParameterLabel(param, scheme.ansi(),
                             scheme.parameterStyles),
-                    new Text(scheme.ansi(), Utils.isEmpty(param.description()) ? ""
-                            : param.description()[0]) } };
+                    new Text(scheme.ansi(),
+                            Utils.isEmpty(param.description()) ? "" : param.description()[0]) } };
         }
 
         @Override
@@ -874,9 +872,9 @@ public class Help {
     }
 
     /**
-     * The OptionRenderer converts {@link OptionSpec Options} to five columns of text to
-     * match the default {@linkplain TextTable TextTable} column layout. The first row of values
-     * looks like this:
+     * The OptionRenderer converts {@link OptionSpec Options} to five columns of text to match the
+     * default {@linkplain TextTable TextTable} column layout. The first row of values looks like
+     * this:
      * <ol>
      * <li>the required option marker (if the option is required)</li>
      * <li>2-character short option name (or empty string if no short option exists)</li>
@@ -963,9 +961,9 @@ public class Help {
     }
 
     /**
-     * The ParameterRenderer converts {@linkplain PositionalParamSpec positional parameters}
-     * to five columns of text to match the default {@linkplain TextTable TextTable} column layout.
-     * The first row of values looks like this:
+     * The ParameterRenderer converts {@linkplain PositionalParamSpec positional parameters} to five
+     * columns of text to match the default {@linkplain TextTable TextTable} column layout. The
+     * first row of values looks like this:
      * <ol>
      * <li>the required option marker (if the parameter's arity is to have at least one value)</li>
      * <li>empty string</li>
@@ -1021,8 +1019,8 @@ public class Help {
     }
 
     /**
-     * ParamLabelRenderer separates option parameters from their {@linkplain OptionSpec
-     * option names} with a {@linkplain ParserSpec#separator() separator} string, and, unless
+     * ParamLabelRenderer separates option parameters from their {@linkplain OptionSpec option
+     * names} with a {@linkplain ParserSpec#separator() separator} string, and, unless
      * {@link ArgSpec#hideParamSyntax()} is true, surrounds optional values with {@code '['} and
      * {@code ']'} characters and uses ellipses ("...") to indicate that any number of values is
      * allowed for options or parameters with variable arity.
@@ -1319,13 +1317,34 @@ public class Help {
     private Rendering rendering;
 
     /**
-     * Constructs a new {@code Help} instance with the specified color scheme, initialized from
-     * annotatations on the specified class and superclasses.
+     * Constructs a new {@code Help} instance with a default color scheme.
      *
      * @param commandSpec
-     *            the command model to create usage help for
+     *            Command model to create usage help for.
+     */
+    public Help(CommandSpec commandSpec) {
+        this(commandSpec, Ansi.AUTO);
+    }
+
+    /**
+     * Constructs a new {@code Help} instance with a default color scheme.
+     *
+     * @param commandSpec
+     *            Command model to create usage help for.
+     * @param ansi
+     *            whether to emit ANSI escape codes or not
+     */
+    public Help(CommandSpec commandSpec, Ansi ansi) {
+        this(commandSpec, defaultColorScheme(ansi));
+    }
+
+    /**
+     * Constructs a new {@code Help} instance with the specified color scheme.
+     *
+     * @param commandSpec
+     *            Command model to create usage help for.
      * @param colorScheme
-     *            the color scheme to use
+     *            Color scheme to use.
      */
     public Help(CommandSpec commandSpec, ColorScheme colorScheme) {
         this.commandSpec = Assert.notNull(commandSpec, "commandSpec");
@@ -1334,46 +1353,6 @@ public class Help {
         this.colorScheme = Assert.notNull(colorScheme, "colorScheme").applySystemProperties();
         rendering = new Rendering(new HelpRendererFactory());
         this.addAllSubcommands(commandSpec.subcommands());
-    }
-
-    /**
-     * Constructs a new {@code Help} instance with a default color scheme, initialized from
-     * annotatations on the specified class and superclasses.
-     *
-     * @param command
-     *            the annotated object to create usage help for
-     */
-    public Help(Object command) {
-        this(command, Ansi.AUTO);
-    }
-
-    /**
-     * Constructs a new {@code Help} instance with a default color scheme, initialized from
-     * annotatations on the specified class and superclasses.
-     *
-     * @param command
-     *            the annotated object to create usage help for
-     * @param ansi
-     *            whether to emit ANSI escape codes or not
-     */
-    public Help(Object command, Ansi ansi) {
-        this(command, defaultColorScheme(ansi));
-    }
-
-    /**
-     * Constructs a new {@code Help} instance with the specified color scheme, initialized from
-     * annotatations on the specified class and superclasses.
-     *
-     * @param command
-     *            the annotated object to create usage help for
-     * @param colorScheme
-     *            the color scheme to use
-     * @deprecated use
-     *             {@link picocli.help.Help#Help(picocli.CommandLine.Model.CommandSpec, picocli.help.Help.ColorScheme)}
-     */
-    @Deprecated
-    public Help(Object command, ColorScheme colorScheme) {
-        this(CommandSpec.forAnnotatedObject(command, new DefaultFactory()), colorScheme);
     }
 
     /**
@@ -1471,16 +1450,6 @@ public class Help {
         return commandSpec;
     }
 
-    /**
-     * Returns a {@code Layout} instance configured with the user preferences captured in this Help
-     * instance.
-     *
-     * @return a Layout
-     */
-    public Layout createDefaultLayout() {
-        return createLayout(Help.defaultOptionsColumnWidth);
-    }
-
     public Rendering rendering() {
         return rendering;
     }
@@ -1538,6 +1507,17 @@ public class Help {
                 commandLine.helpFactory().createHelp(commandLine.getCommandSpec(), colorScheme)
                         .withCommandNames(commandNames));
         return this;
+    }
+
+    /**
+     * Returns a {@code Layout} instance configured with the user preferences captured in this Help
+     * instance.
+     *
+     * @return a Layout
+     */
+    //TODO:check whether to remove it.
+    Layout createDefaultLayout() {
+        return createLayout(Help.defaultOptionsColumnWidth);
     }
 
     Help withCommandNames(List<String> aliases) {

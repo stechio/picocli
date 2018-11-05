@@ -795,7 +795,7 @@ public class Help {
             textTable.indentWrappedLines = 1; // don't worry about first line: options (2nd column) always start with a space
 
             // right-adjust the command name by length of synopsis heading
-            Text PADDING = new Text(Ansi.OFF, stringOf('X', synopsisHeadingLength));
+            Text PADDING = new Text(Ansi.OFF, StringUtils.repeat('X', synopsisHeadingLength));
             textTable.addRowValues(PADDING.append(help.colorScheme().commandText(commandName)),
                     optionText);
             return textTable.toString().substring(synopsisHeadingLength); // cut off leading synopsis heading spaces
@@ -907,8 +907,7 @@ public class Help {
             String shortOption = shortOptionCount > 0 ? names[0] : "";
             sep = shortOptionCount > 0 && names.length > 1 ? "," : "";
 
-            String longOption = join(names, shortOptionCount, names.length - shortOptionCount,
-                    ", ");
+            String longOption = Utils.join(names, ", ", shortOptionCount, names.length);
             Text longOptionText = createLongOptionText(option, paramLabelRenderer, scheme,
                     longOption);
 
@@ -1282,26 +1281,10 @@ public class Help {
         return formatString == null ? "" : String.format(formatString, params);
     }
 
-    private static String join(String[] names, int offset, int length, String separator) {
-        if (names == null)
-            return "";
-        StringBuilder result = new StringBuilder();
-        for (int i = offset; i < offset + length; i++) {
-            result.append((i > offset) ? separator : "").append(names[i]);
-        }
-        return result.toString();
-    }
-
     private static int maxLength(Collection<String> any) {
         List<String> strings = new ArrayList<>(any);
         Collections.sort(strings, Collections.reverseOrder(Help.shortestFirst()));
         return strings.get(0).length();
-    }
-
-    private static String stringOf(char chr, int length) {
-        char[] buff = new char[length];
-        Arrays.fill(buff, chr);
-        return new String(buff);
     }
 
     protected final CommandSpec commandSpec;

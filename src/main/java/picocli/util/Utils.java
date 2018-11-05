@@ -4,8 +4,8 @@ import org.apache.commons.lang3.StringUtils;
 
 public class Utils {
     /**
-     * Almost the same behaviour as {@link ObjectUtils#isEmpty(Object)}, since String arrays are
-     * considered empty also when all their items are empty.
+     * Same as {@link ObjectUtils#isEmpty(Object)}, except that String arrays are considered empty
+     * also when all their items are empty.
      * 
      * @param object
      * @return
@@ -29,6 +29,24 @@ public class Utils {
         return !isEmpty(object);
     }
 
+    /**
+     * Same as {@link StringUtils#join(Object[],String,int,int)}, except that null arrays return
+     * empty.
+     * 
+     * @param object
+     */
+    public static <T> String join(T[] array, String separator, int startIndex, int endIndex) {
+        return isEmpty(array) ? StringUtils.EMPTY
+                : StringUtils.join(array, separator, startIndex, endIndex);
+    }
+
+    /**
+     * Safely retrieves the array item at the given position.
+     *
+     * @param array
+     * @param index
+     * @return Empty string if null {@code array} or out-of-bounds {@code index}.
+     */
     public static String safeGet(String[] array, int index) {
         return ObjectUtilsX.safeEmptyGet(array, index);
     }

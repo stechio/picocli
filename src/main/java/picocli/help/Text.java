@@ -43,9 +43,9 @@ public class Text implements Appendable, Cloneable {
 
     private final Ansi ansi;
     /**
-     * Whether the buffer mapping (substring) doesn't reach its actual ending.
+     * Whether this object is a shallow clone sharing the same buffer with its origin.
      */
-    private boolean fragmented;
+    private boolean derived;
     private int from;
     private int length;
     private StringBuilder plainTextBuffer = new StringBuilder();
@@ -98,8 +98,8 @@ public class Text implements Appendable, Cloneable {
 
     @Override
     public Text append(char c) {
-        if (fragmented) {
-            defragment();
+        if (derived) {
+            detach();
         }
         plainTextBuffer.append(c);
         length++;
@@ -109,8 +109,8 @@ public class Text implements Appendable, Cloneable {
     @Override
     public Text append(CharSequence styledText) {
         if (styledText.length() > 0) {
-            if (fragmented) {
-                defragment();
+            if (derived) {
+                detach();
             }
 
             String styledTextString = styledText.toString();
@@ -136,7 +136,7 @@ public class Text implements Appendable, Cloneable {
                     /*
                      * NOTE: No conversion without closing tag.
                      */
-                    // Add malformed marked-up chunk!
+                    // Add malformed terminal marked-up chunk!
                     plainTextBuffer.append(styledTextString.substring(styledChunkStart));
                     break;
                 }
@@ -181,8 +181,8 @@ public class Text implements Appendable, Cloneable {
      * @since 3.0
      */
     public Text append(Text other) {
-        if (fragmented) {
-            defragment();
+        if (derived) {
+            detach();
         }
         plainTextBuffer.append(
                 other.plainTextBuffer.toString().substring(other.from, other.from + other.length));
@@ -316,7 +316,7 @@ public class Text implements Appendable, Cloneable {
         }
         result.from = from + start;
         result.length = end - start;
-        result.fragmented = result.length < result.plainTextBuffer.length() - result.from;
+        result.derived = true;
         return result;
     }
 
@@ -364,11 +364,15 @@ public class Text implements Appendable, Cloneable {
                 Style.off(Ansi.reverse(styles)) + Style.reset.off()));
     }
 
-    private void defragment() {
+    /**
+     * Ensures that the internal buffer is ready for appending new text.
+     */
+    private boolean detach() {
         /*
-         * NOTE: Buffer is reallocated only if its mapping is noncontiguous to the new appendage.
+         * NOTE: In case this object is a shallow clone sharing its internal buffer with the
+         * original object, we have to reallocate it in order to apply modifications.
          */
-        if (fragmented) {
+        if (derived) {
             plainTextBuffer = new StringBuilder(
                     plainTextBuffer.toString().substring(from, from + length));
             List<StyledChunk> newStyledChunks = new ArrayList<>();
@@ -378,10 +382,17 @@ public class Text implements Appendable, Cloneable {
             from = 0;
             length = plainTextBuffer.length();
             styledChunks = newStyledChunks;
-            fragmented = false;
+            derived = false;
+            return true;
         }
+        return false;
     }
 
+    /**
+     * Retrieves the marked-up chunk whose range includes the given plain text position.
+     *
+     * @param index
+     */
     private StyledChunk findStyledChunkOf(int index) {
         for (StyledChunk styledChunk : styledChunks) {
             if (index >= styledChunk.startIndex

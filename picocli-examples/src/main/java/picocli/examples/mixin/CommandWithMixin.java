@@ -1,9 +1,9 @@
 package picocli.examples.mixin;
 
 import picocli.CommandLine;
-import picocli.CommandLine.Command;
-import picocli.CommandLine.Mixin;
-import picocli.CommandLine.Option;
+import picocli.annots.Command;
+import picocli.annots.Mixin;
+import picocli.annots.Option;
 
 @Command(name = "mixee", description = "This command has a footer and an option mixed in")
 public class CommandWithMixin {

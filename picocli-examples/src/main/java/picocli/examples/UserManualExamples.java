@@ -16,8 +16,8 @@
 package picocli.examples;
 
 import picocli.CommandLine;
-import picocli.CommandLine.Command;
-import picocli.CommandLine.Option;
+import picocli.annots.Command;
+import picocli.annots.Option;
 
 /**
  *

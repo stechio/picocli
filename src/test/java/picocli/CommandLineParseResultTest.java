@@ -15,7 +15,13 @@
  */
 package picocli;
 
-import org.junit.Test;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.util.Arrays;
@@ -23,13 +29,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Test;
+
 import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.Model.OptionSpec;
 import picocli.CommandLine.Model.PositionalParamSpec;
-import picocli.CommandLine.ParseResult;
-
-import static org.junit.Assert.*;
-import static picocli.CommandLine.*;
+import picocli.CommandLine.Range;
+import picocli.annots.Command;
+import picocli.annots.Option;
+import picocli.annots.Parameters;
 
 public class CommandLineParseResultTest {
     @Test

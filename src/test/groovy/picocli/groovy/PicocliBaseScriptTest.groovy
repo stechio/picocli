@@ -22,7 +22,9 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.contrib.java.lang.system.ProvideSystemProperty
 import picocli.CommandLine
-import picocli.CommandLine.ExecutionException
+import picocli.annots.Option
+import picocli.annots.Parameters
+import picocli.excepts.ExecutionException
 
 import java.nio.charset.Charset
 
@@ -48,11 +50,13 @@ public class PicocliBaseScriptTest {
 @groovy.transform.BaseScript(picocli.groovy.PicocliBaseScript)
 import groovy.transform.Field
 import picocli.CommandLine
+import picocli.annots.Option
+import picocli.annots.Parameters
 
-@CommandLine.Parameters
+@Parameters
 @Field List<String> parameters
 
-@CommandLine.Option(names = ["-cp", "--codepath"])
+@Option(names = ["-cp", "--codepath"])
 @Field List<String> codepath = []
 
 //println parameters
@@ -104,8 +108,9 @@ assert codepath == ['/usr/x.jar', '/bin/y.jar', 'z']
 @picocli.groovy.PicocliScript
 import groovy.transform.Field
 import picocli.CommandLine
+import picocli.annots.Option
 
-@CommandLine.Option(names = ["-x", "--requiredOption"], required = true, description = "this option is required")
+@Option(names = ["-x", "--requiredOption"], required = true, description = "this option is required")
 @Field String requiredOption
 '''
         String expected = String.format("" +
@@ -128,8 +133,9 @@ import picocli.CommandLine
 @picocli.groovy.PicocliScript
 import groovy.transform.Field
 import picocli.CommandLine
+import picocli.annots.Option
 
-@CommandLine.Option(names = ["-h", "--help"], usageHelp = true)
+@Option(names = ["-h", "--help"], usageHelp = true)
 @Field boolean usageHelpRequested
 '''
         String expected = String.format("" +
@@ -146,10 +152,11 @@ import picocli.CommandLine
         GroovyShell shell = new GroovyShell()
         shell.context.setVariable('args', ["--help"] as String[])
         shell.evaluate '''
-@picocli.CommandLine.Command(name = 'cmd', description = 'my description')
+@picocli.annots.Command(name = 'cmd', description = 'my description')
 @picocli.groovy.PicocliScript
+import picocli.annots.Option
 
-@picocli.CommandLine.Option(names = ["-h", "--help"], usageHelp = true)
+@Option(names = ["-h", "--help"], usageHelp = true)
 @groovy.transform.Field boolean usageHelpRequested
 '''
         String expected = String.format("" +
@@ -184,12 +191,13 @@ import picocli.CommandLine
         GroovyShell shell = new GroovyShell()
         shell.context.setVariable('args', ["--version"] as String[])
         shell.evaluate '''
-@picocli.CommandLine.Command(version = "best version ever v1.2.3")
+@picocli.annots.Command(version = "best version ever v1.2.3")
 @picocli.groovy.PicocliScript
 import groovy.transform.Field
 import picocli.CommandLine
+import picocli.annots.Option
 
-@CommandLine.Option(names = ["-V", "--version"], versionHelp = true)
+@Option(names = ["-V", "--version"], versionHelp = true)
 @Field boolean usageHelpRequested
 '''
         String expected = String.format("" +
@@ -203,7 +211,7 @@ import picocli.CommandLine
         System.setErr(new PrintStream(baos))
 
         String script = '''
-@picocli.CommandLine.Command
+@picocli.annots.Command
 @picocli.groovy.PicocliScript
 import groovy.transform.Field
 import picocli.CommandLine
@@ -227,12 +235,13 @@ throw new IllegalStateException("Hi this is a test exception")
         System.setErr(new PrintStream(baos))
 
         String script = '''
-@picocli.CommandLine.Command
+@picocli.annots.Command
 @picocli.groovy.PicocliScript
 import groovy.transform.Field
 import picocli.CommandLine
+import picocli.excepts.ExecutionException
 
-throw new CommandLine.ExecutionException(new CommandLine(this), "Hi this is a test ExecutionException")
+throw new ExecutionException(new CommandLine(this), "Hi this is a test ExecutionException")
 '''
         GroovyShell shell = new GroovyShell()
         shell.context.setVariable('args', [] as String[])
@@ -251,15 +260,16 @@ throw new CommandLine.ExecutionException(new CommandLine(this), "Hi this is a te
         System.setErr(new PrintStream(baos))
 
         String script = '''
-@picocli.CommandLine.Command
+@picocli.annots.Command
 @picocli.groovy.PicocliScript
 import picocli.CommandLine
+import picocli.excepts.ExecutionException
 
 public Object handleExecutionException(CommandLine commandLine, String[] args, Exception ex) {
     return ex
 }
     
-throw new CommandLine.ExecutionException(new CommandLine(this), "Hi this is a test handleExecutionException")
+throw new ExecutionException(new CommandLine(this), "Hi this is a test handleExecutionException")
 '''
         GroovyShell shell = new GroovyShell()
         shell.context.setVariable('args', [] as String[])
@@ -278,7 +288,7 @@ throw new CommandLine.ExecutionException(new CommandLine(this), "Hi this is a te
         System.setErr(new PrintStream(baos))
 
         String script = '''
-@picocli.CommandLine.Command
+@picocli.annots.Command
 @picocli.groovy.PicocliScript
 import groovy.transform.Field
 import picocli.CommandLine
@@ -296,8 +306,8 @@ throw new IllegalStateException("Hi this is a test exception")
     }
 
     private class Params {
-        @CommandLine.Parameters String[] positional
-        @CommandLine.Option(names = "-o") option
+        @Parameters String[] positional
+        @Option(names = "-o") option
     }
 
     @Test
@@ -310,7 +320,7 @@ throw new IllegalStateException("Hi this is a test exception")
         System.setErr(new PrintStream(baos))
 
         String script = '''
-@picocli.CommandLine.Command
+@picocli.annots.Command
 @picocli.groovy.PicocliScript
 import groovy.transform.Field
 import picocli.CommandLine
@@ -335,9 +345,10 @@ throw new IllegalStateException("Hi this is a test exception")
     void testScriptWithInnerClass() {
         String script = '''
 import static picocli.CommandLine.*
-@Command(name="classyTest")
+@picocli.annots.Command(name="classyTest")
 @picocli.groovy.PicocliScript
 import groovy.transform.Field
+import picocli.annots.Option
 
 @Option(names = ['-g', '--greeting'], description = 'Type of greeting')
 @Field String greeting = 'Hello\'

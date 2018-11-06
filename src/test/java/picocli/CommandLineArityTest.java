@@ -15,11 +15,13 @@
  */
 package picocli;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import picocli.CommandLine.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static picocli.help.HelpTestUtil.setTraceLevel;
 
 import java.io.File;
 import java.net.InetAddress;
@@ -28,8 +30,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.Assert.*;
-import static picocli.help.HelpTestUtil.setTraceLevel;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+
+import picocli.CommandLine.Model;
+import picocli.CommandLine.Range;
+import picocli.annots.Command;
+import picocli.annots.Option;
+import picocli.annots.Parameters;
+import picocli.annots.Unmatched;
+import picocli.excepts.InitializationException;
+import picocli.excepts.MissingParameterException;
+import picocli.excepts.ParameterException;
+import picocli.excepts.UnmatchedArgumentException;
 
 public class CommandLineArityTest {
     @Before public void setUp() { System.clearProperty("picocli.trace"); }
@@ -495,7 +510,7 @@ public class CommandLineArityTest {
         try {
             CommandLine.populateCommand(new BooleanOptionsArity0_nAndParameters(), "-bool=123 -other".split(" "));
             fail("was able to assign 123 to boolean");
-        } catch (CommandLine.ParameterException ex) {
+        } catch (ParameterException ex) {
             assertEquals("Invalid value for option '-bool': '123' is not a boolean", ex.getMessage());
         }
     }
@@ -520,7 +535,7 @@ public class CommandLineArityTest {
         try {
             CommandLine.populateCommand(new BooleanOptionsArity0_nAndParameters(), "-rv=234 -bool".split(" "));
             fail("was able to assign 234 to boolean");
-        } catch (CommandLine.ParameterException ex) {
+        } catch (ParameterException ex) {
             assertEquals("Invalid value for option '-other': '234' is not a boolean", ex.getMessage());
         }
     }
@@ -560,7 +575,7 @@ public class CommandLineArityTest {
         try {
             CommandLine.populateCommand(new BooleanOptionsArity1_nAndParameters(), "-bool abc".split(" "));
             fail("Invalid format abc was accepted for boolean");
-        } catch (CommandLine.ParameterException expected) {
+        } catch (ParameterException expected) {
             assertEquals("Invalid value for option '-bool': 'abc' is not a boolean", expected.getMessage());
         }
     }
@@ -569,7 +584,7 @@ public class CommandLineArityTest {
         try {
             CommandLine.populateCommand(new BooleanOptionsArity1_nAndParameters(), "-bool".split(" "));
             fail("Missing param was accepted for boolean with arity=1");
-        } catch (CommandLine.ParameterException expected) {
+        } catch (ParameterException expected) {
             assertEquals("Missing required parameter for option '-bool' at index 0 (<aBoolean>)", expected.getMessage());
         }
     }
@@ -599,7 +614,7 @@ public class CommandLineArityTest {
         try {
             CommandLine.populateCommand(new App(),  "-Long", "-boolean");
             fail("should fail");
-        } catch (CommandLine.ParameterException ex) {
+        } catch (ParameterException ex) {
             assertEquals("Invalid value for option '-Long': '-boolean' is not a long", ex.getMessage());
         }
     }

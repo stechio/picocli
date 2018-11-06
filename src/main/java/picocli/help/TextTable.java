@@ -4,6 +4,8 @@ import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 import picocli.util.Assert;
 
 /**
@@ -357,7 +359,7 @@ public class TextTable {
         for (int i = 0; i < columnValues.size(); i++) {
             Text column = columnValues.get(i);
             row.append(column.toString());
-            row.append(new String(Help.spaces(columns[i % columnCount].width - column.length())));
+            row.append(StringUtils.repeat(' ', columns[i % columnCount].width - column.length()));
             if (i % columnCount == columnCount - 1) {
                 int lastChar = row.length() - 1;
                 while (lastChar >= 0 && row.charAt(lastChar) == ' ') {

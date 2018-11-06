@@ -1,17 +1,29 @@
 package picocli;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.contrib.java.lang.system.ProvideSystemProperty;
-import picocli.CommandLine.ParameterException;
-import picocli.CommandLine.PicocliException;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
-import static org.junit.Assert.*;
-import static picocli.CommandLine.Option;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.contrib.java.lang.system.ProvideSystemProperty;
+
+import picocli.annots.Option;
+import picocli.excepts.ParameterException;
+import picocli.excepts.PicocliException;
 
 public class CommandLineAnnotatedMethodImplTest {
     @Rule
@@ -270,7 +282,7 @@ public class CommandLineAnnotatedMethodImplTest {
             assertNotNull(ex.getCause());
             assertTrue(ex.getCause() instanceof PicocliException);
             assertEquals("Pico!", ex.getCause().getMessage());
-            assertEquals("PicocliException: Pico! while processing argument at or before arg[1] 'abc' in [--pico, abc]: picocli.CommandLine$PicocliException: Pico!", ex.getMessage());
+            assertEquals("PicocliException: Pico! while processing argument at or before arg[1] 'abc' in [--pico, abc]: picocli.excepts.PicocliException: Pico!", ex.getMessage());
         }
     }
 }

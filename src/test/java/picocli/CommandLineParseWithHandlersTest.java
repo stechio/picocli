@@ -15,6 +15,21 @@
  */
 package picocli;
 
+import static java.lang.String.format;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.Callable;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.ExpectedSystemExit;
@@ -22,21 +37,20 @@ import org.junit.contrib.java.lang.system.ProvideSystemProperty;
 import org.junit.contrib.java.lang.system.SystemErrRule;
 import org.junit.contrib.java.lang.system.SystemOutRule;
 
+import picocli.CommandLine.DefaultExceptionHandler;
+import picocli.CommandLine.IParseResultHandler;
+import picocli.CommandLine.IParseResultHandler2;
+import picocli.CommandLine.RunAll;
+import picocli.CommandLine.RunFirst;
+import picocli.CommandLine.RunLast;
+import picocli.annots.Command;
+import picocli.annots.Option;
+import picocli.annots.Parameters;
+import picocli.excepts.ExecutionException;
+import picocli.excepts.InitializationException;
+import picocli.excepts.ParameterException;
 import picocli.help.Ansi;
 import picocli.help.Text;
-
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.Callable;
-
-import static java.lang.String.format;
-import static org.junit.Assert.*;
-import static picocli.CommandLine.*;
 
 public class CommandLineParseWithHandlersTest {
     @Rule

@@ -15,39 +15,22 @@
  */
 package picocli;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
+import java.text.ParseException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.ProvideSystemProperty;
 import org.junit.contrib.java.lang.system.SystemErrRule;
 import org.junit.contrib.java.lang.system.SystemOutRule;
-import picocli.CommandLine.Command;
-import picocli.CommandLine.Option;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
-import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Field;
-import java.net.InetAddress;
-import java.net.URL;
-import java.text.ParseException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
-
-import static java.lang.String.format;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import picocli.annots.Option;
+import picocli.annots.Parameters;
 
 /**
  * Tests collecting errors instead of throwing them.
@@ -93,8 +76,8 @@ public class LenientParsingTest {
     @Test
     public void testMissingRequiredParams() {
         class Example {
-            @CommandLine.Parameters(index = "1", arity = "0..1") String optional;
-            @CommandLine.Parameters(index = "0") String mandatory;
+            @Parameters(index = "1", arity = "0..1") String optional;
+            @Parameters(index = "0") String mandatory;
         }
 
         CommandLine cmd = new CommandLine(new Example());
@@ -107,9 +90,9 @@ public class LenientParsingTest {
     @Test
     public void testMissingRequiredParams1() {
         class Tricky1 {
-            @CommandLine.Parameters(index = "2") String anotherMandatory;
-            @CommandLine.Parameters(index = "1", arity = "0..1") String optional;
-            @CommandLine.Parameters(index = "0") String mandatory;
+            @Parameters(index = "2") String anotherMandatory;
+            @Parameters(index = "1", arity = "0..1") String optional;
+            @Parameters(index = "0") String mandatory;
         }
         CommandLine cmd = new CommandLine(new Tricky1());
         cmd.getCommandSpec().parser().collectErrors(true);
@@ -126,9 +109,9 @@ public class LenientParsingTest {
     @Test
     public void testMissingRequiredParams2() {
         class Tricky2 {
-            @CommandLine.Parameters(index = "2", arity = "0..1") String anotherOptional;
-            @CommandLine.Parameters(index = "1", arity = "0..1") String optional;
-            @CommandLine.Parameters(index = "0") String mandatory;
+            @Parameters(index = "2", arity = "0..1") String anotherOptional;
+            @Parameters(index = "1", arity = "0..1") String optional;
+            @Parameters(index = "0") String mandatory;
         }
         CommandLine cmd = new CommandLine(new Tricky2());
         cmd.getCommandSpec().parser().collectErrors(true);
@@ -142,8 +125,8 @@ public class LenientParsingTest {
         class Tricky3 {
             @Option(names="-v", required = true) boolean more;
             @Option(names="-t", required = true) boolean any;
-            @CommandLine.Parameters(index = "1") String alsoMandatory;
-            @CommandLine.Parameters(index = "0") String mandatory;
+            @Parameters(index = "1") String alsoMandatory;
+            @Parameters(index = "0") String mandatory;
         }
         CommandLine cmd = new CommandLine(new Tricky3());
         cmd.getCommandSpec().parser().collectErrors(true);
@@ -162,7 +145,7 @@ public class LenientParsingTest {
     public void testMissingRequiredParamWithOption() {
         class Tricky3 {
             @Option(names="-t") boolean any;
-            @CommandLine.Parameters(index = "0") String mandatory;
+            @Parameters(index = "0") String mandatory;
         }
         CommandLine cmd = new CommandLine(new Tricky3());
         cmd.getCommandSpec().parser().collectErrors(true);
@@ -175,7 +158,7 @@ public class LenientParsingTest {
     @Test
     public void testNonVarargArrayParametersWithArity0() {
         class NonVarArgArrayParamsZeroArity {
-            @CommandLine.Parameters(arity = "0")
+            @Parameters(arity = "0")
             List<String> params;
         }
         CommandLine cmd = new CommandLine(new NonVarArgArrayParamsZeroArity());

@@ -1,22 +1,23 @@
 package picocli.codegen.aot.graalvm;
 
-import picocli.CommandLine;
-import picocli.CommandLine.Command;
-import picocli.CommandLine.Mixin;
-import picocli.CommandLine.Model.CommandSpec;
-import picocli.CommandLine.Option;
-import picocli.CommandLine.ParameterException;
-import picocli.CommandLine.Parameters;
-import picocli.CommandLine.Spec;
-import picocli.CommandLine.Unmatched;
-
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import picocli.CommandLine;
+import picocli.CommandLine.Model.CommandSpec;
+import picocli.CommandLine.Parameters;
+import picocli.help.HelpCommandtchedects.Mixins.Command;
+import picocli.annots.Mixin;
+import picocli.annots.Option;
+import picocli.annots.Spec;
+import picocli.annots.Unmatched;
+import picocli.excepts.ParameterException;
+import picocli.help.HelpCommand;
+
 @Command(name = "example", version = "3.7.0",
-        mixinStandardHelpOptions = true, subcommands = CommandLine.HelpCommand.class)
+        mixinStandardHelpOptions = true, subcommands = HelpCommand.class)
 public class Example implements Runnable {
 
     @Command public static class ExampleMixin {

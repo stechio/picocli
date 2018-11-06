@@ -2,13 +2,15 @@ package picocli.groovy
 
 import org.junit.Test
 import picocli.CommandLine
+import picocli.annots.Option
+import picocli.annots.Parameters
 
 import static org.junit.Assert.assertEquals
 
 class CommandLineTest {
     private class Params {
-        @CommandLine.Parameters String[] positional
-        @CommandLine.Option(names = "-o") option
+        @Parameters String[] positional
+        @Option(names = "-o") option
     }
 
     @Test

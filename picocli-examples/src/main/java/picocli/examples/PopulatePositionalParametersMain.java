@@ -17,9 +17,9 @@
 package picocli.examples;
 
 import picocli.CommandLine;
-import picocli.CommandLine.Option;
-import picocli.CommandLine.ParameterException;
-import picocli.CommandLine.Parameters;
+import picocli.annots.Option;
+import picocli.annots.Parameters;
+import picocli.excepts.ParameterException;
 
 /**
  * This example demonstrates the usage with positional parameters.

@@ -4,6 +4,9 @@ import java.io.IOException;
 
 import org.junit.Test;
 
+import picocli.annots.Command;
+import picocli.annots.Option;
+
 import static java.lang.String.format;
 import static org.junit.Assert.assertEquals;
 import static picocli.CommandLine.*;

@@ -15,6 +15,8 @@
  */
 package picocli;
 
+import static java.lang.String.format;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -27,17 +29,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import picocli.CommandLine.Command;
-import picocli.CommandLine.Model.PositionalParamSpec;
-import picocli.help.Help;
-import picocli.CommandLine.Option;
-import picocli.CommandLine.Parameters;
 import picocli.CommandLine.Model.ArgSpec;
 import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.Model.OptionSpec;
-import picocli.CommandLine.ParseResult;
-
-import static java.lang.String.*;
+import picocli.CommandLine.Model.PositionalParamSpec;
+import picocli.annots.Command;
+import picocli.annots.Option;
+import picocli.annots.Parameters;
+import picocli.help.Help;
 
 /**
  * Stand-alone tool that generates bash auto-complete scripts for picocli-based command line applications.

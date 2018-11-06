@@ -25,12 +25,14 @@ package picocli.groovy
 @groovy.transform.BaseScript(PicocliBaseScript)
 import groovy.transform.Field
 import picocli.CommandLine
+import picocli.annots.Option
+import picocli.annots.Parameters
 
 
-@CommandLine.Parameters
+@Parameters
 @Field List<String> parameters
 
-@CommandLine.Option(names = ["-cp", "--codepath"])
+@Option(names = ["-cp", "--codepath"])
 @Field List<String> codepath = []
 
 //// Override the default of using the 'args' binding for our test.

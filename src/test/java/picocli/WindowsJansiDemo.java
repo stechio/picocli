@@ -16,7 +16,8 @@
 package picocli;
 
 import org.fusesource.jansi.AnsiConsole;
-import picocli.CommandLine.Command;
+
+import picocli.annots.Command;
 import picocli.help.Ansi;
 
 /**

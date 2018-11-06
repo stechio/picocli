@@ -1,11 +1,12 @@
 package picocli;
 
-import picocli.CommandLine.Command;
-import picocli.CommandLine.Option;
-import picocli.CommandLine.Parameters;
+import picocli.annots.Command;
+import picocli.annots.Option;
+import picocli.annots.Parameters;
+import picocli.help.HelpCommand;
 
 @Command(name = "i18n-sub",
-        subcommands = CommandLine.HelpCommand.class,
+        subcommands = HelpCommand.class,
         mixinStandardHelpOptions = true,
         description = {"subcmd desc 1", "subcmd desc 2", "subcmd desc 3"},
         descriptionHeading = "subcmd desc heading%n",

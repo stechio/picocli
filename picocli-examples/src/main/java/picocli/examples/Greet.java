@@ -16,7 +16,8 @@
 package picocli.examples;
 
 import picocli.CommandLine;
-import static picocli.CommandLine.*;
+import picocli.annots.Command;
+import picocli.annots.Option;
 
 @Command(name = "Greet", header = "%n@|green Hello world demo|@")
 public class Greet implements Runnable {

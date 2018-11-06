@@ -18,9 +18,9 @@ package picocli.examples.subcommands;
 import java.io.File;
 
 import picocli.CommandLine;
-import picocli.CommandLine.Command;
-import picocli.CommandLine.Option;
-import picocli.CommandLine.ParentCommand;
+import picocli.annots.Command;
+import picocli.annots.Option;
+import picocli.annots.ParentCommand;
 
 public class ParentCommandDemo {
 

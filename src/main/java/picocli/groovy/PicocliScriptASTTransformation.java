@@ -29,13 +29,13 @@ import org.codehaus.groovy.control.SourceUnit;
 import org.codehaus.groovy.transform.AbstractASTTransformation;
 import org.codehaus.groovy.transform.GroovyASTTransformation;
 
-import picocli.CommandLine;
+import picocli.annots.Command;
 
 /**
  * Ensures that Groovy scripts annotated with {@link PicocliScript} are transformed into a class that
  * extends {@link PicocliBaseScript}.
  * This class performs the same transformations as {@link org.codehaus.groovy.transform.BaseScriptASTTransformation},
- * and in addition moves {@link picocli.CommandLine.Command} annotations to the generated script class.
+ * and in addition moves {@link picocli.annots.Command} annotations to the generated script class.
  * The {@code @Command} annotation must be on the same {@code import} or local variable as the {@code PicocliScript}
  * annotation.
  *
@@ -46,7 +46,7 @@ import picocli.CommandLine;
 public class PicocliScriptASTTransformation extends AbstractASTTransformation {
 
     private static final Class<PicocliScript> MY_CLASS = PicocliScript.class;
-    private static final Class<CommandLine.Command> COMMAND_CLASS = CommandLine.Command.class;
+    private static final Class<Command> COMMAND_CLASS = Command.class;
     private static final Class<PicocliBaseScript> BASE_SCRIPT_CLASS = PicocliBaseScript.class;
     private static final ClassNode MY_TYPE = ClassHelper.make(MY_CLASS);
     private static final ClassNode COMMAND_TYPE = ClassHelper.make(COMMAND_CLASS);

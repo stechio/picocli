@@ -1,12 +1,13 @@
 package picocli;
 
-import picocli.CommandLine.Command;
-import picocli.CommandLine.Option;
-import picocli.CommandLine.Parameters;
+import picocli.annots.Command;
+import picocli.annots.Option;
+import picocli.annots.Parameters;
+import picocli.help.HelpCommand;
 
 @Command(name = "i18n",
         resourceBundle = "picocli.I18nSuperclass_Messages",
-        subcommands = CommandLine.HelpCommand.class,
+        subcommands = HelpCommand.class,
         mixinStandardHelpOptions = true,
         description = {"super desc 1", "super desc 2", "super desc 3"},
         descriptionHeading = "super desc heading%n",

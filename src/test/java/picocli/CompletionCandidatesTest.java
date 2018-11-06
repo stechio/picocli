@@ -34,8 +34,8 @@ import org.junit.contrib.java.lang.system.SystemOutRule;
 import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.Model.OptionSpec;
 import picocli.CommandLine.Model.PositionalParamSpec;
-import picocli.CommandLine.Option;
-import picocli.CommandLine.Parameters;
+import picocli.annots.Option;
+import picocli.annots.Parameters;
 import picocli.help.Ansi;
 
 /**

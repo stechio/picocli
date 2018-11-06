@@ -17,8 +17,8 @@
 package picocli.examples;
 
 import picocli.CommandLine;
-import picocli.CommandLine.Option;
-import picocli.CommandLine.ParameterException;
+import picocli.annots.Option;
+import picocli.excepts.ParameterException;
 
 /**
  * This example demonstrates the usage with options which takes values.

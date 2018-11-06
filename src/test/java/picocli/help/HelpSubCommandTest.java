@@ -1,30 +1,26 @@
 package picocli.help;
 
-import org.junit.Test;
-
-import picocli.CommandLine;
-import picocli.CommandLineTest;
-import picocli.CommandLine.Command;
-import picocli.CommandLine.Model;
-import picocli.CommandLine.Model.CommandSpec;
-import picocli.CommandLine.Model.OptionSpec;
-import picocli.help.Help;
+import static org.junit.Assert.assertEquals;
+import static picocli.help.HelpTestUtil.usageString;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
-import static org.junit.Assert.assertEquals;
-import static picocli.CommandLine.*;
-import static picocli.CommandLine.Model.*;
-import static picocli.help.HelpTestUtil.usageString;
+import org.junit.Test;
 
+import picocli.CommandLine;
+import picocli.CommandLine.Model.CommandSpec;
+import picocli.CommandLine.Model.OptionSpec;
+import picocli.annots.Command;
+import picocli.CommandLineTest;
 
 public class HelpSubCommandTest {
 
     @Test
     public void testShowSynopsisUsageWithCommandOption() {
         CommandSpec spec = CommandSpec.create();
-        spec.addOption(OptionSpec.builder("-h", "--help").usageHelp(true).description("show help and exit").build());
+        spec.addOption(OptionSpec.builder("-h", "--help").usageHelp(true)
+                .description("show help and exit").build());
 
         // adding a subcommand should show "COMMAND" option to the help synopsis
         spec.addSubcommand("subcommand", CommandSpec.create());
@@ -32,18 +28,16 @@ public class HelpSubCommandTest {
         CommandLine commandLine = new CommandLine(spec);
 
         String actual = usageString(commandLine, Ansi.OFF);
-        String expected = String.format("" +
-                "Usage: <main class> [-h] [COMMAND]%n" +
-                "  -h, --help   show help and exit%n" +
-                "Commands:%n" +
-                "  subcommand%n");
+        String expected = String.format("" + "Usage: <main class> [-h] [COMMAND]%n"
+                + "  -h, --help   show help and exit%n" + "Commands:%n" + "  subcommand%n");
         assertEquals(expected, actual);
     }
 
     @Test
     public void testShowAbbreviatedSynopsisUsageWithCommandOption() {
         CommandSpec spec = CommandSpec.create();
-        spec.addOption(OptionSpec.builder("-h", "--help").usageHelp(true).description("show help and exit").build());
+        spec.addOption(OptionSpec.builder("-h", "--help").usageHelp(true)
+                .description("show help and exit").build());
 
         // using abbreviated synopsis
         spec.usageMessage().abbreviateSynopsis(true);
@@ -54,30 +48,36 @@ public class HelpSubCommandTest {
         CommandLine commandLine = new CommandLine(spec);
 
         String actual = usageString(commandLine, Ansi.OFF);
-        String expected = String.format("" +
-                "Usage: <main class> [OPTIONS] [COMMAND]%n" +
-                "  -h, --help   show help and exit%n" +
-                "Commands:%n" +
-                "  subcommand%n");
+        String expected = String.format("" + "Usage: <main class> [OPTIONS] [COMMAND]%n"
+                + "  -h, --help   show help and exit%n" + "Commands:%n" + "  subcommand%n");
         assertEquals(expected, actual);
     }
 
-    @Command(name = "top", aliases = {"t", "tp"}, subcommands = {SubCommand1.class, SubCommand2.class}, description = "top level command")
-    static class TopLevelCommand { }
+    @Command(name = "top", aliases = { "t", "tp" }, subcommands = { SubCommand1.class,
+            SubCommand2.class }, description = "top level command")
+    static class TopLevelCommand {
+    }
 
-    @Command(name = "sub", aliases = {"s", "sb"}, subcommands = {SubSubCommand.class}, description = "I'm subcommand No. 1!")
-    static class SubCommand1 {}
+    @Command(name = "sub", aliases = { "s", "sb" }, subcommands = {
+            SubSubCommand.class }, description = "I'm subcommand No. 1!")
+    static class SubCommand1 {
+    }
 
-    @Command(name = "sub2", aliases = {"s2", "sb2"}, subcommands = {SubSubCommand.class}, description = "I'm subcommand 2 but pretty good still")
-    static class SubCommand2 {}
+    @Command(name = "sub2", aliases = { "s2", "sb2" }, subcommands = {
+            SubSubCommand.class }, description = "I'm subcommand 2 but pretty good still")
+    static class SubCommand2 {
+    }
 
-    @Command(name = "subsub", aliases = {"ss", "sbsb"}, description = "I'm like a 3rd rate command but great bang for your buck")
-    static class SubSubCommand {}
+    @Command(name = "subsub", aliases = { "ss",
+            "sbsb" }, description = "I'm like a 3rd rate command but great bang for your buck")
+    static class SubSubCommand {
+    }
 
     @Test
     public void testCommandAliasRegistrationByAnnotation() {
         CommandLine commandLine = new CommandLine(new TopLevelCommand());
-        assertEquals(CommandLineTest.setOf("sub", "s", "sb", "sub2", "s2", "sb2"), commandLine.getSubcommands().keySet());
+        assertEquals(CommandLineTest.setOf("sub", "s", "sb", "sub2", "s2", "sb2"),
+                commandLine.getSubcommands().keySet());
 
         CommandLine sub1 = commandLine.getSubcommands().get("sub");
         assertEquals(CommandLineTest.setOf("subsub", "ss", "sbsb"), sub1.getSubcommands().keySet());
@@ -91,14 +91,15 @@ public class HelpSubCommandTest {
         CommandLine commandLine = new CommandLine(new TopLevelCommand());
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        commandLine.usage(new PrintStream(baos), Help.defaultColorScheme(Ansi.ON).commands(Ansi.Style.underline)); // add underline
-        
-        String expected = new Text(Ansi.ON, String.format("" +
-                "Usage: @|bold,underline top|@ [COMMAND]%n" +
-                "top level command%n" +
-                "Commands:%n" +
-                "  @|bold,underline sub|@, @|bold,underline s|@, @|bold,underline sb|@     I'm subcommand No. 1!%n" +
-                "  @|bold,underline sub2|@, @|bold,underline s2|@, @|bold,underline sb2|@  I'm subcommand 2 but pretty good still%n")).toString();
+        commandLine.usage(new PrintStream(baos),
+                ColorScheme.createDefault(Ansi.ON).commands(Ansi.Style.underline)); // add underline
+
+        String expected = new Text(Ansi.ON, String.format(""
+                + "Usage: @|bold,underline top|@ [COMMAND]%n" + "top level command%n"
+                + "Commands:%n"
+                + "  @|bold,underline sub|@, @|bold,underline s|@, @|bold,underline sb|@     I'm subcommand No. 1!%n"
+                + "  @|bold,underline sub2|@, @|bold,underline s2|@, @|bold,underline sb2|@  I'm subcommand 2 but pretty good still%n"))
+                        .toString();
         assertEquals(expected, baos.toString());
     }
 
@@ -107,13 +108,14 @@ public class HelpSubCommandTest {
         CommandLine commandLine = new CommandLine(new TopLevelCommand());
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        commandLine.getSubcommands().get("sub").usage(new PrintStream(baos), Help.defaultColorScheme(Ansi.ON).commands(Ansi.Style.underline)); // add underline
+        commandLine.getSubcommands().get("sub").usage(new PrintStream(baos),
+                ColorScheme.createDefault(Ansi.ON).commands(Ansi.Style.underline)); // add underline
 
-        String expected = new Text(Ansi.ON, String.format("" +
-                "Usage: @|bold,underline top sub|@ [COMMAND]%n" +
-                "I'm subcommand No. 1!%n" +
-                "Commands:%n" +
-                "  @|bold,underline subsub|@, @|bold,underline ss|@, @|bold,underline sbsb|@  I'm like a 3rd rate command but great bang for your buck%n")).toString();
+        String expected = new Text(Ansi.ON, String.format(""
+                + "Usage: @|bold,underline top sub|@ [COMMAND]%n" + "I'm subcommand No. 1!%n"
+                + "Commands:%n"
+                + "  @|bold,underline subsub|@, @|bold,underline ss|@, @|bold,underline sbsb|@  I'm like a 3rd rate command but great bang for your buck%n"))
+                        .toString();
         assertEquals(expected, baos.toString());
     }
 }

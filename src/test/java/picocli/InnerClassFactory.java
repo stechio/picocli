@@ -16,7 +16,7 @@
 package picocli;
 
 import picocli.CommandLine.IFactory;
-import picocli.CommandLine.InitializationException;
+import picocli.excepts.InitializationException;
 
 import java.lang.reflect.Constructor;
 

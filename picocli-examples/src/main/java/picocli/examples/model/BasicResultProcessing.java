@@ -15,16 +15,16 @@
  */
 package picocli.examples.model;
 
+import java.io.File;
+import java.util.Collections;
+import java.util.List;
+
 import picocli.CommandLine;
 import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.Model.OptionSpec;
 import picocli.CommandLine.Model.PositionalParamSpec;
-import picocli.CommandLine.ParameterException;
-import picocli.CommandLine.ParseResult;
-
-import java.io.File;
-import java.util.Collections;
-import java.util.List;
+import picocli.ParseResult;
+import picocli.excepts.ParameterException;
 
 public class BasicResultProcessing {
     public static void main(final String[] args) {

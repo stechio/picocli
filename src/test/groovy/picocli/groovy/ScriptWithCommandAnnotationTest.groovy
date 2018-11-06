@@ -3,9 +3,10 @@ package picocli.groovy
 @Command(name = 'package-test-name22', separator = ';', version = 'package-test-version')
 @PicocliScript
 import picocli.groovy.PicocliScript
-import picocli.CommandLine.Command
+
 import org.junit.Test
 import picocli.CommandLine
+import picocli.annots.Command
 
 /**
  * Tests putting @Command annotations on the package declaration of a class.

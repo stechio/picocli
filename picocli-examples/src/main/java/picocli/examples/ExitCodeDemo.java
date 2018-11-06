@@ -16,11 +16,8 @@
 package picocli.examples;
 
 import picocli.CommandLine;
-import picocli.CommandLine.Command;
-import picocli.CommandLine.ParameterException;
-
-import java.util.Collections;
-import java.util.List;
+import picocli.annots.Command;
+import picocli.excepts.ParameterException;
 
 @Command
 public class ExitCodeDemo implements Runnable {

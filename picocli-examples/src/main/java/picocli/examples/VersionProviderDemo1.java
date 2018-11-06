@@ -15,13 +15,13 @@
  */
 package picocli.examples;
 
-import picocli.CommandLine;
-import picocli.CommandLine.Command;
-import picocli.CommandLine.IVersionProvider;
-import picocli.CommandLine.Option;
-
 import java.net.URL;
 import java.util.Properties;
+
+import picocli.CommandLine;
+import picocli.CommandLine.IVersionProvider;
+import picocli.annots.Command;
+import picocli.annots.Option;
 
 /**
  * Demonstrates a {@link IVersionProvider} implementation that reads version information from a

@@ -1,8 +1,8 @@
 package picocli;
 
-import picocli.CommandLine.Command;
-import picocli.CommandLine.Option;
-import picocli.CommandLine.Parameters;
+import picocli.annots.Command;
+import picocli.annots.Option;
+import picocli.annots.Parameters;
 
 @Command(name = "i18n-sub2",
         resourceBundle = "picocli.I18nSubclass2_Messages",

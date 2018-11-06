@@ -1,7 +1,6 @@
 package picocli.codegen.aot.graalvm;
 
 import picocli.CommandLine;
-import picocli.CommandLine.Command;
 import picocli.CommandLine.Model.ArgSpec;
 import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.Model.IGetter;
@@ -9,8 +8,13 @@ import picocli.CommandLine.Model.ISetter;
 import picocli.CommandLine.Model.OptionSpec;
 import picocli.CommandLine.Model.PositionalParamSpec;
 import picocli.CommandLine.Model.UnmatchedArgsBinding;
-import picocli.CommandLine.Option;
-import picocli.CommandLine.Parameters;
+import picocli.annots.Unmatchedects.ParentCommandd;
+import picocli.annots.Spec;
+import picocli.annots.Unmatched;
+import picocli.annots.Mixin;
+import picocli.annots.Option;
+import picocli.annots.ParentCommand;
+import picocli.Copicocli.annots.Mixinameters;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -211,16 +215,16 @@ public class ReflectionConfigGenerator {
             ReflectedClass reflectedClass = getOrCreateClass(cls);
             Field[] declaredFields = cls.getDeclaredFields();
             for (Field f : declaredFields) {
-                if (f.isAnnotationPresent(CommandLine.Spec.class)) {
+                if (f.isAnnotationPresent(Spec.class)) {
                     reflectedClass.addField(f.getName());
                 }
-                if (f.isAnnotationPresent(CommandLine.ParentCommand.class)) {
+                if (f.isAnnotationPresent(ParentCommand.class)) {
                     reflectedClass.addField(f.getName());
                 }
-                if (f.isAnnotationPresent(CommandLine.Mixin.class)) {
+                if (f.isAnnotationPresent(Mixin.class)) {
                     reflectedClass.addField(f.getName());
                 }
-                if (f.isAnnotationPresent(CommandLine.Unmatched.class)) {
+                if (f.isAnnotationPresent(Unmatched.class)) {
                     reflectedClass.addField(f.getName());
                 }
             }

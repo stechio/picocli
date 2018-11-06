@@ -19,6 +19,18 @@ import picocli.util.Assert;
  * @see Help#defaultColorScheme(Ansi)
  */
 public class ColorScheme {
+    /**
+     * Creates a new {@link ColorScheme} initialized with picocli default values: commands are bold,
+     * options and parameters use a yellow foreground, and option parameters use italic.
+     *
+     * @param ansi
+     *            whether the usage help message should contain ANSI escape codes or not
+     */
+    public static ColorScheme createDefault(Ansi ansi) {
+        return new ColorScheme(ansi).commands(Style.bold).options(Style.fg_yellow)
+                .parameters(Style.fg_yellow).optionParams(Style.italic);
+    }
+
     public final List<Ansi.IStyle> commandStyles = new ArrayList<>();
     public final List<Ansi.IStyle> optionStyles = new ArrayList<>();
     public final List<Ansi.IStyle> parameterStyles = new ArrayList<>();

@@ -46,9 +46,9 @@ public class HelpTestUtil {
             assertEquals(result, commandLine.getUsageMessage());
         } else if (ansi == Ansi.ON) {
             baos.reset();
-            commandLine.usage(new PrintStream(baos, true), Help.defaultColorScheme(Ansi.ON));
+            commandLine.usage(new PrintStream(baos, true), ColorScheme.createDefault(Ansi.ON));
             assertEquals(result, baos.toString());
-            assertEquals(result, commandLine.getUsageMessage(Help.defaultColorScheme(Ansi.ON)));
+            assertEquals(result, commandLine.getUsageMessage(ColorScheme.createDefault(Ansi.ON)));
         }
         return result;
     }

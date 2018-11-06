@@ -18,6 +18,8 @@ package picocli.groovy;
 
 import org.codehaus.groovy.transform.GroovyASTTransformationClass;
 
+import picocli.annots.Command;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -31,7 +33,7 @@ import java.lang.annotation.Target;
  * {@code @PicocliScript} and the script base class will be {@link PicocliScriptASTTransformation transformed} to
  * {@link picocli.groovy.PicocliBaseScript}.
  * </p><p>
- * Also, any {@link picocli.CommandLine.Command} annotation on the same variable or import statement will be added to
+ * Also, any {@link picocli.annots.Command} annotation on the same variable or import statement will be added to
  * the script class. With the {@code @Command} annotation scripts can customize elements shown in the usage message
  * like command name, description, headers, footers etc.
  * </p><p>

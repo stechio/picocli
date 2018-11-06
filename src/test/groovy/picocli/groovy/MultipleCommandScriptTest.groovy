@@ -26,25 +26,27 @@ package picocli.groovy
 import groovy.transform.BaseScript
 import groovy.transform.Field
 import picocli.CommandLine
-
+import picocli.annots.Command
+import picocli.annots.Option
+import picocli.annots.Parameters
 import java.util.concurrent.Callable
 
-@CommandLine.Command(name = "git", subcommands = [picocli.groovy.CommandCommit, picocli.groovy.CommandAdd])
+@Command(name = "git", subcommands = [picocli.groovy.CommandCommit, picocli.groovy.CommandAdd])
 @PicocliScript PicocliBaseScript thisScript
 
 
-@CommandLine.Option(names = ["-log", "-verbose" ], description = "Level of verbosity")
+@Option(names = ["-log", "-verbose" ], description = "Level of verbosity")
 @Field Integer verbose = 1;
 
-@CommandLine.Command(name = "commit", description = "Record changes to the repository")
+@Command(name = "commit", description = "Record changes to the repository")
 class CommandCommit implements Runnable {
-    @CommandLine.Parameters(description = "The list of files to commit")
+    @Parameters(description = "The list of files to commit")
     private List<String> files;
 
-    @CommandLine.Option(names = "--amend", description = "Amend")
+    @Option(names = "--amend", description = "Amend")
     private Boolean amend = false;
 
-    @CommandLine.Option(names = "--author")
+    @Option(names = "--author")
     private String author;
 
     @Override
@@ -55,12 +57,12 @@ class CommandCommit implements Runnable {
     }
 }
 
-@CommandLine.Command(name = "add", separator = "=", description = "Add file contents to the index")
+@Command(name = "add", separator = "=", description = "Add file contents to the index")
 public class CommandAdd implements Callable<Object> {
-    @CommandLine.Parameters(description = "File patterns to add to the index")
+    @Parameters(description = "File patterns to add to the index")
     List<String> patterns;
 
-    @CommandLine.Option(names = "-i")
+    @Option(names = "-i")
     Boolean interactive = false;
 
     @Override

@@ -15,19 +15,36 @@
  */
 package picocli;
 
-import org.junit.Test;
-import picocli.CommandLine.*;
-import picocli.CommandLine.Model.*;
-import picocli.help.Ansi;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static picocli.help.HelpTestUtil.usageString;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
-import java.util.concurrent.Callable;
 
-import static org.junit.Assert.*;
-import static picocli.help.HelpTestUtil.usageString;
+import org.junit.Test;
+
+import picocli.CommandLine.IVersionProvider;
+import picocli.CommandLine.Model.CommandSpec;
+import picocli.CommandLine.Model.ISetter;
+import picocli.CommandLine.Model.OptionSpec;
+import picocli.CommandLine.Model.UsageMessageSpec;
+import picocli.annots.Command;
+import picocli.annots.Mixin;
+import picocli.annots.Option;
+import picocli.annots.Parameters;
+import picocli.annots.Spec;
+import picocli.excepts.DuplicateOptionAnnotationsException;
+import picocli.excepts.InitializationException;
+import picocli.excepts.ParameterException;
+import picocli.help.Ansi;
 
 public class CommandLineMixinTest {
 

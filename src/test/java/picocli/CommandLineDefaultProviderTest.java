@@ -1,15 +1,19 @@
 package picocli;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 
 import org.junit.Test;
-import picocli.CommandLine.Command;
+
 import picocli.CommandLine.IDefaultValueProvider;
 import picocli.CommandLine.Model.ArgSpec;
+import picocli.annots.Command;
+import picocli.annots.Option;
+import picocli.annots.Parameters;
 import picocli.help.Ansi;
 import picocli.help.Help;
-import picocli.CommandLine.Option;
-import picocli.CommandLine.Parameters;
 
 public class CommandLineDefaultProviderTest {
 

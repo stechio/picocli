@@ -3,7 +3,6 @@ package picocli.help;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.IdentityHashMap;
@@ -15,20 +14,19 @@ import java.util.function.Function;
 import org.apache.commons.lang3.StringUtils;
 
 import picocli.CommandLine;
-import picocli.CommandLine.Command;
 import picocli.CommandLine.Model.ArgSpec;
 import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.Model.OptionSpec;
 import picocli.CommandLine.Model.ParserSpec;
 import picocli.CommandLine.Model.PositionalParamSpec;
 import picocli.CommandLine.Model.UsageMessageSpec;
-import picocli.CommandLine.Option;
-import picocli.CommandLine.Parameters;
+import picocli.annots.Command;
 import picocli.CommandLine.Range;
-import picocli.help.Ansi.Style;
 import picocli.help.TextTable.Column;
 import picocli.util.Assert;
+import picocli.util.Comparators;
 import picocli.util.ListMap;
+import picocli.util.StringUtilsExt;
 import picocli.util.Utils;
 
 /**
@@ -145,7 +143,7 @@ public class Help {
             if (value.isEmpty())
                 return "";
 
-            int commandLength = maxLength(value.keySet());
+            int commandLength = StringUtilsExt.longest(value.keySet()).length();
             TextTable textTable = TextTable.forColumns(help.colorScheme().ansi(),
                     new TextTable.Column(commandLength + 2, 2, TextTable.Column.Overflow.SPAN),
                     new TextTable.Column(
@@ -640,7 +638,7 @@ public class Help {
                     ? result.substring(0,
                             result.length() - System.getProperty("line.separator").length())
                     : result;
-            return result + new String(spaces(countTrailingSpaces(value)));
+            return result + StringUtils.repeat(' ', Utils.countTrailingSpaces(value));
         }
 
         public SectionHeadingRenderer withAfter(String after) {
@@ -662,26 +660,6 @@ public class Help {
         }
     }
 
-    /** Sorts short strings before longer strings. */
-    public static class ShortestFirst implements Comparator<String> {
-        /** Sorts the specified array of Strings longest-first and returns it. */
-        public static String[] longestFirst(String[] names) {
-            Arrays.sort(names, Collections.reverseOrder(new ShortestFirst()));
-            return names;
-        }
-
-        /** Sorts the specified array of Strings shortest-first and returns it. */
-        public static String[] sort(String[] names) {
-            Arrays.sort(names, new ShortestFirst());
-            return names;
-        }
-
-        @Override
-        public int compare(String o1, String o2) {
-            return o1.length() - o2.length();
-        }
-    }
-
     public static class SimpleSectionBodyRenderer extends SimpleSectionMemberRenderer<String[]> {
         @Override
         public String render(Help help, String[] value) {
@@ -698,7 +676,8 @@ public class Help {
             for (String value : values) {
                 // TODO: params?
                 //                Text[] lines = ansi().new Text(format(value, params)).splitLines();
-                Text[] lines = new Text(help.colorScheme().ansi(), format(value)).splitLines();
+                Text[] lines = new Text(help.colorScheme().ansi(), Utils.safeFormat(value))
+                        .splitLines();
                 for (Text line : lines) {
                     table.addRowValues(line);
                 }
@@ -902,7 +881,7 @@ public class Help {
         @Override
         public Text[][] render(OptionSpec option, Help.IParamLabelRenderer paramLabelRenderer,
                 ColorScheme scheme) {
-            String[] names = ShortestFirst.sort(option.names());
+            String[] names = Comparators.Length.sortAsc(option.names());
             int shortOptionCount = names[0].length() == 2 ? 1 : 0;
             String shortOption = shortOptionCount > 0 ? names[0] : "";
             sep = shortOptionCount > 0 && names.length > 1 ? "," : "";
@@ -1140,8 +1119,8 @@ public class Help {
                 return 1;
             else if (o2 == null)
                 return -1;
-            String[] names1 = ShortestFirst.sort(o1.names());
-            String[] names2 = ShortestFirst.sort(o2.names());
+            String[] names1 = Comparators.Length.sortAsc(o1.names());
+            String[] names2 = Comparators.Length.sortAsc(o2.names());
             int result = names1[0].toUpperCase().compareTo(names2[0].toUpperCase()); // case insensitive sort
             result = result == 0 ? -names1[0].compareTo(names2[0]) : result; // lower case before upper case
             return o1.help() == o2.help() ? result : o2.help() ? -1 : 1; // help options come last
@@ -1174,20 +1153,6 @@ public class Help {
     }
 
     /**
-     * Creates and returns a new {@link ColorScheme} initialized with picocli default values:
-     * commands are bold, options and parameters use a yellow foreground, and option parameters use
-     * italic.
-     *
-     * @param ansi
-     *            whether the usage help message should contain ANSI escape codes or not
-     * @return a new default color scheme
-     */
-    public static ColorScheme defaultColorScheme(Ansi ansi) {
-        return new ColorScheme(ansi).commands(Style.bold).options(Style.fg_yellow)
-                .parameters(Style.fg_yellow).optionParams(Style.italic);
-    }
-
-    /**
      * Formats each of the specified values and appends it to the specified StringBuilder.
      * 
      * @param ansi
@@ -1208,7 +1173,7 @@ public class Help {
             TextTable table = TextTable.forColumnWidths(ansi, usageHelpWidth);
             table.indentWrappedLines = 0;
             for (String summaryLine : values) {
-                Text[] lines = new Text(ansi, format(summaryLine, params)).splitLines();
+                Text[] lines = new Text(ansi, Utils.safeFormat(summaryLine, params)).splitLines();
                 for (Text line : lines) {
                     table.addRowValues(line);
                 }
@@ -1218,36 +1183,20 @@ public class Help {
         return sb;
     }
 
-    /**
-     * Sorts short strings before longer strings.
-     *
-     * @return a comparators that sorts short strings before longer strings
-     */
-    public static Comparator<String> shortestFirst() {
-        return new ShortestFirst();
-    }
-
-    static char[] spaces(int length) {
-        char[] result = new char[length];
-        Arrays.fill(result, ' ');
-        return result;
-    }
+    //    /**
+    //     * Sorts short strings before longer strings.
+    //     *
+    //     * @return a comparators that sorts short strings before longer strings
+    //     */
+    //    public static Comparator<String> shortestFirst() {
+    //        return new LengthComparator();
+    //    }
 
     private static void addTrailingDefaultLine(List<Text[]> result, ArgSpec arg,
             ColorScheme scheme) {
         Text EMPTY = Ansi.EMPTY_TEXT;
         result.add(new Text[] { EMPTY, EMPTY, EMPTY, EMPTY,
                 new Text(scheme.ansi(), "  Default: " + arg.defaultValueString()) });
-    }
-
-    private static int countTrailingSpaces(String str) {
-        if (str == null)
-            return 0;
-        int trailingSpaces = 0;
-        for (int i = str.length() - 1; i >= 0 && str.charAt(i) == ' '; i--) {
-            trailingSpaces++;
-        }
-        return trailingSpaces;
     }
 
     private static Text[] createDescriptionFirstLines(ColorScheme scheme, ArgSpec arg,
@@ -1275,16 +1224,6 @@ public class Help {
      */
     private static Comparator<OptionSpec> createShortOptionNameComparator() {
         return new SortByShortestOptionNameAlphabetically();
-    }
-
-    private static String format(String formatString, Object... params) {
-        return formatString == null ? "" : String.format(formatString, params);
-    }
-
-    private static int maxLength(Collection<String> any) {
-        List<String> strings = new ArrayList<>(any);
-        Collections.sort(strings, Collections.reverseOrder(Help.shortestFirst()));
-        return strings.get(0).length();
     }
 
     protected final CommandSpec commandSpec;
@@ -1318,7 +1257,7 @@ public class Help {
      *            whether to emit ANSI escape codes or not
      */
     public Help(CommandSpec commandSpec, Ansi ansi) {
-        this(commandSpec, defaultColorScheme(ansi));
+        this(commandSpec, ColorScheme.createDefault(ansi));
     }
 
     /**
@@ -1394,7 +1333,7 @@ public class Help {
         commands.put(commandName,
                 commandSpec.commandLine().helpFactory().createHelp(
                         CommandSpec.forAnnotatedObject(command, commandSpec.commandLine().factory),
-                        Help.defaultColorScheme(Ansi.AUTO)));
+                        ColorScheme.createDefault(Ansi.AUTO)));
         return this;
     }
 

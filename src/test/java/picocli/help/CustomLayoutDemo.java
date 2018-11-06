@@ -16,11 +16,11 @@
 package picocli.help;
 
 import picocli.CommandLine;
-import picocli.CommandLine.Command;
 import picocli.CommandLine.Model.ArgSpec;
 import picocli.CommandLine.Model.CommandSpec;
-import picocli.CommandLine.Option;
-import picocli.CommandLine.Parameters;
+import picocli.annots.Command;
+import picocli.annots.Option;
+import picocli.annots.Parameters;
 import picocli.help.Help.IOptionRenderer;
 import picocli.help.Help.IParameterRenderer;
 import picocli.help.TextTable.Column;
@@ -162,7 +162,7 @@ public class CustomLayoutDemo implements Runnable {
                 new Column(30, 2, Column.Overflow.SPAN), // overflow into adjacent columns
                 new Column(4, 1, Column.Overflow.TRUNCATE), // values should fit again
                 new Column(39, 2, Column.Overflow.WRAP));
-        TwoOptionsPerRowLayout layout = new TwoOptionsPerRowLayout(Help.defaultColorScheme(ansi),
+        TwoOptionsPerRowLayout layout = new TwoOptionsPerRowLayout(ColorScheme.createDefault(ansi),
                 textTable, help.rendering().minimalOption(), help.rendering().minimalParameter());
 
         StringBuilder sb = new StringBuilder();
@@ -244,7 +244,7 @@ public class CustomLayoutDemo implements Runnable {
                 new Column(15, 2, Column.Overflow.TRUNCATE),
                 new Column(65, 1, Column.Overflow.WRAP));
         textTable.indentWrappedLines = 0;
-        Layout layout = new Layout(Help.defaultColorScheme(ansi), textTable,
+        Layout layout = new Layout(ColorScheme.createDefault(ansi), textTable,
                 help.rendering().minimalOption(), help.rendering().minimalParameter());
         layout.addOptions(help.commandSpec().options(), help.rendering().paramLabel());
         layout.addPositionalParameters(help.commandSpec().positionalParameters(),

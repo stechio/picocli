@@ -55,21 +55,21 @@ import org.junit.Test;
 import org.junit.contrib.java.lang.system.ProvideSystemProperty;
 
 import picocli.CommandLine;
-import picocli.CommandLine.Command;
-import picocli.CommandLine.ExecutionException;
-import picocli.CommandLine.HelpCommand;
 import picocli.CommandLine.IVersionProvider;
-import picocli.CommandLine.InitializationException;
 import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.Model.OptionSpec;
 import picocli.CommandLine.Model.PositionalParamSpec;
 import picocli.CommandLine.Model.UsageMessageSpec;
-import picocli.CommandLine.Option;
-import picocli.CommandLine.Parameters;
 import picocli.Demo;
 import picocli.InnerClassFactory;
+import picocli.annots.Command;
+import picocli.annots.Option;
+import picocli.annots.Parameters;
+import picocli.excepts.ExecutionException;
+import picocli.excepts.InitializationException;
 import picocli.help.Ansi.IStyle;
 import picocli.help.Ansi.Style;
+import picocli.util.Comparators;
 
 /**
  * Tests for picocli's "Usage" help functionality.
@@ -1227,7 +1227,7 @@ public class CommandLineHelpTest {
     @Test
     public void testShortestFirstComparator_sortsShortestFirst() {
         String[] values = { "12345", "12", "123", "123456", "1", "", "1234" };
-        Arrays.sort(values, new Help.ShortestFirst());
+        Arrays.sort(values, Comparators.Length.Order);
         String[] expected = { "", "1", "12", "123", "1234", "12345", "123456" };
         assertArrayEquals(expected, values);
     }
@@ -1235,7 +1235,7 @@ public class CommandLineHelpTest {
     @Test
     public void testShortestFirstComparator_sortsDeclarationOrderIfEqualLength() {
         String[] values = { "-d", "-", "-a", "--alpha", "--b", "--a", "--beta" };
-        Arrays.sort(values, new Help.ShortestFirst());
+        Arrays.sort(values, Comparators.Length.Order);
         String[] expected = { "-", "-d", "-a", "--b", "--a", "--beta", "--alpha" };
         assertArrayEquals(expected, values);
     }
@@ -1301,7 +1301,7 @@ public class CommandLineHelpTest {
         Help.IParamLabelRenderer parameterRenderer = help.rendering().paramLabel();
         OptionSpec option = help.commandSpec().options().get(0);
         Text[][] row1 = renderer.render(option, parameterRenderer,
-                Help.defaultColorScheme(help.ansi()));
+                ColorScheme.createDefault(help.ansi()));
         assertEquals(1, row1.length);
         //assertArrayEquals(new String[]{"---long=<longField>", "long description"}, row1[0]);
         assertArrayEquals(
@@ -1314,7 +1314,7 @@ public class CommandLineHelpTest {
 
         OptionSpec option2 = help.commandSpec().options().get(1);
         Text[][] row2 = renderer.render(option2, parameterRenderer,
-                Help.defaultColorScheme(help.ansi()));
+                ColorScheme.createDefault(help.ansi()));
         assertEquals(1, row2.length);
         //assertArrayEquals(new String[]{"-b=<otherField>", "other"}, row2[0]);
         assertArrayEquals(
@@ -1745,7 +1745,7 @@ public class CommandLineHelpTest {
                 count[0]++;
             }
         };
-        Layout layout = new Layout(Help.defaultColorScheme(Ansi.OFF), tt);
+        Layout layout = new Layout(ColorScheme.createDefault(Ansi.OFF), tt);
         layout.layout(null, values);
         assertEquals(2, count[0]);
     }
@@ -2939,7 +2939,7 @@ public class CommandLineHelpTest {
     @Test
     public void testTextDefaultColorScheme() {
         Ansi ansi = Ansi.ON;
-        ColorScheme scheme = Help.defaultColorScheme(ansi);
+        ColorScheme scheme = ColorScheme.createDefault(ansi);
         assertEquals(new Text(scheme.ansi(), "@|yellow -p|@"), scheme.optionText("-p"));
         assertEquals(new Text(scheme.ansi(), "@|bold command|@"), scheme.commandText("command"));
         assertEquals(new Text(scheme.ansi(), "@|yellow FILE|@"), scheme.parameterText("FILE"));
@@ -3699,7 +3699,7 @@ public class CommandLineHelpTest {
             new CommandLine(new App(), new InnerClassFactory(this));
         } catch (InitializationException ex) {
             assertEquals(
-                    "picocli.help.Help is not a valid subcommand. Did you mean picocli.CommandLine$HelpCommand?",
+                    "picocli.help.Help is not a valid subcommand. Did you mean picocli.help.HelpCommand?",
                     ex.getMessage());
         }
     }
@@ -3960,7 +3960,7 @@ public class CommandLineHelpTest {
             @Parameters(paramLabel = "FILES", arity = "1..*", description = "List of files")
             private List<File> files = new ArrayList<File>();
 
-            @CommandLine.Option(names = { "-v" }, description = "Print output")
+            @Option(names = { "-v" }, description = "Print output")
             private boolean verbose;
 
             public void run() {

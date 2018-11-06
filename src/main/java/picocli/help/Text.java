@@ -19,19 +19,43 @@ import picocli.help.Ansi.Style;
  * </p>
  */
 public class Text implements Appendable, Cloneable {
-    private static class StyledChunk {
-        private int startIndex, length;
-        private String startStyles, endStyles;
+    private static class StyledChunk implements Cloneable {
+        /**
+         * Start index within the text buffer.
+         */
+        private int index;
+        /**
+         * Length within the text buffer.
+         */
+        private int length;
+        /**
+         * Styles applied to this text chunk.
+         */
+        private String styles;
+        /**
+         * Styles applied after this text chunk.
+         */
+        private String exitStyles;
 
-        StyledChunk(int start, int len, String style1, String style2) {
-            startIndex = start;
-            length = len;
-            startStyles = style1;
-            endStyles = style2;
+        StyledChunk(int index, int length, String styles, String exitStyles) {
+            this.index = index;
+            this.length = length;
+            this.styles = styles;
+            this.exitStyles = exitStyles;
         }
 
-        StyledChunk withStartIndex(int newStart) {
-            return new StyledChunk(newStart, length, startStyles, endStyles);
+        @Override
+        public StyledChunk clone() {
+            try {
+                return (StyledChunk) super.clone();
+            } catch (CloneNotSupportedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        public StyledChunk withIndex(int value) {
+            this.index = value;
+            return this;
         }
     }
 
@@ -124,7 +148,7 @@ public class Text implements Appendable, Cloneable {
                 if (styledChunkStart == -1) {
                     // Add terminal plain chunk!
                     plainTextBuffer.append(
-                            styledTextString.substring(chunkStart, styledTextString.length()));
+                            styledTextString.substring(chunkStart));
                     break;
                 }
 
@@ -171,15 +195,6 @@ public class Text implements Appendable, Cloneable {
         return append(new Text(ansi, styledText).substring(start, end));
     }
 
-    /**
-     * Returns a copy of this {@code Text} instance with the specified text concatenated to the end.
-     * Does not modify this instance!
-     * 
-     * @param other
-     *            the text to concatenate to the end of this Text
-     * @return a new Text instance
-     * @since 3.0
-     */
     public Text append(Text other) {
         if (derived) {
             detach();
@@ -187,8 +202,8 @@ public class Text implements Appendable, Cloneable {
         plainTextBuffer.append(
                 other.plainTextBuffer.toString().substring(other.from, other.from + other.length));
         for (StyledChunk styledChunk : other.styledChunks) {
-            int index = length + styledChunk.startIndex - other.from;
-            styledChunks.add(styledChunk.withStartIndex(index));
+            int index = length + styledChunk.index - other.from;
+            styledChunks.add(styledChunk.clone().withIndex(index));
         }
         length = plainTextBuffer.length() - from;
         return this;
@@ -218,26 +233,25 @@ public class Text implements Appendable, Cloneable {
      *            Substring start.
      * @param length
      *            Substring length.
-     * @param destination
+     * @param target
      *            Target text.
      * @param offset
      *            Padding.
      */
-    public void copy(int from, int length, Text destination, int offset) {
+    public void copy(int from, int length, Text target, int offset) {
         from += this.from /* NOTE: Maps to internal from. */;
-        if (destination.length < offset) {
-            for (int i = destination.length; i < offset; i++) {
-                destination.plainTextBuffer.append(' ');
+        if (target.length < offset) {
+            for (int i = target.length; i < offset; i++) {
+                target.plainTextBuffer.append(' ');
             }
-            destination.length = offset;
+            target.length = offset;
         }
         for (StyledChunk styledChunk : styledChunks) {
-            destination.styledChunks.add(
-                    styledChunk.withStartIndex(styledChunk.startIndex - from + destination.length));
+            target.styledChunks
+                    .add(styledChunk.clone().withIndex(styledChunk.index - from + target.length));
         }
-        destination.plainTextBuffer
-                .append(plainTextBuffer.toString().substring(from, from + length));
-        destination.length = destination.plainTextBuffer.length() - destination.from;
+        target.plainTextBuffer.append(plainTextBuffer.toString().substring(from, from + length));
+        target.length = target.plainTextBuffer.length() - target.from;
     }
 
     @Override
@@ -308,6 +322,7 @@ public class Text implements Appendable, Cloneable {
         if (end > length) {
             end = length;
         }
+
         Text result;
         try {
             result = (Text) super.clone();
@@ -335,8 +350,9 @@ public class Text implements Appendable, Cloneable {
     public String toString() {
         if (!ansi.enabled())
             return plainTextBuffer.toString().substring(from, from + length);
-        if (length == 0)
+        else if (length == 0)
             return "";
+
         StringBuilder sb = new StringBuilder(plainTextBuffer.length() + 20 * styledChunks.size());
         StyledChunk current = null;
         int end = Math.min(from + length, plainTextBuffer.length());
@@ -344,23 +360,23 @@ public class Text implements Appendable, Cloneable {
             StyledChunk styledChunk = findStyledChunkOf(i);
             if (styledChunk != current) {
                 if (current != null) {
-                    sb.append(current.endStyles);
+                    sb.append(current.exitStyles);
                 }
                 if (styledChunk != null) {
-                    sb.append(styledChunk.startStyles);
+                    sb.append(styledChunk.styles);
                 }
                 current = styledChunk;
             }
             sb.append(plainTextBuffer.charAt(i));
         }
         if (current != null) {
-            sb.append(current.endStyles);
+            sb.append(current.exitStyles);
         }
         return sb.toString();
     }
 
-    private void addStyledChunk(int start, int length, IStyle[] styles) {
-        styledChunks.add(new StyledChunk(start, length, Style.on(styles),
+    private void addStyledChunk(int index, int length, IStyle[] styles) {
+        styledChunks.add(new StyledChunk(index, length, Style.on(styles),
                 Style.off(Ansi.reverse(styles)) + Style.reset.off()));
     }
 
@@ -377,7 +393,7 @@ public class Text implements Appendable, Cloneable {
                     plainTextBuffer.toString().substring(from, from + length));
             List<StyledChunk> newStyledChunks = new ArrayList<>();
             for (StyledChunk styledChunk : styledChunks) {
-                newStyledChunks.add(styledChunk.withStartIndex(styledChunk.startIndex - from));
+                newStyledChunks.add(styledChunk.clone().withIndex(styledChunk.index - from));
             }
             from = 0;
             length = plainTextBuffer.length();
@@ -395,8 +411,7 @@ public class Text implements Appendable, Cloneable {
      */
     private StyledChunk findStyledChunkOf(int index) {
         for (StyledChunk styledChunk : styledChunks) {
-            if (index >= styledChunk.startIndex
-                    && index < styledChunk.startIndex + styledChunk.length)
+            if (index >= styledChunk.index && index < styledChunk.index + styledChunk.length)
                 return styledChunk;
         }
         return null;

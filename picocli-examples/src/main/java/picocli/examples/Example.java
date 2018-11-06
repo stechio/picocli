@@ -15,10 +15,11 @@
  */
 package picocli.examples;
 
-import picocli.CommandLine;
-import picocli.CommandLine.Option;
-import picocli.CommandLine.Parameters;
 import java.io.File;
+
+import picocli.CommandLine;
+import picocli.annots.Option;
+import picocli.annots.Parameters;
 
 /**
  * The picocli example in the README.md.

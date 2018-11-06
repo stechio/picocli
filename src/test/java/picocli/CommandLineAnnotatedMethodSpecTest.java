@@ -1,7 +1,10 @@
 package picocli;
 
-import org.junit.*;
-import org.junit.contrib.java.lang.system.ProvideSystemProperty;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -14,8 +17,12 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import static org.junit.Assert.*;
-import static picocli.CommandLine.*;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.contrib.java.lang.system.ProvideSystemProperty;
+
+import picocli.annots.Option;
+import picocli.excepts.InitializationException;
 
 public class CommandLineAnnotatedMethodSpecTest {
     @Rule

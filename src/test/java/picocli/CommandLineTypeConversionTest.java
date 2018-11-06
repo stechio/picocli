@@ -15,6 +15,18 @@
  */
 package picocli;
 
+import static java.util.concurrent.TimeUnit.MICROSECONDS;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.File;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
@@ -43,15 +55,12 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import picocli.CommandLine.ITypeConverter;
-import picocli.CommandLine.Option;
-import picocli.CommandLine.Parameters;
-
-import static java.util.concurrent.TimeUnit.*;
-import static org.junit.Assert.*;
+import picocli.annots.Option;
+import picocli.annots.Parameters;
+import picocli.excepts.ParameterException;
 
 public class CommandLineTypeConversionTest {
 
@@ -216,7 +225,7 @@ public class CommandLineTypeConversionTest {
         try {
             CommandLine.populateCommand(new SupportedTypes(), "-byte", "0x1F", "-Byte", "0x0F");
             fail("Should fail on hex input");
-        } catch (CommandLine.ParameterException expected) {
+        } catch (ParameterException expected) {
             assertEquals("Invalid value for option '-byte': '0x1F' is not a byte", expected.getMessage());
         }
     }
@@ -248,7 +257,7 @@ public class CommandLineTypeConversionTest {
         try {
             CommandLine.populateCommand(new SupportedTypes(), "-short", "0xFF", "-Short", "0x6FFE");
             fail("Should fail on hex input");
-        } catch (CommandLine.ParameterException expected) {
+        } catch (ParameterException expected) {
             assertEquals("Invalid value for option '-short': '0xFF' is not a short", expected.getMessage());
         }
     }
@@ -280,7 +289,7 @@ public class CommandLineTypeConversionTest {
         try {
             CommandLine.populateCommand(new SupportedTypes(), "-int", "0xFF", "-Integer", "0xFFFF");
             fail("Should fail on hex input");
-        } catch (CommandLine.ParameterException expected) {
+        } catch (ParameterException expected) {
             assertEquals("Invalid value for option '-int': '0xFF' is not an int", expected.getMessage());
         }
     }
@@ -312,7 +321,7 @@ public class CommandLineTypeConversionTest {
         try {
             CommandLine.populateCommand(new SupportedTypes(), "-long", "0xAABBCC", "-Long", "0xAABBCCDD");
             fail("Should fail on hex input");
-        } catch (CommandLine.ParameterException expected) {
+        } catch (ParameterException expected) {
             assertEquals("Invalid value for option '-long': '0xAABBCC' is not a long", expected.getMessage());
         }
     }
@@ -364,7 +373,7 @@ public class CommandLineTypeConversionTest {
         try {
             CommandLine.populateCommand(new SupportedTypes(), "-Time", "23:59:58;123");
             fail("Invalid format was accepted");
-        } catch (CommandLine.ParameterException expected) {
+        } catch (ParameterException expected) {
             assertEquals("Invalid value for option '-Time': '23:59:58;123' is not a HH:mm[:ss[.SSS]] time", expected.getMessage());
         }
     }
@@ -373,7 +382,7 @@ public class CommandLineTypeConversionTest {
         try {
             CommandLine.populateCommand(new SupportedTypes(), "-Time", "23:59:58.");
             fail("Invalid format was accepted");
-        } catch (CommandLine.ParameterException expected) {
+        } catch (ParameterException expected) {
             assertEquals("Invalid value for option '-Time': '23:59:58.' is not a HH:mm[:ss[.SSS]] time", expected.getMessage());
         }
     }
@@ -382,7 +391,7 @@ public class CommandLineTypeConversionTest {
         try {
             CommandLine.populateCommand(new SupportedTypes(), "-Time", "23:59:587");
             fail("Invalid format was accepted");
-        } catch (CommandLine.ParameterException expected) {
+        } catch (ParameterException expected) {
             assertEquals("Invalid value for option '-Time': '23:59:587' is not a HH:mm[:ss[.SSS]] time", expected.getMessage());
         }
     }
@@ -391,7 +400,7 @@ public class CommandLineTypeConversionTest {
         try {
             CommandLine.populateCommand(new SupportedTypes(), "-Time", "23:59:");
             fail("Invalid format was accepted");
-        } catch (CommandLine.ParameterException expected) {
+        } catch (ParameterException expected) {
             assertEquals("Invalid value for option '-Time': '23:59:' is not a HH:mm[:ss[.SSS]] time", expected.getMessage());
         }
     }
@@ -400,7 +409,7 @@ public class CommandLineTypeConversionTest {
         try {
             CommandLine.populateCommand(new SupportedTypes(), "-Date", "20170131");
             fail("Invalid format was accepted");
-        } catch (CommandLine.ParameterException expected) {
+        } catch (ParameterException expected) {
             assertEquals("Invalid value for option '-Date': '20170131' is not a yyyy-MM-dd date", expected.getMessage());
         }
     }
@@ -409,13 +418,13 @@ public class CommandLineTypeConversionTest {
         try {
             CommandLine.populateCommand(new SupportedTypes(), "-Character", "aa");
             fail("Invalid format was accepted");
-        } catch (CommandLine.ParameterException expected) {
+        } catch (ParameterException expected) {
             assertEquals("Invalid value for option '-Character': 'aa' is not a single character", expected.getMessage());
         }
         try {
             CommandLine.populateCommand(new SupportedTypes(), "-char", "aa");
             fail("Invalid format was accepted");
-        } catch (CommandLine.ParameterException expected) {
+        } catch (ParameterException expected) {
             assertEquals("Invalid value for option '-char': 'aa' is not a single character", expected.getMessage());
         }
     }
@@ -506,7 +515,7 @@ public class CommandLineTypeConversionTest {
         try {
             SupportedTypes bean = CommandLine.populateCommand(new SupportedTypes(), option, value);
             fail("Invalid format " + value + " was accepted for " + option);
-        } catch (CommandLine.ParameterException actual) {
+        } catch (ParameterException actual) {
             for (String errMsg : errorMessage) {
                 if (actual.getMessage().equals(errMsg)) { return; } // that is okay also
             }
@@ -617,7 +626,7 @@ public class CommandLineTypeConversionTest {
         CommandLine commandLine = new CommandLine(new App());
         try {
             commandLine.parse("anything");
-        } catch (CommandLine.ParameterException ex) {
+        } catch (ParameterException ex) {
             assertEquals("Invalid value for positional parameter at index 0..* (<sqlTypeParam>): cannot convert 'anything' to int (java.lang.IllegalStateException: bad converter)", ex.getMessage());
         }
     }

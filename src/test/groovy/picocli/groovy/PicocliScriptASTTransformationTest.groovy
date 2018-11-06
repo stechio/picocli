@@ -54,9 +54,9 @@ public class PicocliScriptASTTransformationTest {
 @PicocliScript
 import groovy.transform.Field
 import picocli.groovy.PicocliScript
-import picocli.CommandLine.Command
-import picocli.CommandLine.Option
-import picocli.CommandLine.Parameters
+import picocli.annots.Command
+import picocli.annots.Option
+import picocli.annots.Parameters
 
 @Parameters(description = "some parameters")
 @Field List<String> parameters
@@ -89,9 +89,9 @@ import picocli.CommandLine.Parameters
 package anypackage;
 import groovy.transform.Field
 import picocli.groovy.PicocliScript
-import picocli.CommandLine.Command
-import picocli.CommandLine.Option
-import picocli.CommandLine.Parameters
+import picocli.annots.Command
+import picocli.annots.Option
+import picocli.annots.Parameters
 
 @Parameters(description = "some parameters")
 @Field List<String> parameters
@@ -117,9 +117,9 @@ codepath
 @PicocliScript
 import groovy.transform.Field
 import picocli.groovy.PicocliScript
-import picocli.CommandLine.Command
-import picocli.CommandLine.Option
-import picocli.CommandLine.Parameters
+import picocli.annots.Command
+import picocli.annots.Option
+import picocli.annots.Parameters
 
 @Parameters(description = "some parameters")
 @Field List<String> parameters
@@ -145,9 +145,10 @@ codepath
 @PicocliScript(picocli.groovy.PicocliBaseScript)
 import groovy.transform.Field
 import picocli.groovy.PicocliScript
-import picocli.CommandLine.Command
+import picocli.annots.Command
 import picocli.CommandLine.Option
-import picocli.CommandLine.Parameters
+import picocli.annots.Option
+import picocli.annots.Parameters
 
 @Parameters(description = "some parameters")
 @Field List<String> parameters
@@ -172,9 +173,9 @@ codepath
 import groovy.transform.Field
 import picocli.groovy.PicocliBaseScript
 import picocli.groovy.PicocliScript
-import picocli.CommandLine.Command
-import picocli.CommandLine.Option
-import picocli.CommandLine.Parameters
+import picocli.annots.Command
+import picocli.annots.Option
+import picocli.annots.Parameters
 
 @Command(name = "test-command", description = "tests help from a command script")
 @PicocliScript PicocliBaseScript cli;
@@ -194,7 +195,7 @@ codepath
     @Test
     void testClassCannotBeAnnotatedWithPicocliScript() {
         def script = '''
-@picocli.CommandLine.Command
+@picocli.annots.Command
 @picocli.groovy.PicocliScript
 class Arg {};
 '''
@@ -213,13 +214,12 @@ class Arg {};
     @Test
     void testPicocliScriptAnnotationValueMustBeAClassLiteral() {
         def script = '''
-@Command(name = "test-command", description = "invalid annotation")
+@picocli.annots.Command(name = "test-command", description = "invalid annotation")
 @PicocliScript("invalid string") // expect groovyc compiler error
 import groovy.transform.Field
 import picocli.groovy.PicocliScript
-import picocli.CommandLine.Command
-import picocli.CommandLine.Option
-import picocli.CommandLine.Parameters
+import picocli.annots.Option
+import picocli.annots.Parameters
 
 @Parameters(description = "some parameters")
 @Field List<String> parameters
@@ -242,9 +242,9 @@ import picocli.CommandLine.Parameters
 import groovy.transform.Field
 import picocli.groovy.PicocliBaseScript
 import picocli.groovy.PicocliScript
-import picocli.CommandLine.Command
-import picocli.CommandLine.Option
-import picocli.CommandLine.Parameters
+import picocli.annots.Command
+import picocli.annots.Option
+import picocli.annots.Parameters
 
 @Command
 @PicocliScript PicocliBaseScript cli = new PicocliBaseScript() { // invalid assignment
@@ -273,9 +273,9 @@ import picocli.CommandLine.Parameters
 import groovy.transform.Field
 import picocli.groovy.PicocliBaseScript
 import picocli.groovy.PicocliScript
-import picocli.CommandLine.Command
-import picocli.CommandLine.Option
-import picocli.CommandLine.Parameters
+import picocli.annots.Command
+import picocli.annots.Option
+import picocli.annots.Parameters
 
 @Command
 @PicocliScript def (cli1, cli2) = [new PicocliBaseScript() { // invalid assignment
@@ -308,9 +308,9 @@ new PicocliBaseScript() { // invalid assignment
 import groovy.transform.Field
 import picocli.groovy.PicocliBaseScript
 import picocli.groovy.PicocliScript
-import picocli.CommandLine.Command
-import picocli.CommandLine.Option
-import picocli.CommandLine.Parameters
+import picocli.annots.Command
+import picocli.annots.Option
+import picocli.annots.Parameters
 
 @Command
 @PicocliScript(picocli.groovy.PicocliBaseScript.class)
@@ -337,7 +337,7 @@ PicocliBaseScript cli;
 @PicocliScript(Long.class) // invalid script class
 import groovy.transform.Field
 import picocli.groovy.PicocliScript
-import picocli.CommandLine.Parameters
+import picocli.annots.Parameters
 
 @Parameters(description = "some parameters")
 @Field List<String> parameters
@@ -359,7 +359,7 @@ import picocli.CommandLine.Parameters
         def script = '''
 @picocli.groovy.PicocliScript(groovy.lang.Script)
 import groovy.transform.Field
-import picocli.CommandLine.Parameters
+import picocli.annots.Parameters
 
 @Parameters(description = "some parameters")
 @Field List<String> parameters

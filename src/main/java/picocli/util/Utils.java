@@ -40,6 +40,17 @@ public class Utils {
                 : StringUtils.join(array, separator, startIndex, endIndex);
     }
 
+    public static int countTrailingSpaces(String str) {
+        if (str == null)
+            return 0;
+
+        int trailingSpaces = 0;
+        for (int i = str.length(); --i >= 0 && str.charAt(i) == ' ';) {
+            trailingSpaces++;
+        }
+        return trailingSpaces;
+    }
+
     /**
      * Safely retrieves the array item at the given position.
      *
@@ -48,6 +59,10 @@ public class Utils {
      * @return Empty string if null {@code array} or out-of-bounds {@code index}.
      */
     public static String safeGet(String[] array, int index) {
-        return ObjectUtilsX.safeEmptyGet(array, index);
+        return ObjectUtilsExt.safeEmptyGet(array, index);
+    }
+
+    public static String safeFormat(String formatString, Object... params) {
+        return formatString == null ? "" : String.format(formatString, params);
     }
 }

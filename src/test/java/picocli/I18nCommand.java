@@ -1,12 +1,13 @@
 package picocli;
 
-import picocli.CommandLine.Command;
-import picocli.CommandLine.Option;
-import picocli.CommandLine.Parameters;
+import picocli.annots.Command;
+import picocli.annots.Option;
+import picocli.annots.Parameters;
+import picocli.help.HelpCommand;
 
 @Command(name = "i18n-top",
         resourceBundle = "picocli.SharedMessages",
-        subcommands = {CommandLine.HelpCommand.class, I18nSubcommand.class },
+        subcommands = {HelpCommand.class, I18nSubcommand.class },
         mixinStandardHelpOptions = true,
         description = {"top desc 1", "top desc 2", "top desc 3"},
         descriptionHeading = "top desc heading%n",

@@ -16,8 +16,8 @@
 package picocli.examples;
 
 import picocli.CommandLine;
-
-import static picocli.CommandLine.*;
+import picocli.annots.Command;
+import picocli.annots.Option;
 
 @Command(version = "Help demo for picocli v3.0", header = "%nFully Automatic Help Demo%n",
         description = "Prints usage help and version help when requested.%n",

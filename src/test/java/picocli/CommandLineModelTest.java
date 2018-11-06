@@ -15,25 +15,56 @@
  */
 package picocli;
 
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
-import java.sql.Types;
-import java.util.*;
-
-import org.junit.Rule;
-import org.junit.Test;
-
-import org.junit.contrib.java.lang.system.SystemErrRule;
-import org.junit.contrib.java.lang.system.SystemOutRule;
-import picocli.CommandLine.*;
-import picocli.CommandLine.Model.*;
-import picocli.help.Ansi;
-import picocli.help.Help;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static picocli.help.HelpTestUtil.setTraceLevel;
 import static picocli.help.HelpTestUtil.usageString;
 import static picocli.help.HelpTestUtil.versionString;
+
+import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.contrib.java.lang.system.SystemErrRule;
+import org.junit.contrib.java.lang.system.SystemOutRule;
+
+import picocli.CommandLine.ITypeConverter;
+import picocli.CommandLine.IVersionProvider;
+import picocli.CommandLine.Model.CommandSpec;
+import picocli.CommandLine.Model.IGetter;
+import picocli.CommandLine.Model.ISetter;
+import picocli.CommandLine.Model.OptionSpec;
+import picocli.CommandLine.Model.PositionalParamSpec;
+import picocli.CommandLine.Model.UnmatchedArgsBinding;
+import picocli.CommandLine.Model.UsageMessageSpec;
+import picocli.CommandLine.Range;
+import picocli.annots.Command;
+import picocli.annots.Option;
+import picocli.annots.Parameters;
+import picocli.annots.Spec;
+import picocli.excepts.InitializationException;
+import picocli.excepts.MissingParameterException;
+import picocli.excepts.PicocliException;
+import picocli.excepts.UnmatchedArgumentException;
+import picocli.help.Ansi;
+import picocli.help.AutoHelpMixin;
+import picocli.help.Help;
 
 
 public class CommandLineModelTest {

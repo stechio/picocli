@@ -15,11 +15,6 @@
  */
 package picocli;
 
-import picocli.CommandLine.Command;
-import picocli.CommandLine.IVersionProvider;
-import picocli.CommandLine.Option;
-import picocli.CommandLine.Parameters;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -30,12 +25,16 @@ import java.net.URL;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
+
+import picocli.CommandLine.IVersionProvider;
+import picocli.annots.Command;
+import picocli.annots.Option;
+import picocli.annots.Parameters;
+import picocli.help.HelpCommand;
 
 /**
  * Demonstrates picocli subcommands.
@@ -445,7 +444,7 @@ public class Demo implements Runnable {
 
     public static CommandLine mainCommand() {
         CommandLine commandLine = new CommandLine(new Git());
-        commandLine.addSubcommand("help", new CommandLine.HelpCommand());
+        commandLine.addSubcommand("help", new HelpCommand());
         commandLine.addSubcommand("status", new GitStatus());
         commandLine.addSubcommand("commit", new GitCommit());
         commandLine.addSubcommand("add", new GitAdd());

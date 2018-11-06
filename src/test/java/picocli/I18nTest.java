@@ -15,23 +15,28 @@
  */
 package picocli;
 
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.contrib.java.lang.system.ProvideSystemProperty;
-import picocli.CommandLine.Command;
-import picocli.CommandLine.Model.ArgSpec;
-import picocli.CommandLine.Model.OptionSpec;
-import picocli.CommandLine.Model.PositionalParamSpec;
-import picocli.CommandLine.Option;
-import picocli.CommandLine.Parameters;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 
 import java.io.File;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-import static org.junit.Assert.*;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.contrib.java.lang.system.ProvideSystemProperty;
+
+import picocli.CommandLine.Model.ArgSpec;
+import picocli.annots.Command;
+import picocli.annots.Option;
+import picocli.annots.Parameters;
 
 /**
  * Tests internationalization (i18n) and localization (l12n)-related functionality.

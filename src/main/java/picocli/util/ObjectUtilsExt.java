@@ -6,7 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.base.Defaults;
 
-public class ObjectUtilsX {
+public class ObjectUtilsExt {
     /**
      * Safely retrieves the array item at the given position.
      *

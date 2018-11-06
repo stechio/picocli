@@ -18,8 +18,8 @@ package picocli.groovy;
 import groovy.lang.MissingPropertyException;
 import groovy.lang.Script;
 import picocli.CommandLine;
-import picocli.CommandLine.ExecutionException;
-import picocli.CommandLine.ParameterException;
+import picocli.excepts.ExecutionException;
+import picocli.excepts.ParameterException;
 
 import java.io.PrintStream;
 import java.util.Arrays;
@@ -83,7 +83,7 @@ abstract public class PicocliBaseScript extends Script {
      *     {@code this.commandLine}). {@code CommandLine} creation and initialization may be
      *     customized by overriding {@link #createCommandLine()}.</li>
      *   <li>The {@link #parseScriptArguments(CommandLine, String[])} method is called with the script arguments.
-     *     This initialises all {@code @Field} variables annotated with {@link CommandLine.Option} or
+     *     This initialises all {@code @Field} variables annotated with {@link Option} or
      *     {@link CommandLine.Parameters}, unless the user input was invalid.</li>
      *   <li>If the user input was invalid, an error message and the usage message are printed to standard err and the
      *     script exits. This may be customized by overriding

@@ -1,14 +1,15 @@
 package picocli;
 
 import org.junit.Test;
-import picocli.CommandLine.MissingParameterException;
+
 import picocli.CommandLine.Model.ArgSpec;
 import picocli.CommandLine.Model.ParserSpec;
 import picocli.CommandLine.Model.PositionalParamSpec;
-import picocli.CommandLine.Option;
-import picocli.CommandLine.Parameters;
+import picocli.excepts.MissingParameterException;
+import picocli.excepts.UnmatchedArgumentException;
 import picocli.CommandLine.Range;
-import picocli.CommandLine.UnmatchedArgumentException;
+import picocli.annots.Option;
+import picocli.annots.Parameters;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;

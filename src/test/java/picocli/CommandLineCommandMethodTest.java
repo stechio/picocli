@@ -41,15 +41,16 @@ import org.junit.contrib.java.lang.system.ProvideSystemProperty;
 import org.junit.contrib.java.lang.system.SystemErrRule;
 import org.junit.contrib.java.lang.system.SystemOutRule;
 
-import picocli.CommandLine.Command;
 import picocli.CommandLine.IParseResultHandler;
-import picocli.CommandLine.MissingParameterException;
-import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Model;
-import picocli.CommandLine.Option;
-import picocli.CommandLine.Parameters;
-import picocli.CommandLine.UnmatchedArgumentException;
 import picocli.CommandLineTest.CompactFields;
+import picocli.annots.Command;
+import picocli.annots.Mixin;
+import picocli.annots.Option;
+import picocli.annots.Parameters;
+import picocli.excepts.InitializationException;
+import picocli.excepts.MissingParameterException;
+import picocli.excepts.UnmatchedArgumentException;
 import picocli.help.Ansi;
 
 /**
@@ -559,7 +560,7 @@ public class CommandLineCommandMethodTest {
         try {
             new CommandLine(new UnAnnotatedClassWithoutAnnotatedFields());
             fail("expected exception");
-        } catch (CommandLine.InitializationException ex) {
+        } catch (InitializationException ex) {
             assertEquals("picocli.CommandLineCommandMethodTest$UnAnnotatedClassWithoutAnnotatedFields " +
                             "is not a command: it has no @Command, @Option, " +
                             "@Parameters or @Unmatched annotations", ex.getMessage());

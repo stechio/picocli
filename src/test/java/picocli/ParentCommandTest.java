@@ -15,17 +15,21 @@
  */
 package picocli;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.fail;
+
 import java.io.File;
 import java.util.List;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
 
-import picocli.CommandLine.Command;
-import picocli.CommandLine.InitializationException;
-import picocli.CommandLine.Option;
-import picocli.CommandLine.Parameters;
-import picocli.CommandLine.ParentCommand;
+import picocli.annots.Command;
+import picocli.annots.Option;
+import picocli.annots.Parameters;
+import picocli.annots.ParentCommand;
+import picocli.excepts.InitializationException;
 
 public class ParentCommandTest {
 

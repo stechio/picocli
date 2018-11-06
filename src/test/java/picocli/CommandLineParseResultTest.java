@@ -31,13 +31,14 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import picocli.CommandLine.Model.CommandSpec;
-import picocli.CommandLine.Model.OptionSpec;
-import picocli.CommandLine.Model.PositionalParamSpec;
-import picocli.CommandLine.Range;
 import picocli.annots.Command;
 import picocli.annots.Option;
 import picocli.annots.Parameters;
+import picocli.model.CommandSpec;
+import picocli.model.OptionSpec;
+import picocli.model.ParseResult;
+import picocli.model.PositionalParamSpec;
+import picocli.model.Range;
 
 public class CommandLineParseResultTest {
     @Test

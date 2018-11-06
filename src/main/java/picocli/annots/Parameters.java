@@ -9,9 +9,9 @@ import java.lang.annotation.Target;
 import picocli.CommandLine;
 import picocli.CommandLine.ITypeConverter;
 import picocli.CommandLine.NoCompletionCandidates;
-import picocli.CommandLine.Model.PositionalParamSpec;
 import picocli.excepts.MissingParameterException;
 import picocli.help.Help;
+import picocli.model.PositionalParamSpec;
 
 /**
  * <p>

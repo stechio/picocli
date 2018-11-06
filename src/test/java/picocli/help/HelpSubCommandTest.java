@@ -9,10 +9,10 @@ import java.io.PrintStream;
 import org.junit.Test;
 
 import picocli.CommandLine;
-import picocli.CommandLine.Model.CommandSpec;
-import picocli.CommandLine.Model.OptionSpec;
-import picocli.annots.Command;
 import picocli.CommandLineTest;
+import picocli.annots.Command;
+import picocli.model.CommandSpec;
+import picocli.model.OptionSpec;
 
 public class HelpSubCommandTest {
 

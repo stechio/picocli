@@ -1,22 +1,23 @@
-package picocli;
+package picocli.model;
 
-import org.junit.Test;
-
-import picocli.CommandLine.Model.ArgSpec;
-import picocli.CommandLine.Model.ParserSpec;
-import picocli.CommandLine.Model.PositionalParamSpec;
-import picocli.excepts.MissingParameterException;
-import picocli.excepts.UnmatchedArgumentException;
-import picocli.CommandLine.Range;
-import picocli.annots.Option;
-import picocli.annots.Parameters;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import org.junit.Test;
+
+import picocli.CommandLine;
+import picocli.annots.Option;
+import picocli.annots.Parameters;
+import picocli.excepts.MissingParameterException;
+import picocli.excepts.UnmatchedArgumentException;
 
 
 public class ArgSplitTest {
@@ -176,7 +177,7 @@ public class ArgSplitTest {
         } catch (MissingParameterException ex) {
             assertEquals("positional parameter at index 0..* (<values>) requires at least 2 values, but only 1 were specified: [a,b,c,d,e]", ex.getMessage());
             assertEquals(1, ex.getMissing().size());
-            assertTrue(ex.getMissing().get(0).toString(), ex.getMissing().get(0) instanceof CommandLine.Model.PositionalParamSpec);
+            assertTrue(ex.getMissing().get(0).toString(), ex.getMissing().get(0) instanceof PositionalParamSpec);
         }
         try {
             CommandLine.populateCommand(new Args()); // 0 arg: should fail

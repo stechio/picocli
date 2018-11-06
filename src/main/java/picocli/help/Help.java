@@ -2,7 +2,6 @@ package picocli.help;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.IdentityHashMap;
@@ -14,15 +13,17 @@ import java.util.function.Function;
 import org.apache.commons.lang3.StringUtils;
 
 import picocli.CommandLine;
-import picocli.CommandLine.Model.ArgSpec;
-import picocli.CommandLine.Model.CommandSpec;
-import picocli.CommandLine.Model.OptionSpec;
-import picocli.CommandLine.Model.ParserSpec;
-import picocli.CommandLine.Model.PositionalParamSpec;
-import picocli.CommandLine.Model.UsageMessageSpec;
 import picocli.annots.Command;
-import picocli.CommandLine.Range;
+import picocli.annots.Option;
+import picocli.annots.Parameters;
 import picocli.help.TextTable.Column;
+import picocli.model.ArgSpec;
+import picocli.model.CommandSpec;
+import picocli.model.OptionSpec;
+import picocli.model.ParserSpec;
+import picocli.model.PositionalParamSpec;
+import picocli.model.Range;
+import picocli.model.UsageMessageSpec;
 import picocli.util.Assert;
 import picocli.util.Comparators;
 import picocli.util.ListMap;
@@ -1270,7 +1271,7 @@ public class Help {
      */
     public Help(CommandSpec commandSpec, ColorScheme colorScheme) {
         this.commandSpec = Assert.notNull(commandSpec, "commandSpec");
-        this.aliases = new ArrayList<>(Arrays.asList(commandSpec.aliases()));
+        this.aliases = new ArrayList<>(commandSpec.aliases());
         this.aliases.add(0, commandSpec.name());
         this.colorScheme = Assert.notNull(colorScheme, "colorScheme").applySystemProperties();
         rendering = new Rendering(new HelpRendererFactory());
@@ -1291,7 +1292,7 @@ public class Help {
             Map<CommandLine, List<String>> done = new IdentityHashMap<>();
             for (CommandLine cmd : commands.values()) {
                 if (!done.containsKey(cmd)) {
-                    done.put(cmd, new ArrayList<>(Arrays.asList(cmd.getCommandSpec().aliases())));
+                    done.put(cmd, new ArrayList<>(cmd.getCommandSpec().aliases()));
                 }
             }
             // then loop over all names that the command was registered with and add this name to the front of the list (if it isn't already in the list)

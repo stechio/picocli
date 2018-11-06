@@ -6,6 +6,7 @@ package picocli.examples
         description = "@|bold Groovy script|@ @|underline picocli|@ example")
 @picocli.groovy.PicocliScript
 import groovy.transform.Field
+import picocli.annots.*
 import static picocli.CommandLine.*
 
 @Option(names = ["-c", "--count"], description = "number of repetitions")

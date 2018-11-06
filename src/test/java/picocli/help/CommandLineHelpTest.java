@@ -21,12 +21,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static picocli.ModelTestUtil.options;
 import static picocli.help.Help.Visibility.ALWAYS;
 import static picocli.help.Help.Visibility.NEVER;
 import static picocli.help.Help.Visibility.ON_DEMAND;
 import static picocli.help.HelpTestUtil.textArray;
 import static picocli.help.HelpTestUtil.usageString;
+import static picocli.model.ModelTestUtil.options;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -56,10 +56,6 @@ import org.junit.contrib.java.lang.system.ProvideSystemProperty;
 
 import picocli.CommandLine;
 import picocli.CommandLine.IVersionProvider;
-import picocli.CommandLine.Model.CommandSpec;
-import picocli.CommandLine.Model.OptionSpec;
-import picocli.CommandLine.Model.PositionalParamSpec;
-import picocli.CommandLine.Model.UsageMessageSpec;
 import picocli.Demo;
 import picocli.InnerClassFactory;
 import picocli.annots.Command;
@@ -69,6 +65,10 @@ import picocli.excepts.ExecutionException;
 import picocli.excepts.InitializationException;
 import picocli.help.Ansi.IStyle;
 import picocli.help.Ansi.Style;
+import picocli.model.CommandSpec;
+import picocli.model.OptionSpec;
+import picocli.model.PositionalParamSpec;
+import picocli.model.UsageMessageSpec;
 import picocli.util.Comparators;
 
 /**

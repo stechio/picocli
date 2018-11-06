@@ -1,8 +1,7 @@
 package picocli.excepts;
 
 import picocli.CommandLine;
-import picocli.CommandLine.Model;
-import picocli.CommandLine.Model.ArgSpec;
+import picocli.model.ArgSpec;
 
 /**
  * Exception indicating that an option for a single-value option field has been specified
@@ -10,9 +9,9 @@ import picocli.CommandLine.Model.ArgSpec;
  */
 public class OverwrittenOptionException extends ParameterException {
     private static final long serialVersionUID = 1338029208271055776L;
-    private final Model.ArgSpec overwrittenArg;
+    private final ArgSpec overwrittenArg;
 
-    public OverwrittenOptionException(CommandLine commandLine, Model.ArgSpec overwritten,
+    public OverwrittenOptionException(CommandLine commandLine, ArgSpec overwritten,
             String msg) {
         super(commandLine, msg);
         overwrittenArg = overwritten;
@@ -23,7 +22,7 @@ public class OverwrittenOptionException extends ParameterException {
      * 
      * @since 3.8
      */
-    public Model.ArgSpec getOverwritten() {
+    public ArgSpec getOverwritten() {
         return overwrittenArg;
     }
 }

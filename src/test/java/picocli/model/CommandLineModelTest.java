@@ -13,7 +13,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package picocli;
+package picocli.model;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -44,16 +44,11 @@ import org.junit.Test;
 import org.junit.contrib.java.lang.system.SystemErrRule;
 import org.junit.contrib.java.lang.system.SystemOutRule;
 
+import picocli.CommandLine;
 import picocli.CommandLine.ITypeConverter;
 import picocli.CommandLine.IVersionProvider;
-import picocli.CommandLine.Model.CommandSpec;
-import picocli.CommandLine.Model.IGetter;
-import picocli.CommandLine.Model.ISetter;
-import picocli.CommandLine.Model.OptionSpec;
-import picocli.CommandLine.Model.PositionalParamSpec;
-import picocli.CommandLine.Model.UnmatchedArgsBinding;
-import picocli.CommandLine.Model.UsageMessageSpec;
-import picocli.CommandLine.Range;
+import picocli.CommandLineTypeConversionTest;
+import picocli.I18nCommand;
 import picocli.annots.Command;
 import picocli.annots.Option;
 import picocli.annots.Parameters;
@@ -1744,7 +1739,7 @@ public class CommandLineModelTest {
             new CommandLine(injected);
             fail("Expect exception");
         } catch (InitializationException ex) {
-            assertEquals("@picocli.CommandLine.Spec annotation is only supported on fields of type picocli.CommandLine$Model$CommandSpec", ex.getMessage());
+            assertEquals("@Spec annotation is only supported on fields of type picocli.model.CommandSpec", ex.getMessage());
         }
     }
 

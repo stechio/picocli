@@ -1,4 +1,4 @@
-package picocli;
+package picocli.model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,11 +8,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.Stack;
 
-import picocli.CommandLine.Model;
-import picocli.CommandLine.Model.CommandSpec;
-import picocli.CommandLine.Model.OptionSpec;
-import picocli.CommandLine.Model.ParserSpec;
-import picocli.CommandLine.Model.PositionalParamSpec;
+import picocli.CommandLine;
 import picocli.excepts.PicocliException;
 import picocli.util.Assert;
 
@@ -23,38 +19,39 @@ import picocli.util.Assert;
  */
 public class ParseResult {
     /** Creates and returns a new {@code ParseResult.Builder} for the specified command spec. */
-    public static ParseResult.Builder builder(Model.CommandSpec commandSpec) {
+    public static ParseResult.Builder builder(CommandSpec commandSpec) {
         return new Builder(commandSpec);
     }
 
     /** Builds immutable {@code ParseResult} instances. */
     public static class Builder {
-        private final Model.CommandSpec commandSpec;
-        private final Set<Model.OptionSpec> options = new LinkedHashSet<Model.OptionSpec>();
-        private final Set<Model.PositionalParamSpec> positionals = new LinkedHashSet<Model.PositionalParamSpec>();
-        final List<String> unmatched = new ArrayList<String>();
+        private final CommandSpec commandSpec;
+        private final Set<OptionSpec> options = new LinkedHashSet<OptionSpec>();
+        private final Set<PositionalParamSpec> positionals = new LinkedHashSet<PositionalParamSpec>();
+        //TODO:private scope
+        public final List<String> unmatched = new ArrayList<String>();
         private final List<String> originalArgList = new ArrayList<String>();
-        private final List<List<Model.PositionalParamSpec>> positionalParams = new ArrayList<List<Model.PositionalParamSpec>>();
+        private final List<List<PositionalParamSpec>> positionalParams = new ArrayList<List<PositionalParamSpec>>();
         private ParseResult subcommand;
-        boolean usageHelpRequested;
-        boolean versionHelpRequested;
+        //TODO:private scope
+        public boolean usageHelpRequested;
+        public boolean versionHelpRequested;
         boolean isInitializingDefaultValues;
         private List<Exception> errors = new ArrayList<Exception>(1);
         List<Object> nowProcessing;
 
-        private Builder(Model.CommandSpec spec) {
+        private Builder(CommandSpec spec) {
             commandSpec = Assert.notNull(spec, "commandSpec");
         }
 
         /**
-         * Creates and returns a new {@code ParseResult} instance for this builder's
-         * configuration.
+         * Creates and returns a new {@code ParseResult} instance for this builder's configuration.
          */
         public ParseResult build() {
             return new ParseResult(this);
         }
 
-        void nowProcessing(Model.ArgSpec spec, Object value) {
+        void nowProcessing(ArgSpec spec, Object value) {
             if (nowProcessing != null && !isInitializingDefaultValues) {
                 nowProcessing.add(spec.isPositional() ? spec : value);
             }
@@ -71,11 +68,11 @@ public class ParseResult {
          *            matched. Ignored for {@code OptionSpec}s.
          * @return this builder for method chaining
          */
-        public ParseResult.Builder add(Model.ArgSpec arg, int position) {
+        public ParseResult.Builder add(ArgSpec arg, int position) {
             if (arg.isOption()) {
-                addOption((Model.OptionSpec) arg);
+                addOption((OptionSpec) arg);
             } else {
-                addPositionalParam((Model.PositionalParamSpec) arg, position);
+                addPositionalParam((PositionalParamSpec) arg, position);
             }
             return this;
         }
@@ -84,7 +81,7 @@ public class ParseResult {
          * Adds the specified {@code OptionSpec} to the list of options that were matched on the
          * command line.
          */
-        public ParseResult.Builder addOption(Model.OptionSpec option) {
+        public ParseResult.Builder addOption(OptionSpec option) {
             if (!isInitializingDefaultValues) {
                 options.add(option);
             }
@@ -102,21 +99,21 @@ public class ParseResult {
          *            matched.
          * @return this builder for method chaining
          */
-        public ParseResult.Builder addPositionalParam(Model.PositionalParamSpec positionalParam, int position) {
+        public ParseResult.Builder addPositionalParam(PositionalParamSpec positionalParam,
+                int position) {
             if (isInitializingDefaultValues) {
                 return this;
             }
             positionals.add(positionalParam);
             while (positionalParams.size() <= position) {
-                positionalParams.add(new ArrayList<Model.PositionalParamSpec>());
+                positionalParams.add(new ArrayList<PositionalParamSpec>());
             }
             positionalParams.get(position).add(positionalParam);
             return this;
         }
 
         /**
-         * Adds the specified command line argument to the list of unmatched command line
-         * arguments.
+         * Adds the specified command line argument to the list of unmatched command line arguments.
          */
         public ParseResult.Builder addUnmatched(String arg) {
             unmatched.add(arg);
@@ -124,8 +121,8 @@ public class ParseResult {
         }
 
         /**
-         * Adds all elements of the specified command line arguments stack to the list of
-         * unmatched command line arguments.
+         * Adds all elements of the specified command line arguments stack to the list of unmatched
+         * command line arguments.
          */
         public ParseResult.Builder addUnmatched(Stack<String> args) {
             while (!args.isEmpty()) {
@@ -135,8 +132,8 @@ public class ParseResult {
         }
 
         /**
-         * Sets the specified {@code ParseResult} for a subcommand that was matched on the
-         * command line.
+         * Sets the specified {@code ParseResult} for a subcommand that was matched on the command
+         * line.
          */
         public ParseResult.Builder subcommand(ParseResult subcommand) {
             this.subcommand = subcommand;
@@ -149,19 +146,19 @@ public class ParseResult {
             return this;
         }
 
-        void addStringValue(Model.ArgSpec argSpec, String value) {
+        void addStringValue(ArgSpec argSpec, String value) {
             if (!isInitializingDefaultValues) {
                 argSpec.stringValues.add(value);
             }
         }
 
-        void addOriginalStringValue(Model.ArgSpec argSpec, String value) {
+        void addOriginalStringValue(ArgSpec argSpec, String value) {
             if (!isInitializingDefaultValues) {
                 argSpec.originalStringValues.add(value);
             }
         }
 
-        void addTypedValues(Model.ArgSpec argSpec, int position, Object typedValue) {
+        void addTypedValues(ArgSpec argSpec, int position, Object typedValue) {
             if (!isInitializingDefaultValues) {
                 argSpec.typedValues.add(typedValue);
                 argSpec.typedValueAtPosition.put(position, typedValue);
@@ -173,14 +170,14 @@ public class ParseResult {
         }
     }
 
-    private final Model.CommandSpec commandSpec;
-    private final List<Model.OptionSpec> matchedOptions;
-    private final List<Model.PositionalParamSpec> matchedUniquePositionals;
+    private final CommandSpec commandSpec;
+    private final List<OptionSpec> matchedOptions;
+    private final List<PositionalParamSpec> matchedUniquePositionals;
     private final List<String> originalArgs;
     private final List<String> unmatched;
-    private final List<List<Model.PositionalParamSpec>> matchedPositionalParams;
+    private final List<List<PositionalParamSpec>> matchedPositionalParams;
     private final List<Exception> errors;
-    final List<Object> tentativeMatch;
+    public final List<Object> tentativeMatch;
 
     private final ParseResult subcommand;
     private final boolean usageHelpRequested;
@@ -189,11 +186,11 @@ public class ParseResult {
     private ParseResult(ParseResult.Builder builder) {
         commandSpec = builder.commandSpec;
         subcommand = builder.subcommand;
-        matchedOptions = new ArrayList<Model.OptionSpec>(builder.options);
+        matchedOptions = new ArrayList<OptionSpec>(builder.options);
         unmatched = new ArrayList<String>(builder.unmatched);
         originalArgs = new ArrayList<String>(builder.originalArgList);
-        matchedUniquePositionals = new ArrayList<Model.PositionalParamSpec>(builder.positionals);
-        matchedPositionalParams = new ArrayList<List<Model.PositionalParamSpec>>(
+        matchedUniquePositionals = new ArrayList<PositionalParamSpec>(builder.positionals);
+        matchedPositionalParams = new ArrayList<List<PositionalParamSpec>>(
                 builder.positionalParams);
         errors = new ArrayList<Exception>(builder.errors);
         usageHelpRequested = builder.usageHelpRequested;
@@ -202,13 +199,13 @@ public class ParseResult {
     }
 
     /**
-     * Returns the option with the specified short name, or {@code null} if no option with that
-     * name was matched on the command line.
+     * Returns the option with the specified short name, or {@code null} if no option with that name
+     * was matched on the command line.
      * <p>
      * Use {@link OptionSpec#getValue() getValue} on the returned {@code OptionSpec} to get the
      * matched value (or values), converted to the type of the option. Alternatively, use
-     * {@link OptionSpec#stringValues() stringValues} to get the matched String values after
-     * they were {@linkplain OptionSpec#splitRegex() split} into parts, or
+     * {@link OptionSpec#stringValues() stringValues} to get the matched String values after they
+     * were {@linkplain OptionSpec#splitRegex() split} into parts, or
      * {@link OptionSpec#originalStringValues() originalStringValues} to get the original String
      * values that were matched on the command line, before any processing.
      * </p>
@@ -220,18 +217,18 @@ public class ParseResult {
      * 
      * @see CommandSpec#findOption(char)
      */
-    public Model.OptionSpec matchedOption(char shortName) {
+    public OptionSpec matchedOption(char shortName) {
         return CommandSpec.findOption(shortName, matchedOptions);
     }
 
     /**
-     * Returns the option with the specified name, or {@code null} if no option with that name
-     * was matched on the command line.
+     * Returns the option with the specified name, or {@code null} if no option with that name was
+     * matched on the command line.
      * <p>
      * Use {@link OptionSpec#getValue() getValue} on the returned {@code OptionSpec} to get the
      * matched value (or values), converted to the type of the option. Alternatively, use
-     * {@link OptionSpec#stringValues() stringValues} to get the matched String values after
-     * they were {@linkplain OptionSpec#splitRegex() split} into parts, or
+     * {@link OptionSpec#stringValues() stringValues} to get the matched String values after they
+     * were {@linkplain OptionSpec#splitRegex() split} into parts, or
      * {@link OptionSpec#originalStringValues() originalStringValues} to get the original String
      * values that were matched on the command line, before any processing.
      * </p>
@@ -243,11 +240,11 @@ public class ParseResult {
      * 
      * @see CommandSpec#findOption(String)
      * @param name
-     *            used to search the matched options. May be an alias of the option name that
-     *            was actually specified on the command line. The specified name may include
-     *            option name prefix characters or not.
+     *            used to search the matched options. May be an alias of the option name that was
+     *            actually specified on the command line. The specified name may include option name
+     *            prefix characters or not.
      */
-    public Model.OptionSpec matchedOption(String name) {
+    public OptionSpec matchedOption(String name) {
         return CommandSpec.findOption(name, matchedOptions);
     }
 
@@ -255,7 +252,7 @@ public class ParseResult {
      * Returns the first {@code PositionalParamSpec} that matched an argument at the specified
      * position, or {@code null} if no positional parameters were matched at that position.
      */
-    public Model.PositionalParamSpec matchedPositional(int position) {
+    public PositionalParamSpec matchedPositional(int position) {
         if (matchedPositionalParams.size() <= position
                 || matchedPositionalParams.get(position).isEmpty()) {
             return null;
@@ -267,47 +264,47 @@ public class ParseResult {
      * Returns all {@code PositionalParamSpec} objects that matched an argument at the specified
      * position, or an empty list if no positional parameters were matched at that position.
      */
-    public List<Model.PositionalParamSpec> matchedPositionals(int position) {
+    public List<PositionalParamSpec> matchedPositionals(int position) {
         if (matchedPositionalParams.size() <= position) {
             return Collections.emptyList();
         }
         return matchedPositionalParams.get(position) == null
-                ? Collections.<Model.PositionalParamSpec>emptyList()
+                ? Collections.<PositionalParamSpec>emptyList()
                 : matchedPositionalParams.get(position);
     }
 
     /** Returns the {@code CommandSpec} for the matched command. */
-    public Model.CommandSpec commandSpec() {
+    public CommandSpec commandSpec() {
         return commandSpec;
     }
 
     /**
-     * Returns whether an option whose aliases include the specified short name was matched on
-     * the command line.
+     * Returns whether an option whose aliases include the specified short name was matched on the
+     * command line.
      * 
      * @param shortName
-     *            used to search the matched options. May be an alias of the option name that
-     *            was actually specified on the command line.
+     *            used to search the matched options. May be an alias of the option name that was
+     *            actually specified on the command line.
      */
     public boolean hasMatchedOption(char shortName) {
         return matchedOption(shortName) != null;
     }
 
     /**
-     * Returns whether an option whose aliases include the specified name was matched on the
-     * command line.
+     * Returns whether an option whose aliases include the specified name was matched on the command
+     * line.
      * 
      * @param name
-     *            used to search the matched options. May be an alias of the option name that
-     *            was actually specified on the command line. The specified name may include
-     *            option name prefix characters or not.
+     *            used to search the matched options. May be an alias of the option name that was
+     *            actually specified on the command line. The specified name may include option name
+     *            prefix characters or not.
      */
     public boolean hasMatchedOption(String name) {
         return matchedOption(name) != null;
     }
 
     /** Returns whether the specified option was matched on the command line. */
-    public boolean hasMatchedOption(Model.OptionSpec option) {
+    public boolean hasMatchedOption(OptionSpec option) {
         return matchedOptions.contains(option);
     }
 
@@ -317,17 +314,17 @@ public class ParseResult {
     }
 
     /** Returns whether the specified positional parameter was matched on the command line. */
-    public boolean hasMatchedPositional(Model.PositionalParamSpec positional) {
+    public boolean hasMatchedPositional(PositionalParamSpec positional) {
         return matchedUniquePositionals.contains(positional);
     }
 
     /** Returns a list of matched options, in the order they were found on the command line. */
-    public List<Model.OptionSpec> matchedOptions() {
+    public List<OptionSpec> matchedOptions() {
         return Collections.unmodifiableList(matchedOptions);
     }
 
     /** Returns a list of matched positional parameters. */
-    public List<Model.PositionalParamSpec> matchedPositionals() {
+    public List<PositionalParamSpec> matchedPositionals() {
         return Collections.unmodifiableList(matchedUniquePositionals);
     }
 
@@ -345,8 +342,8 @@ public class ParseResult {
     }
 
     /**
-     * If {@link ParserSpec#collectErrors} is {@code true}, returns the list of exceptions that
-     * were encountered during parsing, otherwise, returns an empty list.
+     * If {@link ParserSpec#collectErrors} is {@code true}, returns the list of exceptions that were
+     * encountered during parsing, otherwise, returns an empty list.
      * 
      * @since 3.2
      */
@@ -355,18 +352,18 @@ public class ParseResult {
     }
 
     /**
-     * Returns the command line argument value of the option with the specified name, converted
-     * to the {@linkplain OptionSpec#type() type} of the option, or the specified default value
-     * if no option with the specified name was matched.
+     * Returns the command line argument value of the option with the specified name, converted to
+     * the {@linkplain OptionSpec#type() type} of the option, or the specified default value if no
+     * option with the specified name was matched.
      */
     public <T> T matchedOptionValue(char shortName, T defaultValue) {
         return matchedOptionValue(matchedOption(shortName), defaultValue);
     }
 
     /**
-     * Returns the command line argument value of the option with the specified name, converted
-     * to the {@linkplain OptionSpec#type() type} of the option, or the specified default value
-     * if no option with the specified name was matched.
+     * Returns the command line argument value of the option with the specified name, converted to
+     * the {@linkplain OptionSpec#type() type} of the option, or the specified default value if no
+     * option with the specified name was matched.
      */
     public <T> T matchedOptionValue(String name, T defaultValue) {
         return matchedOptionValue(matchedOption(name), defaultValue);
@@ -378,7 +375,7 @@ public class ParseResult {
      * specified option is {@code null}.
      */
     @SuppressWarnings("unchecked")
-    private <T> T matchedOptionValue(Model.OptionSpec option, T defaultValue) {
+    private <T> T matchedOptionValue(OptionSpec option, T defaultValue) {
         return option == null ? defaultValue : (T) option.getValue();
     }
 
@@ -393,12 +390,12 @@ public class ParseResult {
     }
 
     /**
-     * Returns the command line argument value of the specified positional parameter, converted
-     * to the {@linkplain PositionalParamSpec#type() type} of the positional parameter, or the
+     * Returns the command line argument value of the specified positional parameter, converted to
+     * the {@linkplain PositionalParamSpec#type() type} of the positional parameter, or the
      * specified default value if the specified positional parameter is {@code null}.
      */
     @SuppressWarnings("unchecked")
-    private <T> T matchedPositionalValue(Model.PositionalParamSpec positional, T defaultValue) {
+    private <T> T matchedPositionalValue(PositionalParamSpec positional, T defaultValue) {
         return positional == null ? defaultValue : (T) positional.getValue();
     }
 
@@ -411,8 +408,8 @@ public class ParseResult {
     }
 
     /**
-     * Returns the {@code ParseResult} for the subcommand of this command that was matched on
-     * the command line, or {@code null} if no subcommand was matched.
+     * Returns the {@code ParseResult} for the subcommand of this command that was matched on the
+     * command line, or {@code null} if no subcommand was matched.
      */
     public ParseResult subcommand() {
         return subcommand;

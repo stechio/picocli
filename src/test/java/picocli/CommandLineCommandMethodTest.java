@@ -42,7 +42,6 @@ import org.junit.contrib.java.lang.system.SystemErrRule;
 import org.junit.contrib.java.lang.system.SystemOutRule;
 
 import picocli.CommandLine.IParseResultHandler;
-import picocli.CommandLine.Model;
 import picocli.CommandLineTest.CompactFields;
 import picocli.annots.Command;
 import picocli.annots.Mixin;
@@ -52,6 +51,10 @@ import picocli.excepts.InitializationException;
 import picocli.excepts.MissingParameterException;
 import picocli.excepts.UnmatchedArgumentException;
 import picocli.help.Ansi;
+import picocli.model.ArgSpec;
+import picocli.model.CommandSpec;
+import picocli.model.PositionalParamSpec;
+import picocli.model.Range;
 
 /**
  * Tests for {@code @Command} methods.
@@ -133,16 +136,16 @@ public class CommandLineCommandMethodTest {
     public void testAnnotateMethod_unannotatedPositional_indexByParameterOrder() throws Exception {
         Method m = CommandLine.getCommandMethods(UnannotatedPositional.class, "x").get(0);
         CommandLine cmd = new CommandLine(m);
-        Model.CommandSpec spec = cmd.getCommandSpec();
-        List<Model.PositionalParamSpec> positionals = spec.positionalParameters();
+        CommandSpec spec = cmd.getCommandSpec();
+        List<PositionalParamSpec> positionals = spec.positionalParameters();
         String[] labels = { "<arg0>", "<arg1>", "<arg2>", "<arg3>", "<arg4>"};
         assertEquals(positionals.size(), labels.length);
 
         String[] ranges = { "0", "1", "2", "3..*", "4..*" };
 
         for (int i = 0; i < positionals.size(); i++) {
-            Model.PositionalParamSpec positional = positionals.get(i);
-            assertEquals(positional.paramLabel() + " at index " + i, CommandLine.Range.valueOf(ranges[i]), positional.index());
+            PositionalParamSpec positional = positionals.get(i);
+            assertEquals(positional.paramLabel() + " at index " + i, Range.valueOf(ranges[i]), positional.index());
             assertEquals(labels[i], positional.paramLabel());
         }
     }
@@ -157,16 +160,16 @@ public class CommandLineCommandMethodTest {
     public void testAnnotateMethod_unannotatedPositionalMixedWithOptions_indexByParameterOrder() throws Exception {
         Method m = CommandLine.getCommandMethods(PositionalsMixedWithOptions.class, "mixed").get(0);
         CommandLine cmd = new CommandLine(m);
-        Model.CommandSpec spec = cmd.getCommandSpec();
-        List<Model.PositionalParamSpec> positionals = spec.positionalParameters();
+        CommandSpec spec = cmd.getCommandSpec();
+        List<PositionalParamSpec> positionals = spec.positionalParameters();
         String[] labels = { "<arg0>", "<arg3>", "<arg4>"};
         assertEquals(positionals.size(), labels.length);
 
         String[] ranges = { "0", "1..*", "2..*" };
 
         for (int i = 0; i < positionals.size(); i++) {
-            Model.PositionalParamSpec positional = positionals.get(i);
-            assertEquals(positional.paramLabel() + " at index " + i, CommandLine.Range.valueOf(ranges[i]), positional.index());
+            PositionalParamSpec positional = positionals.get(i);
+            assertEquals(positional.paramLabel() + " at index " + i, Range.valueOf(ranges[i]), positional.index());
             assertEquals(labels[i], positional.paramLabel());
         }
 
@@ -202,7 +205,7 @@ public class CommandLineCommandMethodTest {
     public void testAnnotateMethod_mixinParameter() {
         Method m = CommandLine.getCommandMethods(UnannotatedClassWithMixinParameters.class, "withMixin").get(0);
         CommandLine cmd = new CommandLine(m);
-        Model.CommandSpec spec = cmd.getCommandSpec();
+        CommandSpec spec = cmd.getCommandSpec();
         assertEquals(1, spec.mixins().size());
         spec = spec.mixins().get("arg0");
         assertEquals(SomeMixin.class, spec.userObject().getClass());
@@ -212,7 +215,7 @@ public class CommandLineCommandMethodTest {
     public void testAnnotateMethod_positionalAndMixinParameter() {
         Method m = CommandLine.getCommandMethods(UnannotatedClassWithMixinParameters.class, "posAndMixin").get(0);
         CommandLine cmd = new CommandLine(m);
-        Model.CommandSpec spec = cmd.getCommandSpec();
+        CommandSpec spec = cmd.getCommandSpec();
         assertEquals(1, spec.mixins().size());
         assertEquals(1, spec.positionalParameters().size());
         spec = spec.mixins().get("arg1");
@@ -223,7 +226,7 @@ public class CommandLineCommandMethodTest {
     public void testAnnotateMethod_positionalAndOptionsAndMixinParameter() {
         Method m = CommandLine.getCommandMethods(UnannotatedClassWithMixinParameters.class, "posAndOptAndMixin").get(0);
         CommandLine cmd = new CommandLine(m);
-        Model.CommandSpec spec = cmd.getCommandSpec();
+        CommandSpec spec = cmd.getCommandSpec();
         assertEquals(1, spec.mixins().size());
         assertEquals(1, spec.positionalParameters().size());
         assertEquals(3, spec.options().size());
@@ -235,7 +238,7 @@ public class CommandLineCommandMethodTest {
     public void testAnnotateMethod_mixinParameterFirst() {
         Method m = CommandLine.getCommandMethods(UnannotatedClassWithMixinParameters.class, "mixinFirst").get(0);
         CommandLine cmd = new CommandLine(m);
-        Model.CommandSpec spec = cmd.getCommandSpec();
+        CommandSpec spec = cmd.getCommandSpec();
         assertEquals(1, spec.mixins().size());
         assertEquals(1, spec.positionalParameters().size());
         assertEquals(3, spec.options().size());
@@ -451,8 +454,8 @@ public class CommandLineCommandMethodTest {
         assertEquals("run", methodCmd.getCommandName());
         assertEquals("argument count", classCmd.getCommandSpec().args().size(), methodCmd.getCommandSpec().args().size());
         for (int i = 0;  i < classCmd.getCommandSpec().args().size(); i++) {
-            Model.ArgSpec classArg = classCmd.getCommandSpec().args().get(i);
-            Model.ArgSpec methodArg = methodCmd.getCommandSpec().args().get(i);
+            ArgSpec classArg = classCmd.getCommandSpec().args().get(i);
+            ArgSpec methodArg = methodCmd.getCommandSpec().args().get(i);
             assertEquals("arg #" + i, classArg, methodArg);
         }
         setTraceLevel("WARN");
@@ -703,8 +706,8 @@ public class CommandLineCommandMethodTest {
     public void testParamIndex() {
         CommandLine git = new CommandLine(new Git());
         CommandLine clone = git.getSubcommands().get("clone");
-        Model.PositionalParamSpec repo = clone.getCommandSpec().positionalParameters().get(0);
-        assertEquals(CommandLine.Range.valueOf("0"), repo.index());
+        PositionalParamSpec repo = clone.getCommandSpec().positionalParameters().get(0);
+        assertEquals(Range.valueOf("0"), repo.index());
     }
 
     @Command
@@ -722,9 +725,9 @@ public class CommandLineCommandMethodTest {
     public void testParamIndexAnnotatedAndUnAnnotated() {
         CommandLine git = new CommandLine(new AnnotatedParams());
         CommandLine method = git.getSubcommands().get("method");
-        List<Model.PositionalParamSpec> positionals = method.getCommandSpec().positionalParameters();
+        List<PositionalParamSpec> positionals = method.getCommandSpec().positionalParameters();
         for (int i = 0; i < positionals.size(); i++) {
-            assertEquals(CommandLine.Range.valueOf("" + i), positionals.get(i).index());
+            assertEquals(Range.valueOf("" + i), positionals.get(i).index());
         }
     }
 

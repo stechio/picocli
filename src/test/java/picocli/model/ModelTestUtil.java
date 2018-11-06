@@ -13,10 +13,11 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package picocli;
+package picocli.model;
 
 import java.lang.reflect.Field;
-import picocli.CommandLine.Model.*;
+
+import picocli.CommandLine;
 
 public class ModelTestUtil {
     public static Field field(Class<?> cls, String fieldName) throws NoSuchFieldException {

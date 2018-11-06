@@ -8,12 +8,12 @@ import static org.junit.Assert.assertSame;
 import org.junit.Test;
 
 import picocli.CommandLine.IDefaultValueProvider;
-import picocli.CommandLine.Model.ArgSpec;
 import picocli.annots.Command;
 import picocli.annots.Option;
 import picocli.annots.Parameters;
 import picocli.help.Ansi;
 import picocli.help.Help;
+import picocli.model.ArgSpec;
 
 public class CommandLineDefaultProviderTest {
 

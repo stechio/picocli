@@ -4,6 +4,7 @@ package picocli.examples
 @GrabExclude('org.codehaus.groovy:groovy-all')
 import java.security.MessageDigest
 import picocli.CommandLine
+import picocli.annots.*
 import static picocli.CommandLine.*
 
 class Checksum {

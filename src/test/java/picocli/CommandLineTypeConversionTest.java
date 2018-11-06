@@ -573,7 +573,7 @@ public class CommandLineTypeConversionTest {
         assertEquals(args[0], app.globField.glob);
     }
 
-    static class SqlTypeConverter implements ITypeConverter<Integer> {
+    public static class SqlTypeConverter implements ITypeConverter<Integer> {
         public Integer convert(String value) {
             if ("ARRAY".equals(value))   { return Types.ARRAY; }
             if ("BIGINT".equals(value))  { return Types.BIGINT; }

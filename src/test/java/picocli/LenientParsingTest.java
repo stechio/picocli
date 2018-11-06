@@ -31,6 +31,9 @@ import org.junit.contrib.java.lang.system.SystemOutRule;
 
 import picocli.annots.Option;
 import picocli.annots.Parameters;
+import picocli.model.CommandSpec;
+import picocli.model.OptionSpec;
+import picocli.model.PositionalParamSpec;
 
 /**
  * Tests collecting errors instead of throwing them.
@@ -48,8 +51,8 @@ public class LenientParsingTest {
 
     @Test
     public void testMultiValueOptionArityAloneIsInsufficient() throws Exception {
-        CommandLine.Model.CommandSpec spec = CommandLine.Model.CommandSpec.create();
-        CommandLine.Model.OptionSpec option = CommandLine.Model.OptionSpec.builder("-c", "--count").arity("3").type(int.class).build();
+        CommandSpec spec = CommandSpec.create();
+        OptionSpec option = OptionSpec.builder("-c", "--count").arity("3").type(int.class).build();
         assertFalse(option.isMultiValue());
 
         spec.addOption(option);
@@ -62,8 +65,8 @@ public class LenientParsingTest {
 
     @Test
     public void testMultiValuePositionalParamArityAloneIsInsufficient() throws Exception {
-        CommandLine.Model.CommandSpec spec = CommandLine.Model.CommandSpec.create();
-        CommandLine.Model.PositionalParamSpec positional = CommandLine.Model.PositionalParamSpec.builder().index("0").arity("3").type(int.class).build();
+        CommandSpec spec = CommandSpec.create();
+        PositionalParamSpec positional = PositionalParamSpec.builder().index("0").arity("3").type(int.class).build();
         assertFalse(positional.isMultiValue());
 
         spec.addPositional(positional);

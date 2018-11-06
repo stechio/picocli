@@ -4,7 +4,7 @@ import java.io.PrintStream;
 
 import org.apache.commons.lang3.StringUtils;
 
-class Tracer {
+public class Tracer {
     enum TraceLevel {
         OFF, WARN, INFO, DEBUG;
         public boolean isEnabled(TraceLevel other) {
@@ -31,27 +31,27 @@ class Tracer {
     TraceLevel level = TraceLevel.lookup(System.getProperty("picocli.trace"));
     PrintStream stream = System.err;
 
-    void warn(String msg, Object... params) {
+    public void warn(String msg, Object... params) {
         TraceLevel.WARN.print(this, msg, params);
     }
 
-    void info(String msg, Object... params) {
+    public void info(String msg, Object... params) {
         TraceLevel.INFO.print(this, msg, params);
     }
 
-    void debug(String msg, Object... params) {
+    public void debug(String msg, Object... params) {
         TraceLevel.DEBUG.print(this, msg, params);
     }
 
-    boolean isWarn() {
+    public boolean isWarn() {
         return level.isEnabled(TraceLevel.WARN);
     }
 
-    boolean isInfo() {
+    public boolean isInfo() {
         return level.isEnabled(TraceLevel.INFO);
     }
 
-    boolean isDebug() {
+    public boolean isDebug() {
         return level.isEnabled(TraceLevel.DEBUG);
     }
 }

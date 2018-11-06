@@ -1,11 +1,11 @@
 package picocli.shell.jline2;
 
+import java.util.List;
+
 import jline.console.completer.ArgumentCompleter;
 import jline.console.completer.Completer;
 import picocli.AutoComplete;
-import picocli.CommandLine.Model.CommandSpec;
-
-import java.util.List;
+import picocli.model.CommandSpec;
 
 /**
  * Implementation of the JLine 2 {@link Completer} interface that generates completion

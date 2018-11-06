@@ -29,14 +29,16 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import picocli.CommandLine.Model.ArgSpec;
-import picocli.CommandLine.Model.CommandSpec;
-import picocli.CommandLine.Model.OptionSpec;
-import picocli.CommandLine.Model.PositionalParamSpec;
 import picocli.annots.Command;
 import picocli.annots.Option;
 import picocli.annots.Parameters;
 import picocli.help.Help;
+import picocli.model.ArgSpec;
+import picocli.model.CommandSpec;
+import picocli.model.OptionSpec;
+import picocli.model.ParseResult;
+import picocli.model.PositionalParamSpec;
+import picocli.model.Range;
 
 /**
  * Stand-alone tool that generates bash auto-complete scripts for picocli-based command line applications.
@@ -625,7 +627,7 @@ public class AutoComplete {
                 return found;
             }
             if (found instanceof ArgSpec) {
-                CommandLine.Range arity = ((ArgSpec) found).arity();
+                Range arity = ((ArgSpec) found).arity();
                 if (i < arity.min) {
                     return found; // not all parameters have been supplied yet
                 } else {
@@ -687,7 +689,7 @@ public class AutoComplete {
         if (commandSpec == null) { return; }
         for (Map.Entry<String, CommandLine> entry : commandSpec.subcommands().entrySet()) {
             candidates.add(entry.getKey());
-            candidates.addAll(Arrays.asList(entry.getValue().getCommandSpec().aliases()));
+            candidates.addAll(entry.getValue().getCommandSpec().aliases());
         }
         candidates.addAll(commandSpec.optionsMap().keySet());
         for (PositionalParamSpec positional : commandSpec.positionalParameters()) {

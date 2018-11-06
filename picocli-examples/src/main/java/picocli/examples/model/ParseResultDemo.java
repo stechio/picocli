@@ -6,9 +6,9 @@ import java.util.Collections;
 import java.util.List;
 
 import picocli.CommandLine;
-import picocli.CommandLine.Model.CommandSpec;
-import picocli.CommandLine.Model.OptionSpec;
-import picocli.ParseResult;
+import picocli.model.CommandSpec;
+import picocli.model.OptionSpec;
+import picocli.model.ParseResult;
 
 public class ParseResultDemo {
     public static void main(String[] args) {

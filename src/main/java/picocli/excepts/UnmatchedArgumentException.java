@@ -8,10 +8,9 @@ import java.util.Stack;
 
 import picocli.CommandLine;
 import picocli.CommandLine.CosineSimilarity;
-import picocli.CommandLine.Model;
-import picocli.CommandLine.Model.CommandSpec;
 import picocli.annots.Option;
 import picocli.annots.Parameters;
+import picocli.model.CommandSpec;
 import picocli.util.CollectionUtilsExt;
 
 /**
@@ -92,7 +91,7 @@ public class UnmatchedArgumentException extends ParameterException {
         }
         String arg = unmatched.get(0);
         String stripped = CommandSpec.stripPrefix(arg);
-        Model.CommandSpec spec = getCommandLine().getCommandSpec();
+        CommandSpec spec = getCommandLine().getCommandSpec();
         if (spec.resemblesOption(arg, null)) {
             return spec.findOptionNamesWithPrefix(
                     stripped.substring(0, Math.min(2, stripped.length())));

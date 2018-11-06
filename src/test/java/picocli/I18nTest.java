@@ -33,10 +33,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.ProvideSystemProperty;
 
-import picocli.CommandLine.Model.ArgSpec;
 import picocli.annots.Command;
 import picocli.annots.Option;
 import picocli.annots.Parameters;
+import picocli.model.ArgSpec;
 
 /**
  * Tests internationalization (i18n) and localization (l12n)-related functionality.

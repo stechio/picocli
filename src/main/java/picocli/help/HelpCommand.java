@@ -3,12 +3,11 @@ package picocli.help;
 import java.io.PrintStream;
 
 import picocli.CommandLine;
-import picocli.CommandLine.Model;
-import picocli.CommandLine.Model.Messages;
 import picocli.annots.Command;
 import picocli.annots.Option;
 import picocli.annots.Parameters;
 import picocli.excepts.ParameterException;
+import picocli.model.Messages;
 import picocli.util.Assert;
 
 /**

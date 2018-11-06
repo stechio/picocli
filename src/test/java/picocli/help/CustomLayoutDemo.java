@@ -16,14 +16,14 @@
 package picocli.help;
 
 import picocli.CommandLine;
-import picocli.CommandLine.Model.ArgSpec;
-import picocli.CommandLine.Model.CommandSpec;
 import picocli.annots.Command;
 import picocli.annots.Option;
 import picocli.annots.Parameters;
 import picocli.help.Help.IOptionRenderer;
 import picocli.help.Help.IParameterRenderer;
 import picocli.help.TextTable.Column;
+import picocli.model.ArgSpec;
+import picocli.model.CommandSpec;
 
 /**
  * Demonstrates how the CommandLine.Help API can be used to create custom layouts for usage help

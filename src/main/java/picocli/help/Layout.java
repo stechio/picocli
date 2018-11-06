@@ -3,13 +3,13 @@ package picocli.help;
 import java.util.List;
 
 import picocli.CommandLine;
-import picocli.CommandLine.Model.ArgSpec;
-import picocli.CommandLine.Model.OptionSpec;
-import picocli.CommandLine.Model.PositionalParamSpec;
-import picocli.help.Help.OptionRenderer;
-import picocli.help.Help.ParameterRenderer;
 import picocli.help.Help.IOptionRenderer;
 import picocli.help.Help.IParameterRenderer;
+import picocli.help.Help.OptionRenderer;
+import picocli.help.Help.ParameterRenderer;
+import picocli.model.ArgSpec;
+import picocli.model.OptionSpec;
+import picocli.model.PositionalParamSpec;
 import picocli.util.Assert;
 
 /**

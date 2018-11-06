@@ -1,8 +1,8 @@
 package picocli.examples
 
-import picocli.annots.CommandLine
-import picocli.Option
+import picocli.CommandLine
 import picocli.annots.Command
+import picocli.annots.Option
 
 @Command(name = "MyApp", version = "Groovy picocli demo v3.0",
         mixinStandardHelpOptions = true,

@@ -10,10 +10,10 @@ import java.util.concurrent.Callable;
 import picocli.CommandLine.IParseResultHandler2;
 import picocli.CommandLine.ITypeConverter;
 import picocli.CommandLine.NoCompletionCandidates;
-import picocli.CommandLine.Model.OptionSpec;
 import picocli.annots.Command;
 import picocli.excepts.MissingParameterException;
 import picocli.help.Help;
+import picocli.model.OptionSpec;
 
 /**
  * <p>

@@ -16,9 +16,10 @@
 package picocli.examples.dsl
 
 import picocli.CommandLine
-import picocli.CommandLine.Model.CommandSpec
-import picocli.CommandLine.Model.OptionSpec
-import picocli.CommandLine.Model.PositionalParamSpec
+import picocli.model.CommandSpec
+import picocli.model.OptionSpec
+import picocli.model.PositionalParamSpec
+import picocli.model.UsageMessageSpec
 
 class PrototypeDSL {
     static void main(String[] args) {
@@ -100,7 +101,7 @@ class PrototypeDSL {
                 if (cli.commandSpec.usageMessage().hasProperty(key)) {
                     cli.commandSpec.usageMessage()[key] = value
                     return
-                } else if (CommandLine.Model.UsageMessageSpec.declaredMethods.find {m -> m.name == key} != null) {
+                } else if (UsageMessageSpec.declaredMethods.find {m -> m.name == key} != null) {
                     if (value instanceof List) {
                         cli.commandSpec.invokeMethod(key, (value as List).toArray())
                     } else {
@@ -143,7 +144,7 @@ class PrototypeDSL {
             code()
             addPositional positionalSpec.build()
         }
-        void usage(@DelegatesTo(CommandLine.Model.UsageMessageSpec) Closure details) {
+        void usage(@DelegatesTo(UsageMessageSpec) Closure details) {
             def code = details.rehydrate(commandSpec.usageMessage(), this, this)
             code.resolveStrategy = Closure.DELEGATE_ONLY
             code()

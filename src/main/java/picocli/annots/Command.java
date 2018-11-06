@@ -12,12 +12,12 @@ import picocli.CommandLine.IDefaultValueProvider;
 import picocli.CommandLine.IVersionProvider;
 import picocli.CommandLine.NoDefaultProvider;
 import picocli.CommandLine.NoVersionProvider;
-import picocli.CommandLine.Model.ArgSpec;
-import picocli.CommandLine.Model.CommandSpec;
-import picocli.CommandLine.Model.Messages;
-import picocli.CommandLine.Model.UsageMessageSpec;
 import picocli.help.Help;
 import picocli.help.HelpCommand;
+import picocli.model.ArgSpec;
+import picocli.model.CommandSpec;
+import picocli.model.Messages;
+import picocli.model.UsageMessageSpec;
 
 /**
  * <p>

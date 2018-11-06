@@ -35,8 +35,6 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import picocli.CommandLine.Model;
-import picocli.CommandLine.Range;
 import picocli.annots.Command;
 import picocli.annots.Option;
 import picocli.annots.Parameters;
@@ -45,6 +43,9 @@ import picocli.excepts.InitializationException;
 import picocli.excepts.MissingParameterException;
 import picocli.excepts.ParameterException;
 import picocli.excepts.UnmatchedArgumentException;
+import picocli.model.OptionSpec;
+import picocli.model.PositionalParamSpec;
+import picocli.model.Range;
 
 public class CommandLineArityTest {
     @Before public void setUp() { System.clearProperty("picocli.trace"); }
@@ -746,7 +747,7 @@ public class CommandLineArityTest {
         } catch (MissingParameterException ok) {
             assertEquals("Missing required parameter for option '-chars' (<charOptions>)", ok.getMessage());
             assertEquals(1, ok.getMissing().size());
-            assertTrue(ok.getMissing().get(0).toString(), ok.getMissing().get(0) instanceof Model.OptionSpec);
+            assertTrue(ok.getMissing().get(0).toString(), ok.getMissing().get(0) instanceof OptionSpec);
         }
     }
 
@@ -990,7 +991,7 @@ public class CommandLineArityTest {
         } catch (MissingParameterException ex) {
             assertEquals("Expected parameter 2 (of 2 mandatory parameters) for positional parameter at index 0..* (<parameters>) but found '-o'", ex.getMessage());
             assertEquals(1, ex.getMissing().size());
-            assertTrue(ex.getMissing().get(0).toString(), ex.getMissing().get(0) instanceof Model.PositionalParamSpec);
+            assertTrue(ex.getMissing().get(0).toString(), ex.getMissing().get(0) instanceof PositionalParamSpec);
         }
 
         try {
@@ -999,7 +1000,7 @@ public class CommandLineArityTest {
         } catch (MissingParameterException ex) {
             assertEquals("positional parameter at index 0..* (<parameters>) requires at least 2 values, but only 1 were specified: [p3]", ex.getMessage());
             assertEquals(1, ex.getMissing().size());
-            assertTrue(ex.getMissing().get(0).toString(), ex.getMissing().get(0) instanceof Model.PositionalParamSpec);
+            assertTrue(ex.getMissing().get(0).toString(), ex.getMissing().get(0) instanceof PositionalParamSpec);
         }
     }
 

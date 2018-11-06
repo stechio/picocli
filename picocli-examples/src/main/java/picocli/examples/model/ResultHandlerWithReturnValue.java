@@ -21,10 +21,10 @@ import java.util.List;
 
 import picocli.CommandLine;
 import picocli.CommandLine.AbstractParseResultHandler;
-import picocli.CommandLine.Model.CommandSpec;
-import picocli.CommandLine.Model.OptionSpec;
-import picocli.CommandLine.Model.PositionalParamSpec;
-import picocli.ParseResult;
+import picocli.model.CommandSpec;
+import picocli.model.OptionSpec;
+import picocli.model.ParseResult;
+import picocli.model.PositionalParamSpec;
 
 public class ResultHandlerWithReturnValue {
     public static void main(final String[] args) {

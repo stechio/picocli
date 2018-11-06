@@ -1,4 +1,4 @@
-package picocli;
+package picocli.model;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -48,11 +48,11 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import picocli.CommandLine;
 import picocli.CommandLine.IDefaultValueProvider;
 import picocli.CommandLine.ITypeConverter;
-import picocli.CommandLine.Model;
 import picocli.CommandLine.PositionalParametersSorter;
-import picocli.CommandLine.Range;
+import picocli.Tracer;
 import picocli.excepts.InitializationException;
 import picocli.excepts.MaxValuesExceededException;
 import picocli.excepts.MissingParameterException;
@@ -63,13 +63,14 @@ import picocli.excepts.PicocliException;
 import picocli.excepts.TypeConversionException;
 import picocli.excepts.UnmatchedArgumentException;
 import picocli.util.Assert;
+import picocli.util.ClassUtilsExt;
 import picocli.util.CollectionUtilsExt;
 import picocli.util.Utils;
 
 /**
  * Helper class responsible for processing command line arguments.
  */
-class Interpreter {
+public class Interpreter {
     enum LookBehind {
         SEPARATE, ATTACHED, ATTACHED_WITH_SEPARATOR;
         public boolean isAttached() {
@@ -442,14 +443,18 @@ class Interpreter {
     }
 
     private CommandLine commandLine;
-    final Map<Class<?>, ITypeConverter<?>> converterRegistry = new HashMap<Class<?>, ITypeConverter<?>>();
+    //TODO:private scope
+    public final Map<Class<?>, ITypeConverter<?>> converterRegistry = new HashMap<Class<?>, ITypeConverter<?>>();
     private boolean isHelpRequested;
     private int position;
     private boolean endOfOptions;
-    ParseResult.Builder parseResult;
+    //TODO:private scope
+    public ParseResult.Builder parseResult;
+    Tracer tracer;
 
-    Interpreter(CommandLine commandLine) {
+    public Interpreter(CommandLine commandLine, Tracer tracer) {
         this.commandLine = commandLine;
+        this.tracer = tracer;
         registerBuiltInConverters();
     }
 
@@ -490,49 +495,49 @@ class Interpreter {
         converterRegistry.put(Class.class, new BuiltIn.ClassConverter());
         converterRegistry.put(NetworkInterface.class, new BuiltIn.NetworkInterfaceConverter());
 
-        BuiltIn.ISO8601TimeConverter.registerIfAvailable(converterRegistry, commandLine.tracer);
-        BuiltIn.registerIfAvailable(converterRegistry, commandLine.tracer, "java.sql.Connection",
+        BuiltIn.ISO8601TimeConverter.registerIfAvailable(converterRegistry, tracer);
+        BuiltIn.registerIfAvailable(converterRegistry, tracer, "java.sql.Connection",
                 "java.sql.DriverManager", "getConnection", String.class);
-        BuiltIn.registerIfAvailable(converterRegistry, commandLine.tracer, "java.sql.Driver",
+        BuiltIn.registerIfAvailable(converterRegistry, tracer, "java.sql.Driver",
                 "java.sql.DriverManager", "getDriver", String.class);
-        BuiltIn.registerIfAvailable(converterRegistry, commandLine.tracer, "java.sql.Timestamp",
+        BuiltIn.registerIfAvailable(converterRegistry, tracer, "java.sql.Timestamp",
                 "java.sql.Timestamp", "valueOf", String.class);
 
-        BuiltIn.registerIfAvailable(converterRegistry, commandLine.tracer, "java.time.Duration",
+        BuiltIn.registerIfAvailable(converterRegistry, tracer, "java.time.Duration",
                 "parse", CharSequence.class);
-        BuiltIn.registerIfAvailable(converterRegistry, commandLine.tracer, "java.time.Instant",
+        BuiltIn.registerIfAvailable(converterRegistry, tracer, "java.time.Instant",
                 "parse", CharSequence.class);
-        BuiltIn.registerIfAvailable(converterRegistry, commandLine.tracer, "java.time.LocalDate",
+        BuiltIn.registerIfAvailable(converterRegistry, tracer, "java.time.LocalDate",
                 "parse", CharSequence.class);
-        BuiltIn.registerIfAvailable(converterRegistry, commandLine.tracer,
+        BuiltIn.registerIfAvailable(converterRegistry, tracer,
                 "java.time.LocalDateTime", "parse", CharSequence.class);
-        BuiltIn.registerIfAvailable(converterRegistry, commandLine.tracer, "java.time.LocalTime",
+        BuiltIn.registerIfAvailable(converterRegistry, tracer, "java.time.LocalTime",
                 "parse", CharSequence.class);
-        BuiltIn.registerIfAvailable(converterRegistry, commandLine.tracer, "java.time.MonthDay",
+        BuiltIn.registerIfAvailable(converterRegistry, tracer, "java.time.MonthDay",
                 "parse", CharSequence.class);
-        BuiltIn.registerIfAvailable(converterRegistry, commandLine.tracer,
+        BuiltIn.registerIfAvailable(converterRegistry, tracer,
                 "java.time.OffsetDateTime", "parse", CharSequence.class);
-        BuiltIn.registerIfAvailable(converterRegistry, commandLine.tracer, "java.time.OffsetTime",
+        BuiltIn.registerIfAvailable(converterRegistry, tracer, "java.time.OffsetTime",
                 "parse", CharSequence.class);
-        BuiltIn.registerIfAvailable(converterRegistry, commandLine.tracer, "java.time.Period",
+        BuiltIn.registerIfAvailable(converterRegistry, tracer, "java.time.Period",
                 "parse", CharSequence.class);
-        BuiltIn.registerIfAvailable(converterRegistry, commandLine.tracer, "java.time.Year",
+        BuiltIn.registerIfAvailable(converterRegistry, tracer, "java.time.Year",
                 "parse", CharSequence.class);
-        BuiltIn.registerIfAvailable(converterRegistry, commandLine.tracer, "java.time.YearMonth",
+        BuiltIn.registerIfAvailable(converterRegistry, tracer, "java.time.YearMonth",
                 "parse", CharSequence.class);
-        BuiltIn.registerIfAvailable(converterRegistry, commandLine.tracer,
+        BuiltIn.registerIfAvailable(converterRegistry, tracer,
                 "java.time.ZonedDateTime", "parse", CharSequence.class);
-        BuiltIn.registerIfAvailable(converterRegistry, commandLine.tracer, "java.time.ZoneId", "of",
+        BuiltIn.registerIfAvailable(converterRegistry, tracer, "java.time.ZoneId", "of",
                 String.class);
-        BuiltIn.registerIfAvailable(converterRegistry, commandLine.tracer, "java.time.ZoneOffset",
+        BuiltIn.registerIfAvailable(converterRegistry, tracer, "java.time.ZoneOffset",
                 "of", String.class);
 
-        BuiltIn.registerIfAvailable(converterRegistry, commandLine.tracer, "java.nio.file.Path",
+        BuiltIn.registerIfAvailable(converterRegistry, tracer, "java.nio.file.Path",
                 "java.nio.file.Paths", "get", String.class, String[].class);
     }
 
-    private Model.ParserSpec config() {
-        return commandLine.commandSpec.parser();
+    private ParserSpec config() {
+        return commandLine.getCommandSpec().parser();
     }
 
     /**
@@ -544,14 +549,14 @@ class Interpreter {
      * @throws ParameterException
      *             if the specified command line arguments are invalid
      */
-    List<CommandLine> parse(String... args) {
+    public List<CommandLine> parse(String... args) {
         Assert.notNull(args, "argument array");
-        if (commandLine.tracer.isInfo()) {
-            commandLine.tracer.info("Parsing %d command line args %s%n", args.length,
+        if (tracer.isInfo()) {
+            tracer.info("Parsing %d command line args %s%n", args.length,
                     Arrays.toString(args));
         }
-        if (commandLine.tracer.isDebug()) {
-            commandLine.tracer.debug("Parser configuration: %s%n", config());
+        if (tracer.isDebug()) {
+            tracer.debug("Parser configuration: %s%n", config());
         }
         List<String> expanded = new ArrayList<String>();
         for (String arg : args) {
@@ -568,14 +573,14 @@ class Interpreter {
         if (config().expandAtFiles() && !arg.equals("@") && arg.startsWith("@")) {
             arg = arg.substring(1);
             if (arg.startsWith("@")) {
-                if (commandLine.tracer.isInfo()) {
-                    commandLine.tracer.info(
+                if (tracer.isInfo()) {
+                    tracer.info(
                             "Not expanding @-escaped argument %s (trimmed leading '@' char)%n",
                             arg);
                 }
             } else {
-                if (commandLine.tracer.isInfo()) {
-                    commandLine.tracer.info("Expanding argument file @%s%n", arg);
+                if (tracer.isInfo()) {
+                    tracer.info("Expanding argument file @%s%n", arg);
                 }
                 expandArgumentFile(arg, arguments, visited);
                 return;
@@ -587,15 +592,15 @@ class Interpreter {
     private void expandArgumentFile(String fileName, List<String> arguments, Set<String> visited) {
         File file = new File(fileName);
         if (!file.canRead()) {
-            if (commandLine.tracer.isInfo()) {
-                commandLine.tracer.info(
+            if (tracer.isInfo()) {
+                tracer.info(
                         "File %s does not exist or cannot be read; treating argument literally%n",
                         fileName);
             }
             arguments.add("@" + fileName);
         } else if (visited.contains(file.getAbsolutePath())) {
-            if (commandLine.tracer.isInfo()) {
-                commandLine.tracer.info("Already visited file %s; ignoring...%n",
+            if (tracer.isInfo()) {
+                tracer.info("Already visited file %s; ignoring...%n",
                         file.getAbsolutePath());
             }
         } else {
@@ -616,8 +621,8 @@ class Interpreter {
             tok.whitespaceChars(0, ' ');
             tok.quoteChar('"');
             tok.quoteChar('\'');
-            if (commandLine.commandSpec.parser().atFileCommentChar() != null) {
-                tok.commentChar(commandLine.commandSpec.parser().atFileCommentChar());
+            if (commandLine.getCommandSpec().parser().atFileCommentChar() != null) {
+                tok.commentChar(commandLine.getCommandSpec().parser().atFileCommentChar());
             }
             while (tok.nextToken() != StreamTokenizer.TT_EOF) {
                 addOrExpand(tok.sval, result, visited);
@@ -632,8 +637,8 @@ class Interpreter {
                 }
             }
         }
-        if (commandLine.tracer.isInfo()) {
-            commandLine.tracer.info("Expanded file @%s to arguments %s%n", fileName, result);
+        if (tracer.isInfo()) {
+            tracer.info("Expanded file @%s to arguments %s%n", fileName, result);
         }
         arguments.addAll(result);
     }
@@ -643,16 +648,16 @@ class Interpreter {
         endOfOptions = false;
         isHelpRequested = false;
         parseResult = ParseResult.builder(commandLine.getCommandSpec());
-        for (Model.OptionSpec option : commandLine.getCommandSpec().options()) {
+        for (OptionSpec option : commandLine.getCommandSpec().options()) {
             clear(option);
         }
-        for (Model.PositionalParamSpec positional : commandLine.getCommandSpec()
+        for (PositionalParamSpec positional : commandLine.getCommandSpec()
                 .positionalParameters()) {
             clear(positional);
         }
     }
 
-    private void clear(Model.ArgSpec argSpec) {
+    private void clear(ArgSpec argSpec) {
         argSpec.resetStringValues();
         argSpec.resetOriginalStringValues();
         argSpec.typedValues.clear();
@@ -660,19 +665,19 @@ class Interpreter {
         if (argSpec.hasInitialValue()) {
             try {
                 argSpec.setter().set(argSpec.initialValue());
-                commandLine.tracer.debug("Set initial value for %s of type %s to %s.%n", argSpec,
+                tracer.debug("Set initial value for %s of type %s to %s.%n", argSpec,
                         argSpec.type(), String.valueOf(argSpec.initialValue()));
             } catch (Exception ex) {
-                commandLine.tracer.warn("Could not set initial value for %s of type %s to %s: %s%n",
+                tracer.warn("Could not set initial value for %s of type %s to %s: %s%n",
                         argSpec, argSpec.type(), String.valueOf(argSpec.initialValue()), ex);
             }
         } else {
-            commandLine.tracer.debug("Initial value not available for %s%n", argSpec);
+            tracer.debug("Initial value not available for %s%n", argSpec);
         }
     }
 
     private void maybeThrow(PicocliException ex) throws PicocliException {
-        if (commandLine.commandSpec.parser().collectErrors) {
+        if (commandLine.getCommandSpec().parser().collectErrors) {
             parseResult.addError(ex);
         } else {
             throw ex;
@@ -682,22 +687,22 @@ class Interpreter {
     private void parse(List<CommandLine> parsedCommands, Stack<String> argumentStack,
             String[] originalArgs, List<Object> nowProcessing) {
         clear(); // first reset any state in case this CommandLine instance is being reused
-        if (commandLine.tracer.isDebug()) {
-            commandLine.tracer.debug(
+        if (tracer.isDebug()) {
+            tracer.debug(
                     "Initializing %s: %d options, %d positional parameters, %d required, %d subcommands.%n",
-                    commandLine.commandSpec.toString(),
-                    new HashSet<Model.ArgSpec>(commandLine.commandSpec.optionsMap().values())
+                    commandLine.getCommandSpec().toString(),
+                    new HashSet<ArgSpec>(commandLine.getCommandSpec().optionsMap().values())
                             .size(),
-                    commandLine.commandSpec.positionalParameters().size(),
-                    commandLine.commandSpec.requiredArgs().size(),
-                    commandLine.commandSpec.subcommands().size());
+                    commandLine.getCommandSpec().positionalParameters().size(),
+                    commandLine.getCommandSpec().requiredArgs().size(),
+                    commandLine.getCommandSpec().subcommands().size());
         }
         parsedCommands.add(commandLine);
-        List<Model.ArgSpec> required = new ArrayList<Model.ArgSpec>(
-                commandLine.commandSpec.requiredArgs());
-        Set<Model.ArgSpec> initialized = new HashSet<Model.ArgSpec>();
+        List<ArgSpec> required = new ArrayList<ArgSpec>(
+                commandLine.getCommandSpec().requiredArgs());
+        Set<ArgSpec> initialized = new HashSet<ArgSpec>();
         Collections.sort(required, new PositionalParametersSorter());
-        boolean continueOnError = commandLine.commandSpec.parser().collectErrors;
+        boolean continueOnError = commandLine.getCommandSpec().parser().collectErrors;
         do {
             int stackSize = argumentStack.size();
             try {
@@ -719,7 +724,7 @@ class Interpreter {
             }
         } while (!argumentStack.isEmpty() && continueOnError);
         if (!isAnyHelpRequested() && !required.isEmpty()) {
-            for (Model.ArgSpec missing : required) {
+            for (ArgSpec missing : required) {
                 if (missing.isOption()) {
                     maybeThrow(MissingParameterException.create(commandLine, required,
                             config().separator()));
@@ -730,7 +735,7 @@ class Interpreter {
         }
         if (!parseResult.unmatched.isEmpty()) {
             String[] unmatched = parseResult.unmatched.toArray(new String[0]);
-            for (Model.UnmatchedArgsBinding unmatchedArgsBinding : commandLine.getCommandSpec()
+            for (UnmatchedArgsBinding unmatchedArgsBinding : commandLine.getCommandSpec()
                     .unmatchedArgsBindings()) {
                 unmatchedArgsBinding.addAll(unmatched.clone());
             }
@@ -738,26 +743,26 @@ class Interpreter {
                 maybeThrow(new UnmatchedArgumentException(commandLine,
                         Collections.unmodifiableList(parseResult.unmatched)));
             }
-            if (commandLine.tracer.isInfo()) {
-                commandLine.tracer.info("Unmatched arguments: %s%n", parseResult.unmatched);
+            if (tracer.isInfo()) {
+                tracer.info("Unmatched arguments: %s%n", parseResult.unmatched);
             }
         }
     }
 
-    private void applyDefaultValues(List<Model.ArgSpec> required) throws Exception {
+    private void applyDefaultValues(List<ArgSpec> required) throws Exception {
         parseResult.isInitializingDefaultValues = true;
-        for (Model.OptionSpec option : commandLine.commandSpec.options()) {
-            applyDefault(commandLine.commandSpec.defaultValueProvider(), option, required);
+        for (OptionSpec option : commandLine.getCommandSpec().options()) {
+            applyDefault(commandLine.getCommandSpec().defaultValueProvider(), option, required);
         }
-        for (Model.PositionalParamSpec positional : commandLine.commandSpec
+        for (PositionalParamSpec positional : commandLine.getCommandSpec()
                 .positionalParameters()) {
-            applyDefault(commandLine.commandSpec.defaultValueProvider(), positional, required);
+            applyDefault(commandLine.getCommandSpec().defaultValueProvider(), positional, required);
         }
         parseResult.isInitializingDefaultValues = false;
     }
 
-    private void applyDefault(IDefaultValueProvider defaultValueProvider, Model.ArgSpec arg,
-            List<Model.ArgSpec> required) throws Exception {
+    private void applyDefault(IDefaultValueProvider defaultValueProvider, ArgSpec arg,
+            List<ArgSpec> required) throws Exception {
 
         // Default value provider return value is only used if provider exists and if value
         // is not null otherwise the original default or initial value are used
@@ -768,13 +773,13 @@ class Interpreter {
         if (defaultValue == null) {
             return;
         }
-        if (commandLine.tracer.isDebug()) {
-            commandLine.tracer.debug("Applying defaultValue (%s) to %s%n", defaultValue, arg);
+        if (tracer.isDebug()) {
+            tracer.debug("Applying defaultValue (%s) to %s%n", defaultValue, arg);
         }
         Range arity = arg.arity().min(Math.max(1, arg.arity().min));
 
         applyOption(arg, LookBehind.SEPARATE, arity, stack(defaultValue),
-                new HashSet<Model.ArgSpec>(), arg.toString);
+                new HashSet<ArgSpec>(), arg.toString);
         required.remove(arg);
     }
 
@@ -785,7 +790,7 @@ class Interpreter {
     }
 
     private void processArguments(List<CommandLine> parsedCommands, Stack<String> args,
-            Collection<Model.ArgSpec> required, Set<Model.ArgSpec> initialized,
+            Collection<ArgSpec> required, Set<ArgSpec> initialized,
             String[] originalArgs, List<Object> nowProcessing) throws Exception {
         // arg must be one of:
         // 1. the "--" double dash separating options from positional arguments
@@ -805,15 +810,15 @@ class Interpreter {
                 return;
             }
             String arg = args.pop();
-            if (commandLine.tracer.isDebug()) {
-                commandLine.tracer.debug("Processing argument '%s'. Remainder=%s%n", arg,
+            if (tracer.isDebug()) {
+                tracer.debug("Processing argument '%s'. Remainder=%s%n", arg,
                         CollectionUtilsExt.reverse(ObjectUtils.clone(args)));
             }
 
             // Double-dash separates options from positional arguments.
             // If found, then interpret the remaining args as positional parameters.
-            if (commandLine.commandSpec.parser.endOfOptionsDelimiter().equals(arg)) {
-                commandLine.tracer.info(
+            if (commandLine.getCommandSpec().parser.endOfOptionsDelimiter().equals(arg)) {
+                tracer.info(
                         "Found end-of-options delimiter '--'. Treating remainder as positional parameters.%n");
                 endOfOptions = true;
                 processRemainderAsPositionalParameters(required, initialized, args);
@@ -821,16 +826,16 @@ class Interpreter {
             }
 
             // if we find another command, we are done with the current command
-            if (commandLine.commandSpec.subcommands().containsKey(arg)) {
-                CommandLine subcommand = commandLine.commandSpec.subcommands().get(arg);
-                nowProcessing.add(subcommand.commandSpec);
-                updateHelpRequested(subcommand.commandSpec);
+            if (commandLine.getCommandSpec().subcommands().containsKey(arg)) {
+                CommandLine subcommand = commandLine.getCommandSpec().subcommands().get(arg);
+                nowProcessing.add(subcommand.getCommandSpec());
+                updateHelpRequested(subcommand.getCommandSpec());
                 if (!isAnyHelpRequested() && !required.isEmpty()) { // ensure current command portion is valid
                     throw MissingParameterException.create(commandLine, required, separator);
                 }
-                if (commandLine.tracer.isDebug()) {
-                    commandLine.tracer.debug("Found subcommand '%s' (%s)%n", arg,
-                            subcommand.commandSpec.toString());
+                if (tracer.isDebug()) {
+                    tracer.debug("Found subcommand '%s' (%s)%n", arg,
+                            subcommand.getCommandSpec().toString());
                 }
                 subcommand.interpreter.parse(parsedCommands, args, originalArgs, nowProcessing);
                 parseResult.subcommand(subcommand.interpreter.parseResult.build());
@@ -846,27 +851,27 @@ class Interpreter {
             if (separatorIndex > 0) {
                 String key = arg.substring(0, separatorIndex);
                 // be greedy. Consume the whole arg as an option if possible.
-                if (commandLine.commandSpec.optionsMap().containsKey(key)
-                        && !commandLine.commandSpec.optionsMap().containsKey(arg)) {
+                if (commandLine.getCommandSpec().optionsMap().containsKey(key)
+                        && !commandLine.getCommandSpec().optionsMap().containsKey(arg)) {
                     paramAttachedToOption = true;
                     String optionParam = arg.substring(separatorIndex + separator.length());
                     args.push(optionParam);
                     arg = key;
-                    if (commandLine.tracer.isDebug()) {
-                        commandLine.tracer.debug(
+                    if (tracer.isDebug()) {
+                        tracer.debug(
                                 "Separated '%s' option from '%s' option parameter%n", key,
                                 optionParam);
                     }
                 } else {
-                    if (commandLine.tracer.isDebug()) {
-                        commandLine.tracer.debug(
+                    if (tracer.isDebug()) {
+                        tracer.debug(
                                 "'%s' contains separator '%s' but '%s' is not a known option%n",
                                 arg, separator, key);
                     }
                 }
             } else {
-                if (commandLine.tracer.isDebug()) {
-                    commandLine.tracer.debug(
+                if (tracer.isDebug()) {
+                    tracer.debug(
                             "'%s' cannot be separated into <option>%s<option-parameter>%n", arg,
                             separator);
                 }
@@ -878,8 +883,8 @@ class Interpreter {
             // only single-letter options can be combined with other options or with an argument
             else if (config().posixClusteredShortOptionsAllowed() && arg.length() > 2
                     && arg.startsWith("-")) {
-                if (commandLine.tracer.isDebug()) {
-                    commandLine.tracer.debug("Trying to process '%s' as clustered short options%n",
+                if (tracer.isDebug()) {
+                    tracer.debug("Trying to process '%s' as clustered short options%n",
                             arg, args);
                 }
                 processClusteredShortOptions(required, initialized, arg, args);
@@ -887,17 +892,17 @@ class Interpreter {
             // The argument could not be interpreted as an option: process it as a positional argument
             else {
                 args.push(arg);
-                if (commandLine.tracer.isDebug()) {
-                    commandLine.tracer.debug(
+                if (tracer.isDebug()) {
+                    tracer.debug(
                             "Could not find option '%s', deciding whether to treat as unmatched option or positional parameter...%n",
                             arg);
                 }
-                if (commandLine.commandSpec.resemblesOption(arg, commandLine.tracer)) {
+                if (commandLine.getCommandSpec().resemblesOption(arg, tracer)) {
                     handleUnmatchedArgument(args);
                     continue;
                 } // #149
-                if (commandLine.tracer.isDebug()) {
-                    commandLine.tracer.debug(
+                if (tracer.isDebug()) {
+                    tracer.debug(
                             "No option named '%s' found. Processing remainder as positional parameters%n",
                             arg);
                 }
@@ -907,7 +912,7 @@ class Interpreter {
     }
 
     private boolean isStandaloneOption(String arg) {
-        return commandLine.commandSpec.optionsMap().containsKey(arg);
+        return commandLine.getCommandSpec().optionsMap().containsKey(arg);
     }
 
     private void handleUnmatchedArgument(Stack<String> args) throws Exception {
@@ -926,23 +931,23 @@ class Interpreter {
         parseResult.unmatched.add(arg);
     }
 
-    private void processRemainderAsPositionalParameters(Collection<Model.ArgSpec> required,
-            Set<Model.ArgSpec> initialized, Stack<String> args) throws Exception {
+    private void processRemainderAsPositionalParameters(Collection<ArgSpec> required,
+            Set<ArgSpec> initialized, Stack<String> args) throws Exception {
         while (!args.empty()) {
             processPositionalParameter(required, initialized, args);
         }
     }
 
-    private void processPositionalParameter(Collection<Model.ArgSpec> required,
-            Set<Model.ArgSpec> initialized, Stack<String> args) throws Exception {
-        if (commandLine.tracer.isDebug()) {
-            commandLine.tracer.debug(
+    private void processPositionalParameter(Collection<ArgSpec> required,
+            Set<ArgSpec> initialized, Stack<String> args) throws Exception {
+        if (tracer.isDebug()) {
+            tracer.debug(
                     "Processing next arg as a positional parameter at index=%d. Remainder=%s%n",
                     position, CollectionUtilsExt.reverse(ObjectUtils.clone(args)));
         }
         if (config().stopAtPositional()) {
-            if (!endOfOptions && commandLine.tracer.isDebug()) {
-                commandLine.tracer.debug(
+            if (!endOfOptions && tracer.isDebug()) {
+                tracer.debug(
                         "Parser was configured with stopAtPositional=true, treating remaining arguments as positional parameters.%n");
             }
             endOfOptions = true;
@@ -950,7 +955,7 @@ class Interpreter {
         int argsConsumed = 0;
         int interactiveConsumed = 0;
         int originalNowProcessingSize = parseResult.nowProcessing.size();
-        for (Model.PositionalParamSpec positionalParam : commandLine.commandSpec
+        for (PositionalParamSpec positionalParam : commandLine.getCommandSpec()
                 .positionalParameters()) {
             Range indexRange = positionalParam.index();
             if (!indexRange.contains(position)
@@ -959,8 +964,8 @@ class Interpreter {
             }
             Stack<String> argsCopy = ObjectUtils.clone(args);
             Range arity = positionalParam.arity();
-            if (commandLine.tracer.isDebug()) {
-                commandLine.tracer.debug(
+            if (tracer.isDebug()) {
+                tracer.debug(
                         "Position %d is in index range %s. Trying to assign args to %s, arity=%s%n",
                         position, indexRange, positionalParam, arity);
             }
@@ -987,8 +992,8 @@ class Interpreter {
             args.pop();
         }
         position += argsConsumed + interactiveConsumed;
-        if (commandLine.tracer.isDebug()) {
-            commandLine.tracer.debug(
+        if (tracer.isDebug()) {
+            tracer.debug(
                     "Consumed %d arguments and %d interactive values, moving position to index %d.%n",
                     argsConsumed, interactiveConsumed, position);
         }
@@ -997,10 +1002,10 @@ class Interpreter {
         }
     }
 
-    private void processStandaloneOption(Collection<Model.ArgSpec> required,
-            Set<Model.ArgSpec> initialized, String arg, Stack<String> args,
+    private void processStandaloneOption(Collection<ArgSpec> required,
+            Set<ArgSpec> initialized, String arg, Stack<String> args,
             boolean paramAttachedToKey) throws Exception {
-        Model.ArgSpec argSpec = commandLine.commandSpec.optionsMap().get(arg);
+        ArgSpec argSpec = commandLine.getCommandSpec().optionsMap().get(arg);
         required.remove(argSpec);
         Range arity = argSpec.arity();
         if (paramAttachedToKey) {
@@ -1008,29 +1013,29 @@ class Interpreter {
         }
         LookBehind lookBehind = paramAttachedToKey ? LookBehind.ATTACHED_WITH_SEPARATOR
                 : LookBehind.SEPARATE;
-        if (commandLine.tracer.isDebug()) {
-            commandLine.tracer.debug("Found option named '%s': %s, arity=%s%n", arg, argSpec,
+        if (tracer.isDebug()) {
+            tracer.debug("Found option named '%s': %s, arity=%s%n", arg, argSpec,
                     arity);
         }
         parseResult.nowProcessing.add(argSpec);
         applyOption(argSpec, lookBehind, arity, args, initialized, "option " + arg);
     }
 
-    private void processClusteredShortOptions(Collection<Model.ArgSpec> required,
-            Set<Model.ArgSpec> initialized, String arg, Stack<String> args) throws Exception {
+    private void processClusteredShortOptions(Collection<ArgSpec> required,
+            Set<ArgSpec> initialized, String arg, Stack<String> args) throws Exception {
         String prefix = arg.substring(0, 1);
         String cluster = arg.substring(1);
         boolean paramAttachedToOption = true;
         boolean first = true;
         do {
             if (cluster.length() > 0
-                    && commandLine.commandSpec.posixOptionsMap().containsKey(cluster.charAt(0))) {
-                Model.ArgSpec argSpec = commandLine.commandSpec.posixOptionsMap()
+                    && commandLine.getCommandSpec().posixOptionsMap().containsKey(cluster.charAt(0))) {
+                ArgSpec argSpec = commandLine.getCommandSpec().posixOptionsMap()
                         .get(cluster.charAt(0));
                 Range arity = argSpec.arity();
                 String argDescription = "option " + prefix + cluster.charAt(0);
-                if (commandLine.tracer.isDebug()) {
-                    commandLine.tracer.debug("Found option '%s%s' in %s: %s, arity=%s%n", prefix,
+                if (tracer.isDebug()) {
+                    tracer.debug("Found option '%s%s' in %s: %s, arity=%s%n", prefix,
                             cluster.charAt(0), arg, argSpec, arity);
                 }
                 required.remove(argSpec);
@@ -1044,8 +1049,8 @@ class Interpreter {
                     arity = arity.min(Math.max(1, arity.min)); // if key=value, minimum arity is at least 1
                 }
                 if (arity.min > 0 && !StringUtils.isBlank(cluster)) {
-                    if (commandLine.tracer.isDebug()) {
-                        commandLine.tracer.debug("Trying to process '%s' as option parameter%n",
+                    if (tracer.isDebug()) {
+                        tracer.debug("Trying to process '%s' as option parameter%n",
                                 cluster);
                     }
                 }
@@ -1078,12 +1083,12 @@ class Interpreter {
                 if (arg.endsWith(cluster)) {
                     args.push(paramAttachedToOption ? prefix + cluster : cluster);
                     if (args.peek().equals(arg)) { // #149 be consistent between unmatched short and long options
-                        if (commandLine.tracer.isDebug()) {
-                            commandLine.tracer.debug(
+                        if (tracer.isDebug()) {
+                            tracer.debug(
                                     "Could not match any short options in %s, deciding whether to treat as unmatched option or positional parameter...%n",
                                     arg);
                         }
-                        if (commandLine.commandSpec.resemblesOption(arg, commandLine.tracer)) {
+                        if (commandLine.getCommandSpec().resemblesOption(arg, tracer)) {
                             handleUnmatchedArgument(args);
                             return;
                         } // #149
@@ -1091,14 +1096,14 @@ class Interpreter {
                         return;
                     }
                     // remainder was part of a clustered group that could not be completely parsed
-                    if (commandLine.tracer.isDebug()) {
-                        commandLine.tracer.debug("No option found for %s in %s%n", cluster, arg);
+                    if (tracer.isDebug()) {
+                        tracer.debug("No option found for %s in %s%n", cluster, arg);
                     }
                     handleUnmatchedArgument(args);
                 } else {
                     args.push(cluster);
-                    if (commandLine.tracer.isDebug()) {
-                        commandLine.tracer.debug("%s is not an option parameter for %s%n", cluster,
+                    if (tracer.isDebug()) {
+                        tracer.debug("%s is not an option parameter for %s%n", cluster,
                                 arg);
                     }
                     processPositionalParameter(required, initialized, args);
@@ -1108,11 +1113,11 @@ class Interpreter {
         } while (true);
     }
 
-    private int applyOption(Model.ArgSpec argSpec, LookBehind lookBehind, Range arity,
-            Stack<String> args, Set<Model.ArgSpec> initialized, String argDescription)
+    private int applyOption(ArgSpec argSpec, LookBehind lookBehind, Range arity,
+            Stack<String> args, Set<ArgSpec> initialized, String argDescription)
             throws Exception {
         updateHelpRequested(argSpec);
-        boolean consumeOnlyOne = commandLine.commandSpec.parser()
+        boolean consumeOnlyOne = commandLine.getCommandSpec().parser()
                 .aritySatisfiedByAttachedOptionParam() && lookBehind.isAttached();
         Stack<String> workingStack = args;
         if (consumeOnlyOne) {
@@ -1124,16 +1129,16 @@ class Interpreter {
         }
 
         if (argSpec.interactive()) {
-            String name = argSpec.isOption() ? ((Model.OptionSpec) argSpec).longestName()
+            String name = argSpec.isOption() ? ((OptionSpec) argSpec).longestName()
                     : "position " + position;
             String prompt = String.format("Enter value for %s (%s): ", name,
                     Utils.safeGet(argSpec.renderedDescription(), 0));
-            if (commandLine.tracer.isDebug()) {
-                commandLine.tracer.debug("Reading value for %s from console...%n", name);
+            if (tracer.isDebug()) {
+                tracer.debug("Reading value for %s from console...%n", name);
             }
             char[] value = readPassword(prompt, false);
-            if (commandLine.tracer.isDebug()) {
-                commandLine.tracer.debug("User entered '%s' for %s.%n", value, name);
+            if (tracer.isDebug()) {
+                tracer.debug("User entered '%s' for %s.%n", value, name);
             }
             workingStack.push(new String(value));
         }
@@ -1162,8 +1167,8 @@ class Interpreter {
         return result;
     }
 
-    private int applyValueToSingleValuedField(Model.ArgSpec argSpec, LookBehind lookBehind,
-            Range derivedArity, Stack<String> args, Set<Model.ArgSpec> initialized,
+    private int applyValueToSingleValuedField(ArgSpec argSpec, LookBehind lookBehind,
+            Range derivedArity, Stack<String> args, Set<ArgSpec> initialized,
             String argDescription) throws Exception {
         boolean noMoreValues = args.isEmpty();
         String value = args.isEmpty() ? null : trim(args.pop()); // unquote the value
@@ -1193,7 +1198,7 @@ class Interpreter {
                     if (value != null) {
                         args.push(value); // we don't consume the value
                     }
-                    if (commandLine.commandSpec.parser().toggleBooleanFlags()) {
+                    if (commandLine.getCommandSpec().parser().toggleBooleanFlags()) {
                         Boolean currentValue = (Boolean) argSpec.getValue();
                         value = String.valueOf(currentValue == null || !currentValue); // #147 toggle existing boolean value
                     } else {
@@ -1234,11 +1239,11 @@ class Interpreter {
             }
             initialized.add(argSpec);
         }
-        if (commandLine.tracer.isInfo()) {
-            commandLine.tracer.info(traceMessage, argSpec.toString(), String.valueOf(oldValue),
+        if (tracer.isInfo()) {
+            tracer.info(traceMessage, argSpec.toString(), String.valueOf(oldValue),
                     String.valueOf(newValue), argDescription);
         }
-        argSpec.setValue(newValue, commandLine.commandSpec.commandLine());
+        argSpec.setValue(newValue, commandLine.getCommandSpec().commandLine());
         parseResult.addOriginalStringValue(argSpec, value);// #279 track empty string value if no command line argument was consumed
         parseResult.addStringValue(argSpec, value);
         parseResult.addTypedValues(argSpec, position, newValue);
@@ -1246,8 +1251,8 @@ class Interpreter {
         return result;
     }
 
-    private int applyValuesToMapField(Model.ArgSpec argSpec, LookBehind lookBehind, Range arity,
-            Stack<String> args, Set<Model.ArgSpec> initialized, String argDescription)
+    private int applyValuesToMapField(ArgSpec argSpec, LookBehind lookBehind, Range arity,
+            Stack<String> args, Set<ArgSpec> initialized, String argDescription)
             throws Exception {
         Class<?>[] classes = argSpec.auxiliaryTypes();
         if (classes.length < 2) {
@@ -1261,18 +1266,18 @@ class Interpreter {
         Map<Object, Object> map = (Map<Object, Object>) argSpec.getValue();
         if (map == null || (!map.isEmpty() && !initialized.contains(argSpec))) {
             map = createMap(argSpec.type()); // map class
-            argSpec.setValue(map, commandLine.commandSpec.commandLine());
+            argSpec.setValue(map, commandLine.getCommandSpec().commandLine());
         }
         initialized.add(argSpec);
         int originalSize = map.size();
         consumeMapArguments(argSpec, lookBehind, arity, args, classes, keyConverter, valueConverter,
                 map, argDescription);
         parseResult.add(argSpec, position);
-        argSpec.setValue(map, commandLine.commandSpec.commandLine());
+        argSpec.setValue(map, commandLine.getCommandSpec().commandLine());
         return map.size() - originalSize;
     }
 
-    private void consumeMapArguments(Model.ArgSpec argSpec, LookBehind lookBehind, Range arity,
+    private void consumeMapArguments(ArgSpec argSpec, LookBehind lookBehind, Range arity,
             Stack<String> args, Class<?>[] classes, ITypeConverter<?> keyConverter,
             ITypeConverter<?> valueConverter, Map<Object, Object> result, String argDescription)
             throws Exception {
@@ -1313,7 +1318,7 @@ class Interpreter {
         }
     }
 
-    private void consumeOneMapArgument(Model.ArgSpec argSpec, LookBehind lookBehind, Range arity,
+    private void consumeOneMapArgument(ArgSpec argSpec, LookBehind lookBehind, Range arity,
             int consumed, String arg, Class<?>[] classes, ITypeConverter<?> keyConverter,
             ITypeConverter<?> valueConverter, Map<Object, Object> result, int index,
             String argDescription) {
@@ -1321,15 +1326,15 @@ class Interpreter {
             parseResult.nowProcessing(argSpec, arg);
         }
         String raw = trim(arg);
-        String[] values = argSpec.splitValue(raw, commandLine.commandSpec.parser(), arity,
+        String[] values = argSpec.splitValue(raw, commandLine.getCommandSpec().parser(), arity,
                 consumed);
         for (String value : values) {
             String[] keyValue = splitKeyValue(argSpec, value);
             Object mapKey = tryConvert(argSpec, index, keyConverter, keyValue[0], classes[0]);
             Object mapValue = tryConvert(argSpec, index, valueConverter, keyValue[1], classes[1]);
             result.put(mapKey, mapValue);
-            if (commandLine.tracer.isInfo()) {
-                commandLine.tracer.info("Putting [%s : %s] in %s<%s, %s> %s for %s%n",
+            if (tracer.isInfo()) {
+                tracer.info("Putting [%s : %s] in %s<%s, %s> %s for %s%n",
                         String.valueOf(mapKey), String.valueOf(mapValue),
                         result.getClass().getSimpleName(), classes[0].getSimpleName(),
                         classes[1].getSimpleName(), argSpec.toString(), argDescription);
@@ -1340,10 +1345,10 @@ class Interpreter {
         parseResult.addOriginalStringValue(argSpec, raw);
     }
 
-    private boolean canConsumeOneMapArgument(Model.ArgSpec argSpec, Range arity, int consumed,
+    private boolean canConsumeOneMapArgument(ArgSpec argSpec, Range arity, int consumed,
             String raw, Class<?>[] classes, ITypeConverter<?> keyConverter,
             ITypeConverter<?> valueConverter, String argDescription) {
-        String[] values = argSpec.splitValue(raw, commandLine.commandSpec.parser(), arity,
+        String[] values = argSpec.splitValue(raw, commandLine.getCommandSpec().parser(), arity,
                 consumed);
         try {
             for (String value : values) {
@@ -1353,13 +1358,13 @@ class Interpreter {
             }
             return true;
         } catch (PicocliException ex) {
-            commandLine.tracer.debug("$s cannot be assigned to %s: type conversion fails: %s.%n",
+            tracer.debug("$s cannot be assigned to %s: type conversion fails: %s.%n",
                     raw, argDescription, ex.getMessage());
             return false;
         }
     }
 
-    private String[] splitKeyValue(Model.ArgSpec argSpec, String value) {
+    private String[] splitKeyValue(ArgSpec argSpec, String value) {
         String[] keyValue = value.split("=", 2);
         if (keyValue.length < 2) {
             String splitRegex = argSpec.splitRegex();
@@ -1379,7 +1384,7 @@ class Interpreter {
         return keyValue;
     }
 
-    private void assertNoMissingMandatoryParameter(Model.ArgSpec argSpec, Stack<String> args, int i,
+    private void assertNoMissingMandatoryParameter(ArgSpec argSpec, Stack<String> args, int i,
             Range arity) {
         if (!varargCanConsumeNextValue(argSpec, args.peek())) {
             String desc = arity.min > 1 ? (i + 1) + " (of " + arity.min + " mandatory parameters) "
@@ -1390,8 +1395,8 @@ class Interpreter {
         }
     }
 
-    private int applyValuesToArrayField(Model.ArgSpec argSpec, LookBehind lookBehind, Range arity,
-            Stack<String> args, Set<Model.ArgSpec> initialized, String argDescription)
+    private int applyValuesToArrayField(ArgSpec argSpec, LookBehind lookBehind, Range arity,
+            Stack<String> args, Set<ArgSpec> initialized, String argDescription)
             throws Exception {
         Object existing = argSpec.getValue();
         int length = existing == null ? 0 : Array.getLength(existing);
@@ -1416,14 +1421,14 @@ class Interpreter {
         for (int i = 0; i < newValues.size(); i++) {
             Array.set(array, i, newValues.get(i));
         }
-        argSpec.setValue(array, commandLine.commandSpec.commandLine());
+        argSpec.setValue(array, commandLine.getCommandSpec().commandLine());
         parseResult.add(argSpec, position);
         return converted.size(); // return how many args were consumed
     }
 
     @SuppressWarnings("unchecked")
-    private int applyValuesToCollectionField(Model.ArgSpec argSpec, LookBehind lookBehind,
-            Range arity, Stack<String> args, Set<Model.ArgSpec> initialized, String argDescription)
+    private int applyValuesToCollectionField(ArgSpec argSpec, LookBehind lookBehind,
+            Range arity, Stack<String> args, Set<ArgSpec> initialized, String argDescription)
             throws Exception {
         Collection<Object> collection = (Collection<Object>) argSpec.getValue();
         Class<?> type = argSpec.auxiliaryTypes()[0];
@@ -1431,7 +1436,7 @@ class Interpreter {
                 argDescription);
         if (collection == null || (!collection.isEmpty() && !initialized.contains(argSpec))) {
             collection = createCollection(argSpec.type()); // collection type
-            argSpec.setValue(collection, commandLine.commandSpec.commandLine());
+            argSpec.setValue(collection, commandLine.getCommandSpec().commandLine());
         }
         initialized.add(argSpec);
         for (Object element : converted) {
@@ -1442,11 +1447,11 @@ class Interpreter {
             }
         }
         parseResult.add(argSpec, position);
-        argSpec.setValue(collection, commandLine.commandSpec.commandLine());
+        argSpec.setValue(collection, commandLine.getCommandSpec().commandLine());
         return converted.size();
     }
 
-    private List<Object> consumeArguments(Model.ArgSpec argSpec, LookBehind lookBehind, Range arity,
+    private List<Object> consumeArguments(ArgSpec argSpec, LookBehind lookBehind, Range arity,
             Stack<String> args, Class<?> type, String argDescription) throws Exception {
         List<Object> result = new ArrayList<Object>();
 
@@ -1484,38 +1489,38 @@ class Interpreter {
             consumed = consumedCount(i + 1, initialSize, argSpec);
             lookBehind = LookBehind.SEPARATE;
         }
-        if (result.isEmpty() && arity.min == 0 && arity.max <= 1 && CommandLine.isBoolean(type)) {
+        if (result.isEmpty() && arity.min == 0 && arity.max <= 1 && ClassUtilsExt.isBoolean(type)) {
             return Arrays.asList((Object) Boolean.TRUE);
         }
         return result;
     }
 
-    private int consumedCount(int i, int initialSize, Model.ArgSpec arg) {
-        return commandLine.commandSpec.parser().splitFirst()
+    private int consumedCount(int i, int initialSize, ArgSpec arg) {
+        return commandLine.getCommandSpec().parser().splitFirst()
                 ? arg.stringValues().size() - initialSize
                 : i;
     }
 
-    private int consumedCountMap(int i, int initialSize, Model.ArgSpec arg) {
-        return commandLine.commandSpec.parser().splitFirst()
+    private int consumedCountMap(int i, int initialSize, ArgSpec arg) {
+        return commandLine.getCommandSpec().parser().splitFirst()
                 ? (arg.stringValues().size() - initialSize) / 2
                 : i;
     }
 
-    private int consumeOneArgument(Model.ArgSpec argSpec, LookBehind lookBehind, Range arity,
+    private int consumeOneArgument(ArgSpec argSpec, LookBehind lookBehind, Range arity,
             int consumed, String arg, Class<?> type, List<Object> result, int index,
             String argDescription) {
         if (!lookBehind.isAttached()) {
             parseResult.nowProcessing(argSpec, arg);
         }
         String raw = trim(arg);
-        String[] values = argSpec.splitValue(raw, commandLine.commandSpec.parser(), arity,
+        String[] values = argSpec.splitValue(raw, commandLine.getCommandSpec().parser(), arity,
                 consumed);
         ITypeConverter<?> converter = getTypeConverter(type, argSpec, 0);
         for (int j = 0; j < values.length; j++) {
             result.add(tryConvert(argSpec, index, converter, values[j], type));
-            if (commandLine.tracer.isInfo()) {
-                commandLine.tracer.info("Adding [%s] to %s for %s%n",
+            if (tracer.isInfo()) {
+                tracer.info("Adding [%s] to %s for %s%n",
                         String.valueOf(result.get(result.size() - 1)), argSpec.toString(),
                         argDescription);
             }
@@ -1525,11 +1530,11 @@ class Interpreter {
         return ++index;
     }
 
-    private boolean canConsumeOneArgument(Model.ArgSpec argSpec, Range arity, int consumed,
+    private boolean canConsumeOneArgument(ArgSpec argSpec, Range arity, int consumed,
             String arg, Class<?> type, String argDescription) {
         ITypeConverter<?> converter = getTypeConverter(type, argSpec, 0);
         try {
-            String[] values = argSpec.splitValue(trim(arg), commandLine.commandSpec.parser(), arity,
+            String[] values = argSpec.splitValue(trim(arg), commandLine.getCommandSpec().parser(), arity,
                     consumed);
             //                if (!argSpec.acceptsValues(values.length, commandSpec.parser())) {
             //                    tracer.debug("$s would split into %s values but %s cannot accept that many values.%n", arg, values.length, argDescription);
@@ -1540,7 +1545,7 @@ class Interpreter {
             }
             return true;
         } catch (PicocliException ex) {
-            commandLine.tracer.debug("$s cannot be assigned to %s: type conversion fails: %s.%n",
+            tracer.debug("$s cannot be assigned to %s: type conversion fails: %s.%n",
                     arg, argDescription, ex.getMessage());
             return false;
         }
@@ -1553,11 +1558,11 @@ class Interpreter {
      * end-of-options has been reached, positional parameters may consume all remaining arguments.
      * </p>
      */
-    private boolean varargCanConsumeNextValue(Model.ArgSpec argSpec, String nextValue) {
+    private boolean varargCanConsumeNextValue(ArgSpec argSpec, String nextValue) {
         if (endOfOptions && argSpec.isPositional()) {
             return true;
         }
-        boolean isCommand = commandLine.commandSpec.subcommands().containsKey(nextValue);
+        boolean isCommand = commandLine.getCommandSpec().subcommands().containsKey(nextValue);
         return !isCommand && !isOption(nextValue);
     }
 
@@ -1578,21 +1583,21 @@ class Interpreter {
         }
 
         // not just arg prefix: we may be in the middle of parsing -xrvfFILE
-        if (commandLine.commandSpec.optionsMap().containsKey(arg)) { // -v or -f or --file (not attached to param or other option)
+        if (commandLine.getCommandSpec().optionsMap().containsKey(arg)) { // -v or -f or --file (not attached to param or other option)
             return true;
         }
         int separatorIndex = arg.indexOf(config().separator());
         if (separatorIndex > 0) { // -f=FILE or --file==FILE (attached to param via separator)
-            if (commandLine.commandSpec.optionsMap()
+            if (commandLine.getCommandSpec().optionsMap()
                     .containsKey(arg.substring(0, separatorIndex))) {
                 return true;
             }
         }
         return (arg.length() > 2 && arg.startsWith("-")
-                && commandLine.commandSpec.posixOptionsMap().containsKey(arg.charAt(1)));
+                && commandLine.getCommandSpec().posixOptionsMap().containsKey(arg.charAt(1)));
     }
 
-    private Object tryConvert(Model.ArgSpec argSpec, int index, ITypeConverter<?> converter,
+    private Object tryConvert(ArgSpec argSpec, int index, ITypeConverter<?> converter,
             String value, Class<?> type) throws ParameterException {
         try {
             return converter.convert(value);
@@ -1608,10 +1613,10 @@ class Interpreter {
         }
     }
 
-    private String optionDescription(String prefix, Model.ArgSpec argSpec, int index) {
+    private String optionDescription(String prefix, ArgSpec argSpec, int index) {
         String desc = "";
         if (argSpec.isOption()) {
-            desc = prefix + "option '" + ((Model.OptionSpec) argSpec).longestName() + "'";
+            desc = prefix + "option '" + ((OptionSpec) argSpec).longestName() + "'";
             if (index >= 0) {
                 if (argSpec.arity().max > 1) {
                     desc += " at index " + index;
@@ -1620,7 +1625,7 @@ class Interpreter {
             }
         } else {
             desc = prefix + "positional parameter at index "
-                    + ((Model.PositionalParamSpec) argSpec).index() + " (" + argSpec.paramLabel()
+                    + ((PositionalParamSpec) argSpec).index() + " (" + argSpec.paramLabel()
                     + ")";
         }
         return desc;
@@ -1631,23 +1636,23 @@ class Interpreter {
                 || parseResult.usageHelpRequested;
     }
 
-    private void updateHelpRequested(Model.CommandSpec command) {
+    private void updateHelpRequested(CommandSpec command) {
         isHelpRequested |= command.helpCommand();
     }
 
-    private void updateHelpRequested(Model.ArgSpec argSpec) {
+    private void updateHelpRequested(ArgSpec argSpec) {
         if (argSpec.isOption()) {
-            Model.OptionSpec option = (Model.OptionSpec) argSpec;
+            OptionSpec option = (OptionSpec) argSpec;
             isHelpRequested |= is(argSpec, "help", option.help());
             parseResult.versionHelpRequested |= is(argSpec, "versionHelp", option.versionHelp());
             parseResult.usageHelpRequested |= is(argSpec, "usageHelp", option.usageHelp());
         }
     }
 
-    private boolean is(Model.ArgSpec p, String attribute, boolean value) {
+    private boolean is(ArgSpec p, String attribute, boolean value) {
         if (value) {
-            if (commandLine.tracer.isInfo()) {
-                commandLine.tracer.info("%s has '%s' annotation: not validating required fields%n",
+            if (tracer.isInfo()) {
+                tracer.info("%s has '%s' annotation: not validating required fields%n",
                         p.toString(), attribute);
             }
         }
@@ -1681,7 +1686,7 @@ class Interpreter {
         return new LinkedHashMap<Object, Object>();
     }
 
-    private ITypeConverter<?> getTypeConverter(final Class<?> type, Model.ArgSpec argSpec,
+    private ITypeConverter<?> getTypeConverter(final Class<?> type, ArgSpec argSpec,
             int index) {
         if (argSpec.converters().length > index) {
             return argSpec.converters()[index];
@@ -1693,7 +1698,7 @@ class Interpreter {
             return new ITypeConverter<Object>() {
                 @SuppressWarnings("unchecked")
                 public Object convert(String value) throws Exception {
-                    if (commandLine.commandSpec.parser().caseInsensitiveEnumValuesAllowed()) {
+                    if (commandLine.getCommandSpec().parser().caseInsensitiveEnumValuesAllowed()) {
                         String upper = value.toUpperCase();
                         for (Object enumConstant : type.getEnumConstants()) {
                             if (upper.equals(String.valueOf(enumConstant).toUpperCase())) {
@@ -1715,15 +1720,15 @@ class Interpreter {
                 "No TypeConverter registered for " + type.getName() + " of " + argSpec);
     }
 
-    private boolean assertNoMissingParameters(Model.ArgSpec argSpec, Range arity,
+    private boolean assertNoMissingParameters(ArgSpec argSpec, Range arity,
             Stack<String> args) {
         if (argSpec.interactive()) {
             return true;
         }
         int available = args.size();
-        if (available > 0 && commandLine.commandSpec.parser().splitFirst()
+        if (available > 0 && commandLine.getCommandSpec().parser().splitFirst()
                 && argSpec.splitRegex().length() > 0) {
-            available += argSpec.splitValue(args.peek(), commandLine.commandSpec.parser(), arity,
+            available += argSpec.splitValue(args.peek(), commandLine.getCommandSpec().parser(), arity,
                     0).length - 1;
         }
         if (arity.min > available) {
@@ -1733,11 +1738,11 @@ class Interpreter {
                             "Missing required parameter for " + optionDescription("", argSpec, 0)));
                     return false;
                 }
-                Range indexRange = ((Model.PositionalParamSpec) argSpec).index();
+                Range indexRange = ((PositionalParamSpec) argSpec).index();
                 String sep = "";
                 String names = ": ";
                 int count = 0;
-                List<Model.PositionalParamSpec> positionalParameters = commandLine.commandSpec
+                List<PositionalParamSpec> positionalParameters = commandLine.getCommandSpec()
                         .positionalParameters();
                 for (int i = indexRange.min; i < positionalParameters.size(); i++) {
                     if (positionalParameters.get(i).arity().min > 0) {
@@ -1772,7 +1777,7 @@ class Interpreter {
     }
 
     private String unquote(String value) {
-        if (!commandLine.commandSpec.parser().trimQuotes()) {
+        if (!commandLine.getCommandSpec().parser().trimQuotes()) {
             return value;
         }
         return value == null ? null

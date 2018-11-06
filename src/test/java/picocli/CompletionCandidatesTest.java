@@ -31,12 +31,12 @@ import org.junit.contrib.java.lang.system.ProvideSystemProperty;
 import org.junit.contrib.java.lang.system.SystemErrRule;
 import org.junit.contrib.java.lang.system.SystemOutRule;
 
-import picocli.CommandLine.Model.CommandSpec;
-import picocli.CommandLine.Model.OptionSpec;
-import picocli.CommandLine.Model.PositionalParamSpec;
 import picocli.annots.Option;
 import picocli.annots.Parameters;
 import picocli.help.Ansi;
+import picocli.model.CommandSpec;
+import picocli.model.OptionSpec;
+import picocli.model.PositionalParamSpec;
 
 /**
  * Tests valid values-related functionality.

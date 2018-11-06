@@ -32,10 +32,6 @@ import java.io.UnsupportedEncodingException;
 import org.junit.Test;
 
 import picocli.CommandLine.IVersionProvider;
-import picocli.CommandLine.Model.CommandSpec;
-import picocli.CommandLine.Model.ISetter;
-import picocli.CommandLine.Model.OptionSpec;
-import picocli.CommandLine.Model.UsageMessageSpec;
 import picocli.annots.Command;
 import picocli.annots.Mixin;
 import picocli.annots.Option;
@@ -45,6 +41,10 @@ import picocli.excepts.DuplicateOptionAnnotationsException;
 import picocli.excepts.InitializationException;
 import picocli.excepts.ParameterException;
 import picocli.help.Ansi;
+import picocli.model.CommandSpec;
+import picocli.model.ISetter;
+import picocli.model.OptionSpec;
+import picocli.model.UsageMessageSpec;
 
 public class CommandLineMixinTest {
 

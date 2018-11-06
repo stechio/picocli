@@ -5,6 +5,7 @@ package picocli.examples
 @picocli.groovy.PicocliScript
 import groovy.transform.Field
 import java.security.MessageDigest
+import picocli.annots.*
 import static picocli.CommandLine.*
 
 @Parameters(arity = "1", paramLabel = "FILE", description = "The file(s) whose checksum to calculate.")

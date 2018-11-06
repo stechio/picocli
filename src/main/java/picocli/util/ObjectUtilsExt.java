@@ -1,5 +1,7 @@
 package picocli.util;
 
+import java.util.Collection;
+import java.util.Map;
 import java.util.function.Supplier;
 
 import org.apache.commons.lang3.StringUtils;
@@ -7,6 +9,16 @@ import org.apache.commons.lang3.StringUtils;
 import com.google.common.base.Defaults;
 
 public class ObjectUtilsExt {
+    /**
+     * Gets whether the given class represents a group of elements (array, collection or map).
+     * 
+     * @param type
+     */
+    public static boolean isGroup(Class<?> type) {
+        return type.isArray() || Collection.class.isAssignableFrom(type)
+                || Map.class.isAssignableFrom(type);
+    }
+
     /**
      * Safely retrieves the array item at the given position.
      *

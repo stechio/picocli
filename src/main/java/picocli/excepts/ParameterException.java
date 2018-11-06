@@ -3,14 +3,14 @@ package picocli.excepts;
 import java.util.Arrays;
 
 import picocli.CommandLine;
-import picocli.CommandLine.Model;
+import picocli.model.ArgSpec;
 import picocli.util.Assert;
 
 /** Exception indicating something went wrong while parsing command line options. */
 public class ParameterException extends PicocliException {
     private static final long serialVersionUID = 1477112829129763139L;
     private final CommandLine commandLine;
-    private Model.ArgSpec argSpec = null;
+    private ArgSpec argSpec = null;
     private String value = null;
 
     /**
@@ -58,7 +58,7 @@ public class ParameterException extends PicocliException {
      *            the value that caused this ParameterException
      * @since 3.2
      */
-    public ParameterException(CommandLine commandLine, String msg, Throwable t, Model.ArgSpec argSpec,
+    public ParameterException(CommandLine commandLine, String msg, Throwable t, ArgSpec argSpec,
             String value) {
         super(msg, t);
         this.commandLine = Assert.notNull(commandLine, "commandLine");
@@ -82,7 +82,7 @@ public class ParameterException extends PicocliException {
      *            the value that caused this ParameterException
      * @since 3.2
      */
-    public ParameterException(CommandLine commandLine, String msg, Model.ArgSpec argSpec,
+    public ParameterException(CommandLine commandLine, String msg, ArgSpec argSpec,
             String value) {
         super(msg);
         this.commandLine = Assert.notNull(commandLine, "commandLine");
@@ -110,7 +110,7 @@ public class ParameterException extends PicocliException {
      * @return the {@code ArgSpec} object for the (sub)command where parsing failed.
      * @since 3.2
      */
-    public Model.ArgSpec getArgSpec() {
+    public ArgSpec getArgSpec() {
         return argSpec;
     }
 

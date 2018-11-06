@@ -11,7 +11,6 @@ import java.util.Stack;
 
 import picocli.CommandLine;
 import picocli.CommandLine.IFactory;
-import picocli.Tracer;
 import picocli.annots.Command;
 import picocli.annots.Mixin;
 import picocli.annots.Option;
@@ -21,6 +20,7 @@ import picocli.excepts.InitializationException;
 import picocli.help.Help;
 import picocli.help.HelpCommand;
 import picocli.util.Assert;
+import picocli.util.Tracer;
 
 public class CommandReflection {
     static CommandSpec extractCommandSpec(Object command, IFactory factory,

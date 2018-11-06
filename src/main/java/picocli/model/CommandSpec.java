@@ -20,7 +20,6 @@ import picocli.CommandLine.IVersionProvider;
 import picocli.CommandLine.NoDefaultProvider;
 import picocli.CommandLine.NoVersionProvider;
 import picocli.CommandLine.PositionalParametersSorter;
-import picocli.Tracer;
 import picocli.annots.Command;
 import picocli.annots.Option;
 import picocli.annots.Parameters;
@@ -30,6 +29,7 @@ import picocli.excepts.InitializationException;
 import picocli.excepts.ParameterIndexGapException;
 import picocli.help.AutoHelpMixin;
 import picocli.util.ClassUtilsExt;
+import picocli.util.Tracer;
 
 /**
  * The {@code CommandSpec} class models a command specification, including the options,

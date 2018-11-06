@@ -4,9 +4,9 @@ import java.util.ResourceBundle;
 
 import org.apache.commons.lang3.StringUtils;
 
-import picocli.Tracer;
 import picocli.annots.Command;
 import picocli.excepts.InitializationException;
+import picocli.util.Tracer;
 
 /**
  * Models the usage help message specification.

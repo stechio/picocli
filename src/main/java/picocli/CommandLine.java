@@ -69,6 +69,7 @@ import picocli.model.Range;
 import picocli.model.UsageMessageSpec;
 import picocli.util.Assert;
 import picocli.util.CollectionUtilsExt;
+import picocli.util.Tracer;
 
 /**
  * <p>

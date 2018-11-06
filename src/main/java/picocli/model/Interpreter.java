@@ -52,7 +52,6 @@ import picocli.CommandLine;
 import picocli.CommandLine.IDefaultValueProvider;
 import picocli.CommandLine.ITypeConverter;
 import picocli.CommandLine.PositionalParametersSorter;
-import picocli.Tracer;
 import picocli.excepts.InitializationException;
 import picocli.excepts.MaxValuesExceededException;
 import picocli.excepts.MissingParameterException;
@@ -65,6 +64,7 @@ import picocli.excepts.UnmatchedArgumentException;
 import picocli.util.Assert;
 import picocli.util.ClassUtilsExt;
 import picocli.util.CollectionUtilsExt;
+import picocli.util.Tracer;
 import picocli.util.Utils;
 
 /**

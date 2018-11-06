@@ -1,4 +1,4 @@
-package picocli;
+package picocli.util;
 
 import java.io.PrintStream;
 

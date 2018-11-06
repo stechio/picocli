@@ -16,7 +16,6 @@ import org.apache.commons.lang3.StringUtils;
 import picocli.CommandLine;
 import picocli.CommandLine.IDefaultValueProvider;
 import picocli.CommandLine.ITypeConverter;
-import picocli.Tracer;
 import picocli.annots.Command;
 import picocli.annots.Option;
 import picocli.annots.Parameters;
@@ -26,6 +25,7 @@ import picocli.help.Help;
 import picocli.util.Assert;
 import picocli.util.ClassUtilsExt;
 import picocli.util.ObjectUtilsExt;
+import picocli.util.Tracer;
 
 /**
  * Models the shared attributes of {@link OptionSpec} and {@link PositionalParamSpec}.

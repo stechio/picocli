@@ -1,7 +1,6 @@
 package picocli.model;
 
 import picocli.CommandLine;
-import picocli.CommandLine.ITypeConverter;
 import picocli.annots.Parameters;
 import picocli.excepts.InitializationException;
 import picocli.util.Assert;

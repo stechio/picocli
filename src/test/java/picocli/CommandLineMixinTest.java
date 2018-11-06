@@ -31,7 +31,6 @@ import java.io.UnsupportedEncodingException;
 
 import org.junit.Test;
 
-import picocli.CommandLine.IVersionProvider;
 import picocli.annots.Command;
 import picocli.annots.Mixin;
 import picocli.annots.Option;
@@ -43,6 +42,7 @@ import picocli.excepts.ParameterException;
 import picocli.help.Ansi;
 import picocli.model.CommandSpec;
 import picocli.model.ISetter;
+import picocli.model.IVersionProvider;
 import picocli.model.OptionSpec;
 import picocli.model.UsageMessageSpec;
 

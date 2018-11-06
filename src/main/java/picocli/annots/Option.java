@@ -7,12 +7,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.concurrent.Callable;
 
-import picocli.CommandLine.IParseResultHandler2;
-import picocli.CommandLine.ITypeConverter;
-import picocli.CommandLine.NoCompletionCandidates;
 import picocli.annots.Command;
 import picocli.excepts.MissingParameterException;
+import picocli.handlers.IParseResultHandler2;
 import picocli.help.Help;
+import picocli.model.IFactory;
+import picocli.model.ITypeConverter;
+import picocli.model.NoCompletionCandidates;
 import picocli.model.OptionSpec;
 
 /**
@@ -443,7 +444,7 @@ public @interface Option {
      *
      * @return a class whose instances can iterate over the completion candidates for this
      *         option
-     * @see picocli.CommandLine.IFactory
+     * @see picocli.model.IFactory
      * @since 3.2
      */
     Class<? extends Iterable<String>> completionCandidates() default NoCompletionCandidates.class;

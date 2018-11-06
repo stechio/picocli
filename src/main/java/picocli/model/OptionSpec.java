@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 
 import picocli.CommandLine;
-import picocli.CommandLine.ITypeConverter;
 import picocli.annots.Option;
 import picocli.excepts.InitializationException;
 import picocli.util.Assert;

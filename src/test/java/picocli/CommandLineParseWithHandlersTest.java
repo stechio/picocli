@@ -37,18 +37,18 @@ import org.junit.contrib.java.lang.system.ProvideSystemProperty;
 import org.junit.contrib.java.lang.system.SystemErrRule;
 import org.junit.contrib.java.lang.system.SystemOutRule;
 
-import picocli.CommandLine.DefaultExceptionHandler;
-import picocli.CommandLine.IParseResultHandler;
-import picocli.CommandLine.IParseResultHandler2;
-import picocli.CommandLine.RunAll;
-import picocli.CommandLine.RunFirst;
-import picocli.CommandLine.RunLast;
 import picocli.annots.Command;
 import picocli.annots.Option;
 import picocli.annots.Parameters;
 import picocli.excepts.ExecutionException;
 import picocli.excepts.InitializationException;
 import picocli.excepts.ParameterException;
+import picocli.handlers.DefaultExceptionHandler;
+import picocli.handlers.IParseResultHandler;
+import picocli.handlers.IParseResultHandler2;
+import picocli.handlers.RunAll;
+import picocli.handlers.RunFirst;
+import picocli.handlers.RunLast;
 import picocli.help.Ansi;
 import picocli.help.Text;
 

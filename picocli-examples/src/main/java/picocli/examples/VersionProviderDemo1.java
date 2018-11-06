@@ -19,9 +19,9 @@ import java.net.URL;
 import java.util.Properties;
 
 import picocli.CommandLine;
-import picocli.CommandLine.IVersionProvider;
 import picocli.annots.Command;
 import picocli.annots.Option;
+import picocli.model.IVersionProvider;
 
 /**
  * Demonstrates a {@link IVersionProvider} implementation that reads version information from a

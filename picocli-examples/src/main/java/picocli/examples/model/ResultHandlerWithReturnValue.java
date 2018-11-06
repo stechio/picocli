@@ -20,7 +20,7 @@ import java.util.Collections;
 import java.util.List;
 
 import picocli.CommandLine;
-import picocli.CommandLine.AbstractParseResultHandler;
+import picocli.handlers.AbstractParseResultHandler;
 import picocli.model.CommandSpec;
 import picocli.model.OptionSpec;
 import picocli.model.ParseResult;

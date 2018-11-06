@@ -8,15 +8,15 @@ import java.lang.annotation.Target;
 import java.util.ResourceBundle;
 
 import picocli.CommandLine;
-import picocli.CommandLine.IDefaultValueProvider;
-import picocli.CommandLine.IVersionProvider;
-import picocli.CommandLine.NoDefaultProvider;
-import picocli.CommandLine.NoVersionProvider;
 import picocli.help.Help;
 import picocli.help.HelpCommand;
 import picocli.model.ArgSpec;
 import picocli.model.CommandSpec;
+import picocli.model.IDefaultValueProvider;
+import picocli.model.IVersionProvider;
 import picocli.model.Messages;
+import picocli.model.NoDefaultProvider;
+import picocli.model.NoVersionProvider;
 import picocli.model.UsageMessageSpec;
 
 /**

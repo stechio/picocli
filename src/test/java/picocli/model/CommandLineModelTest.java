@@ -45,8 +45,6 @@ import org.junit.contrib.java.lang.system.SystemErrRule;
 import org.junit.contrib.java.lang.system.SystemOutRule;
 
 import picocli.CommandLine;
-import picocli.CommandLine.ITypeConverter;
-import picocli.CommandLine.IVersionProvider;
 import picocli.CommandLineTypeConversionTest;
 import picocli.I18nCommand;
 import picocli.annots.Command;

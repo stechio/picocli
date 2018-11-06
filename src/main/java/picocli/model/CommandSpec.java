@@ -13,13 +13,6 @@ import java.util.ResourceBundle;
 import java.util.Set;
 
 import picocli.CommandLine;
-import picocli.CommandLine.Factory;
-import picocli.CommandLine.IDefaultValueProvider;
-import picocli.CommandLine.IFactory;
-import picocli.CommandLine.IVersionProvider;
-import picocli.CommandLine.NoDefaultProvider;
-import picocli.CommandLine.NoVersionProvider;
-import picocli.CommandLine.PositionalParametersSorter;
 import picocli.annots.Command;
 import picocli.annots.Option;
 import picocli.annots.Parameters;
@@ -965,7 +958,7 @@ public class CommandSpec {
 
     void initVersionProvider(Class<? extends IVersionProvider> value, IFactory factory) {
         if (Model.initializable(versionProvider, value, NoVersionProvider.class)) {
-            versionProvider = (Model.createVersionProvider(factory, value));
+            versionProvider = (Factory.createVersionProvider(factory, value));
         }
     }
 
@@ -978,7 +971,7 @@ public class CommandSpec {
     void initDefaultValueProvider(Class<? extends IDefaultValueProvider> value,
             IFactory factory) {
         if (Model.initializable(defaultValueProvider, value, NoDefaultProvider.class)) {
-            defaultValueProvider = (Model.createDefaultValueProvider(factory,
+            defaultValueProvider = (Factory.createDefaultValueProvider(factory,
                     value));
         }
     }
@@ -1003,7 +996,7 @@ public class CommandSpec {
 
     void updateVersionProvider(Class<? extends IVersionProvider> value, IFactory factory) {
         if (Model.isNonDefault(value, NoVersionProvider.class)) {
-            versionProvider = (Model.createVersionProvider(factory, value));
+            versionProvider = (Factory.createVersionProvider(factory, value));
         }
     }
 

@@ -57,10 +57,11 @@ import java.util.regex.Pattern;
 
 import org.junit.Test;
 
-import picocli.CommandLine.ITypeConverter;
 import picocli.annots.Option;
 import picocli.annots.Parameters;
 import picocli.excepts.ParameterException;
+import picocli.model.IFactory;
+import picocli.model.ITypeConverter;
 
 public class CommandLineTypeConversionTest {
 
@@ -636,7 +637,7 @@ public class CommandLineTypeConversionTest {
     static class Plus23Converter implements ITypeConverter<Integer> {
         public Integer convert(String value) { return Integer.parseInt(value) + 23; }
     }
-    static class Plus23ConverterFactory implements CommandLine.IFactory {
+    static class Plus23ConverterFactory implements IFactory {
         @SuppressWarnings("unchecked") public <T> T create(Class<T> cls) { return (T) new Plus23Converter(); }
     }
     @Test

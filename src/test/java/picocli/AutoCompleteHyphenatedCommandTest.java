@@ -6,6 +6,7 @@ import org.junit.Test;
 
 import picocli.annots.Command;
 import picocli.annots.Option;
+import picocli.handlers.RunAll;
 
 import static java.lang.String.format;
 import static org.junit.Assert.assertEquals;

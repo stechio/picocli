@@ -1,7 +1,7 @@
 package picocli.excepts;
 
 import picocli.CommandLine;
-import picocli.CommandLine.ITypeConverter;
+import picocli.model.ITypeConverter;
 
 /**
  * Exception indicating that an annotated field had a type for which no {@link ITypeConverter}

@@ -22,9 +22,9 @@ import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
 import picocli.CommandLine;
-import picocli.CommandLine.IVersionProvider;
 import picocli.annots.Command;
 import picocli.annots.Option;
+import picocli.model.IVersionProvider;
 
 /**
  * Demonstrates a {@link IVersionProvider} implementation that reads version information from the picocli-x.x.jar

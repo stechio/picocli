@@ -1,6 +1,6 @@
 package picocli.excepts;
 
-import picocli.CommandLine.ITypeConverter;
+import picocli.model.ITypeConverter;
 
 /**
  * Exception thrown by {@link ITypeConverter} implementations to indicate a String could not be

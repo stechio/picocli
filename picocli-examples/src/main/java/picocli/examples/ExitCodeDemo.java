@@ -18,6 +18,7 @@ package picocli.examples;
 import picocli.CommandLine;
 import picocli.annots.Command;
 import picocli.excepts.ParameterException;
+import picocli.handlers.RunLast;
 
 @Command
 public class ExitCodeDemo implements Runnable {
@@ -26,7 +27,7 @@ public class ExitCodeDemo implements Runnable {
     public static void main(String... args) {
         CommandLine cmd = new CommandLine(new ExitCodeDemo());
         cmd.parseWithHandlers(
-                new CommandLine.RunLast().andExit(123),
+                new RunLast().andExit(123),
                 CommandLine.defaultExceptionHandler().andExit(456),
                 args);
     }

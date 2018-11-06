@@ -55,7 +55,6 @@ import org.junit.Test;
 import org.junit.contrib.java.lang.system.ProvideSystemProperty;
 
 import picocli.CommandLine;
-import picocli.CommandLine.IVersionProvider;
 import picocli.Demo;
 import picocli.InnerClassFactory;
 import picocli.annots.Command;
@@ -66,6 +65,7 @@ import picocli.excepts.InitializationException;
 import picocli.help.Ansi.IStyle;
 import picocli.help.Ansi.Style;
 import picocli.model.CommandSpec;
+import picocli.model.IVersionProvider;
 import picocli.model.OptionSpec;
 import picocli.model.PositionalParamSpec;
 import picocli.model.UsageMessageSpec;
@@ -3393,7 +3393,7 @@ public class CommandLineHelpTest {
     @Test
     public void testNoVersionProvider_errorWhenInvoked() {
         try {
-            Class<?> cls = Class.forName("picocli.CommandLine$NoVersionProvider");
+            Class<?> cls = Class.forName("picocli.model.NoVersionProvider");
             try {
                 Constructor<?> constructor = cls.getDeclaredConstructor(new Class[0]);
                 constructor.setAccessible(true);

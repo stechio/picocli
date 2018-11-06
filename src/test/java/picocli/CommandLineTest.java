@@ -68,11 +68,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.ProvideSystemProperty;
 
-import picocli.CommandLine.IFactory;
-import picocli.CommandLine.IParseResultHandler;
-import picocli.CommandLine.ITypeConverter;
-import picocli.CommandLine.IVersionProvider;
-import picocli.CommandLine.RunAll;
 import picocli.annots.Command;
 import picocli.annots.Mixin;
 import picocli.annots.Option;
@@ -86,11 +81,16 @@ import picocli.excepts.OverwrittenOptionException;
 import picocli.excepts.ParameterException;
 import picocli.excepts.ParameterIndexGapException;
 import picocli.excepts.UnmatchedArgumentException;
+import picocli.handlers.IParseResultHandler;
+import picocli.handlers.RunAll;
 import picocli.help.Ansi;
 import picocli.help.ColorScheme;
 import picocli.help.Help;
 import picocli.help.HelpCommand;
 import picocli.model.CommandSpec;
+import picocli.model.IFactory;
+import picocli.model.ITypeConverter;
+import picocli.model.IVersionProvider;
 import picocli.model.ParseResult;
 import picocli.model.UsageMessageSpec;
 
@@ -1414,7 +1414,7 @@ public class CommandLineTest {
         String prefix7 = String.format(""
                 + "[picocli DEBUG] Could not register converter for java.nio.file.Path: java.lang.ClassNotFoundException: java.nio.file.Path%n");
         String expected = String.format(""
-                + "[picocli DEBUG] Creating CommandSpec for object of class picocli.CommandLineTest$CompactFields with factory picocli.CommandLine$Factory%n"
+                + "[picocli DEBUG] Creating CommandSpec for object of class picocli.CommandLineTest$CompactFields with factory picocli.model.Factory%n"
                 + "[picocli INFO] Parsing 6 command line args [-oout, --, -r, -v, p1, p2]%n"
                 + "[picocli DEBUG] Parser configuration: posixClusteredShortOptionsAllowed=true, stopAtPositional=false, stopAtUnmatched=false, separator=null, overwrittenOptionsAllowed=false, unmatchedArgumentsAllowed=false, expandAtFiles=true, atFileCommentChar=#, endOfOptionsDelimiter=--, limitSplit=false, aritySatisfiedByAttachedOptionParam=false, toggleBooleanFlags=true, unmatchedOptionsArePositionalParams=false, collectErrors=false,caseInsensitiveEnumValuesAllowed=false, trimQuotes=false, splitQuotedStrings=false%n"
                 + "[picocli DEBUG] Set initial value for field boolean picocli.CommandLineTest$CompactFields.verbose of type boolean to false.%n"
@@ -2364,20 +2364,20 @@ public class CommandLineTest {
         String prefix7 = String.format(""
                 + "[picocli DEBUG] Could not register converter for java.nio.file.Path: java.lang.ClassNotFoundException: java.nio.file.Path%n");
         String expected = String.format(""
-                + "[picocli DEBUG] Creating CommandSpec for object of class picocli.Demo$Git with factory picocli.CommandLine$Factory%n"
-                + "[picocli DEBUG] Creating CommandSpec for object of class picocli.help.AutoHelpMixin with factory picocli.CommandLine$Factory%n"
-                + "[picocli DEBUG] Creating CommandSpec for object of class picocli.help.HelpCommand with factory picocli.CommandLine$Factory%n"
-                + "[picocli DEBUG] Creating CommandSpec for object of class picocli.Demo$GitStatus with factory picocli.CommandLine$Factory%n"
-                + "[picocli DEBUG] Creating CommandSpec for object of class picocli.Demo$GitCommit with factory picocli.CommandLine$Factory%n"
-                + "[picocli DEBUG] Creating CommandSpec for object of class picocli.Demo$GitAdd with factory picocli.CommandLine$Factory%n"
-                + "[picocli DEBUG] Creating CommandSpec for object of class picocli.Demo$GitBranch with factory picocli.CommandLine$Factory%n"
-                + "[picocli DEBUG] Creating CommandSpec for object of class picocli.Demo$GitCheckout with factory picocli.CommandLine$Factory%n"
-                + "[picocli DEBUG] Creating CommandSpec for object of class picocli.Demo$GitClone with factory picocli.CommandLine$Factory%n"
-                + "[picocli DEBUG] Creating CommandSpec for object of class picocli.Demo$GitDiff with factory picocli.CommandLine$Factory%n"
-                + "[picocli DEBUG] Creating CommandSpec for object of class picocli.Demo$GitMerge with factory picocli.CommandLine$Factory%n"
-                + "[picocli DEBUG] Creating CommandSpec for object of class picocli.Demo$GitPush with factory picocli.CommandLine$Factory%n"
-                + "[picocli DEBUG] Creating CommandSpec for object of class picocli.Demo$GitRebase with factory picocli.CommandLine$Factory%n"
-                + "[picocli DEBUG] Creating CommandSpec for object of class picocli.Demo$GitTag with factory picocli.CommandLine$Factory%n"
+                + "[picocli DEBUG] Creating CommandSpec for object of class picocli.Demo$Git with factory picocli.model.Factory%n"
+                + "[picocli DEBUG] Creating CommandSpec for object of class picocli.help.AutoHelpMixin with factory picocli.model.Factory%n"
+                + "[picocli DEBUG] Creating CommandSpec for object of class picocli.help.HelpCommand with factory picocli.model.Factory%n"
+                + "[picocli DEBUG] Creating CommandSpec for object of class picocli.Demo$GitStatus with factory picocli.model.Factory%n"
+                + "[picocli DEBUG] Creating CommandSpec for object of class picocli.Demo$GitCommit with factory picocli.model.Factory%n"
+                + "[picocli DEBUG] Creating CommandSpec for object of class picocli.Demo$GitAdd with factory picocli.model.Factory%n"
+                + "[picocli DEBUG] Creating CommandSpec for object of class picocli.Demo$GitBranch with factory picocli.model.Factory%n"
+                + "[picocli DEBUG] Creating CommandSpec for object of class picocli.Demo$GitCheckout with factory picocli.model.Factory%n"
+                + "[picocli DEBUG] Creating CommandSpec for object of class picocli.Demo$GitClone with factory picocli.model.Factory%n"
+                + "[picocli DEBUG] Creating CommandSpec for object of class picocli.Demo$GitDiff with factory picocli.model.Factory%n"
+                + "[picocli DEBUG] Creating CommandSpec for object of class picocli.Demo$GitMerge with factory picocli.model.Factory%n"
+                + "[picocli DEBUG] Creating CommandSpec for object of class picocli.Demo$GitPush with factory picocli.model.Factory%n"
+                + "[picocli DEBUG] Creating CommandSpec for object of class picocli.Demo$GitRebase with factory picocli.model.Factory%n"
+                + "[picocli DEBUG] Creating CommandSpec for object of class picocli.Demo$GitTag with factory picocli.model.Factory%n"
                 + "[picocli INFO] Parsing 8 command line args [--git-dir=/home/rpopma/picocli, commit, -m, \"Fixed typos\", --, src1.java, src2.java, src3.java]%n"
                 + "[picocli DEBUG] Parser configuration: posixClusteredShortOptionsAllowed=true, stopAtPositional=false, stopAtUnmatched=false, separator=null, overwrittenOptionsAllowed=false, unmatchedArgumentsAllowed=false, expandAtFiles=true, atFileCommentChar=#, endOfOptionsDelimiter=--, limitSplit=false, aritySatisfiedByAttachedOptionParam=false, toggleBooleanFlags=true, unmatchedOptionsArePositionalParams=false, collectErrors=false,caseInsensitiveEnumValuesAllowed=false, trimQuotes=false, splitQuotedStrings=false%n"
                 + "[picocli DEBUG] Set initial value for field java.io.File picocli.Demo$Git.gitDir of type class java.io.File to null.%n"

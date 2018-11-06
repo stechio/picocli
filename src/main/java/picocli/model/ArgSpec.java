@@ -14,8 +14,6 @@ import java.util.TreeMap;
 import org.apache.commons.lang3.StringUtils;
 
 import picocli.CommandLine;
-import picocli.CommandLine.IDefaultValueProvider;
-import picocli.CommandLine.ITypeConverter;
 import picocli.annots.Command;
 import picocli.annots.Option;
 import picocli.annots.Parameters;
@@ -256,7 +254,7 @@ public abstract class ArgSpec {
     }
 
     /**
-     * Returns one or more {@link CommandLine.ITypeConverter type converters} to use to convert the
+     * Returns one or more {@link ITypeConverter type converters} to use to convert the
      * command line argument into a strongly typed value (or key-value pair for map fields). This is
      * useful when a particular option or positional parameter should use a custom conversion that
      * is different from the normal conversion for the arg spec's type.
@@ -802,7 +800,7 @@ public abstract class ArgSpec {
         }
 
         /**
-         * Returns one or more {@link CommandLine.ITypeConverter type converters} to use to convert
+         * Returns one or more {@link ITypeConverter type converters} to use to convert
          * the command line argument into a strongly typed value (or key-value pair for map fields).
          * This is useful when a particular option or positional parameter should use a custom
          * conversion that is different from the normal conversion for the arg spec's type.

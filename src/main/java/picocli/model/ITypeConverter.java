@@ -1,0 +1,63 @@
+package picocli.model;
+
+import picocli.annots.Option;
+import picocli.annots.Parameters;
+
+/**
+ * <p>
+ * When parsing command line arguments and initializing fields annotated with
+ * {@link Option @Option} or {@link Parameters @Parameters}, String values can be converted to
+ * any type for which a {@code ITypeConverter} is registered.
+ * </p>
+ * <p>
+ * This interface defines the contract for classes that know how to convert a String into some
+ * domain object. Custom converters can be registered with the
+ * {@link #registerConverter(Class, ITypeConverter)} method.
+ * </p>
+ * <p>
+ * Java 8 lambdas make it easy to register custom type converters:
+ * </p>
+ * 
+ * <pre>
+ * commandLine.registerConverter(java.nio.file.Path.class, s -&gt; java.nio.file.Paths.get(s));
+ * commandLine.registerConverter(java.time.Duration.class, s -&gt; java.time.Duration.parse(s));
+ * </pre>
+ * <p>
+ * Built-in type converters are pre-registered for the following java 1.5 types:
+ * </p>
+ * <ul>
+ * <li>all primitive types</li>
+ * <li>all primitive wrapper types: Boolean, Byte, Character, Double, Float, Integer, Long,
+ * Short</li>
+ * <li>any enum</li>
+ * <li>java.io.File</li>
+ * <li>java.math.BigDecimal</li>
+ * <li>java.math.BigInteger</li>
+ * <li>java.net.InetAddress</li>
+ * <li>java.net.URI</li>
+ * <li>java.net.URL</li>
+ * <li>java.nio.charset.Charset</li>
+ * <li>java.sql.Time</li>
+ * <li>java.util.Date</li>
+ * <li>java.util.UUID</li>
+ * <li>java.util.regex.Pattern</li>
+ * <li>StringBuilder</li>
+ * <li>CharSequence</li>
+ * <li>String</li>
+ * </ul>
+ * 
+ * @param <K>
+ *            the type of the object that is the result of the conversion
+ */
+public interface ITypeConverter<K> {
+    /**
+     * Converts the specified command line argument value to some domain object.
+     * 
+     * @param value
+     *            the command line argument String value
+     * @return the resulting domain object
+     * @throws Exception
+     *             an exception detailing what went wrong during the conversion
+     */
+    K convert(String value) throws Exception;
+}

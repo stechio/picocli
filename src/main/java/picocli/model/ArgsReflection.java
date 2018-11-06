@@ -10,8 +10,6 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
-import picocli.CommandLine.IFactory;
-import picocli.CommandLine.NoCompletionCandidates;
 import picocli.annots.Option;
 import picocli.annots.Parameters;
 import picocli.help.Help;
@@ -32,7 +30,7 @@ class ArgsReflection {
         builder.versionHelp(option.versionHelp());
         builder.showDefaultValue(option.showDefaultValue());
         if (!NoCompletionCandidates.class.equals(option.completionCandidates())) {
-            builder.completionCandidates(Model.createCompletionCandidates(factory,
+            builder.completionCandidates(Factory.createCompletionCandidates(factory,
                     option.completionCandidates()));
         }
 
@@ -50,7 +48,7 @@ class ArgsReflection {
         builder.splitRegex(option.split());
         builder.hidden(option.hidden());
         builder.defaultValue(option.defaultValue());
-        builder.converters(Model.createConverter(factory, option.converter()));
+        builder.converters(Factory.createConverter(factory, option.converter()));
         return builder.build();
     }
 
@@ -77,10 +75,10 @@ class ArgsReflection {
         builder.splitRegex(parameters.split());
         builder.hidden(parameters.hidden());
         builder.defaultValue(parameters.defaultValue());
-        builder.converters(Model.createConverter(factory, parameters.converter()));
+        builder.converters(Factory.createConverter(factory, parameters.converter()));
         builder.showDefaultValue(parameters.showDefaultValue());
         if (!NoCompletionCandidates.class.equals(parameters.completionCandidates())) {
-            builder.completionCandidates(Model.createCompletionCandidates(factory,
+            builder.completionCandidates(Factory.createCompletionCandidates(factory,
                     parameters.completionCandidates()));
         }
         return builder.build();

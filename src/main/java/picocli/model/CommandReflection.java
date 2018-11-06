@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Stack;
 
 import picocli.CommandLine;
-import picocli.CommandLine.IFactory;
 import picocli.annots.Command;
 import picocli.annots.Mixin;
 import picocli.annots.Option;
@@ -39,7 +38,7 @@ public class CommandReflection {
             commandClassName = cls.getName();
             try {
                 t.debug("Getting a %s instance from the factory%n", cls.getName());
-                instance = Model.create(factory, cls);
+                instance = Factory.create(factory, cls);
                 cls = instance.getClass();
                 commandClassName = cls.getName();
                 t.debug("Factory returned a %s instance%n", commandClassName);

@@ -41,7 +41,6 @@ import org.junit.contrib.java.lang.system.ProvideSystemProperty;
 import org.junit.contrib.java.lang.system.SystemErrRule;
 import org.junit.contrib.java.lang.system.SystemOutRule;
 
-import picocli.CommandLine.IParseResultHandler;
 import picocli.CommandLineTest.CompactFields;
 import picocli.annots.Command;
 import picocli.annots.Mixin;
@@ -50,6 +49,8 @@ import picocli.annots.Parameters;
 import picocli.excepts.InitializationException;
 import picocli.excepts.MissingParameterException;
 import picocli.excepts.UnmatchedArgumentException;
+import picocli.handlers.IParseResultHandler;
+import picocli.handlers.RunLast;
 import picocli.help.Ansi;
 import picocli.model.ArgSpec;
 import picocli.model.CommandSpec;
@@ -278,7 +279,7 @@ public class CommandLineCommandMethodTest {
         assertEquals(22, result);
 
         // verify same result with result handler
-        List<Object> results = new CommandLine.RunLast().handleParseResult(parsed, System.out, Ansi.OFF);
+        List<Object> results = new RunLast().handleParseResult(parsed, System.out, Ansi.OFF);
         assertEquals(1, results.size());
         assertEquals(22L, results.get(0));
     }
@@ -319,7 +320,7 @@ public class CommandLineCommandMethodTest {
         assertEquals(30, result);
 
         // verify same result with result handler
-        List<Object> results = new CommandLine.RunLast().handleParseResult(parsed, System.out, Ansi.OFF);
+        List<Object> results = new RunLast().handleParseResult(parsed, System.out, Ansi.OFF);
         assertEquals(1, results.size());
         assertEquals(30L, results.get(0));
     }
@@ -358,7 +359,7 @@ public class CommandLineCommandMethodTest {
         assertEquals(15, result);
 
         // verify same result with result handler
-        List<Object> results = new CommandLine.RunLast().handleParseResult(parsed, System.out, Ansi.OFF);
+        List<Object> results = new RunLast().handleParseResult(parsed, System.out, Ansi.OFF);
         assertEquals(1, results.size());
         assertEquals(15L, results.get(0));
     }
@@ -393,7 +394,7 @@ public class CommandLineCommandMethodTest {
         assertEquals(3, result);
 
         // verify same result with result handler
-        List<Object> results = new CommandLine.RunLast().handleParseResult(parsed, System.out, Ansi.OFF);
+        List<Object> results = new RunLast().handleParseResult(parsed, System.out, Ansi.OFF);
         assertEquals(1, results.size());
         assertEquals(3L, results.get(0));
     }

@@ -30,11 +30,11 @@ import java.util.concurrent.Callable;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
-import picocli.CommandLine.IVersionProvider;
 import picocli.annots.Command;
 import picocli.annots.Option;
 import picocli.annots.Parameters;
 import picocli.help.HelpCommand;
+import picocli.model.IVersionProvider;
 
 /**
  * Demonstrates picocli subcommands.

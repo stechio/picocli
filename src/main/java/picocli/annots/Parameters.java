@@ -7,10 +7,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import picocli.CommandLine;
-import picocli.CommandLine.ITypeConverter;
-import picocli.CommandLine.NoCompletionCandidates;
 import picocli.excepts.MissingParameterException;
 import picocli.help.Help;
+import picocli.model.IFactory;
+import picocli.model.ITypeConverter;
+import picocli.model.NoCompletionCandidates;
 import picocli.model.PositionalParamSpec;
 
 /**
@@ -243,7 +244,7 @@ public @interface Parameters {
      *
      * @return a class whose instances can iterate over the completion candidates for this
      *         positional parameter
-     * @see picocli.CommandLine.IFactory
+     * @see picocli.model.IFactory
      * @since 3.2
      */
     Class<? extends Iterable<String>> completionCandidates() default NoCompletionCandidates.class;

@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Stack;
 
 import picocli.CommandLine;
-import picocli.CommandLine.CosineSimilarity;
 import picocli.annots.Option;
 import picocli.annots.Parameters;
 import picocli.model.CommandSpec;

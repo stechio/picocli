@@ -3,6 +3,17 @@ package picocli.util;
 import org.apache.commons.lang3.StringUtils;
 
 public class Utils {
+    public static int countTrailingSpaces(String str) {
+        if (str == null)
+            return 0;
+
+        int trailingSpaces = 0;
+        for (int i = str.length(); --i >= 0 && str.charAt(i) == ' ';) {
+            trailingSpaces++;
+        }
+        return trailingSpaces;
+    }
+
     /**
      * Same as {@link ObjectUtils#isEmpty(Object)}, except that CharSequence arrays and Iterable's
      * are considered empty also when all their items are empty.
@@ -10,7 +21,7 @@ public class Utils {
      * @param object
      * @return
      */
-    public static boolean isEmpty(final Object object) {
+    public static boolean isEmptyAtAll(final Object object) {
         if (ObjectUtils.isEmpty(object))
             return true;
         else if (object.getClass().isArray()
@@ -26,30 +37,12 @@ public class Utils {
             return false;
     }
 
-    public static boolean isNotEmpty(final Object object) {
-        return !isEmpty(object);
+    public static boolean isNotEmptyAtAll(final Object object) {
+        return !isEmptyAtAll(object);
     }
 
-    /**
-     * Same as {@link StringUtils#join(Object[],String,int,int)}, except that null arrays return
-     * empty.
-     * 
-     * @param object
-     */
-    public static <T> String join(T[] array, String separator, int startIndex, int endIndex) {
-        return isEmpty(array) ? StringUtils.EMPTY
-                : StringUtils.join(array, separator, startIndex, endIndex);
-    }
-
-    public static int countTrailingSpaces(String str) {
-        if (str == null)
-            return 0;
-
-        int trailingSpaces = 0;
-        for (int i = str.length(); --i >= 0 && str.charAt(i) == ' ';) {
-            trailingSpaces++;
-        }
-        return trailingSpaces;
+    public static String safeFormat(String formatString, Object... params) {
+        return formatString == null ? "" : String.format(formatString, params);
     }
 
     /**
@@ -63,7 +56,14 @@ public class Utils {
         return ObjectUtilsExt.safeEmptyGet(array, index);
     }
 
-    public static String safeFormat(String formatString, Object... params) {
-        return formatString == null ? "" : String.format(formatString, params);
+    /**
+     * Same as {@link StringUtils#join(Object[],String,int,int)}, except that null arrays return
+     * empty.
+     * 
+     * @param object
+     */
+    public static <T> String safeJoin(T[] array, String separator, int startIndex, int endIndex) {
+        return isEmptyAtAll(array) ? StringUtils.EMPTY
+                : StringUtils.join(array, separator, startIndex, endIndex);
     }
 }

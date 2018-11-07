@@ -142,7 +142,7 @@ public class Help {
         @Override
         public String render(Help help, Map<String, Help> value) {
             if (value.isEmpty())
-                return "";
+                return StringUtils.EMPTY;
 
             int commandLength = StringUtilsExt.longest(value.keySet()).length();
             TextTable textTable = TextTable.forColumns(help.colorScheme().ansi(),
@@ -159,7 +159,7 @@ public class Help {
                                 : (command.usageMessage().description() != null
                                         && command.usageMessage().description().length > 0
                                                 ? command.usageMessage().description()[0]
-                                                : "");
+                                                : StringUtils.EMPTY);
                 Text[] lines = help.colorScheme().ansi().text(header).splitLines();
                 textTable.addRowValues(renderCommandNames(helpObj), lines[0]);
                 for (int i = 1; i < lines.length; i++) {
@@ -395,18 +395,18 @@ public class Help {
             return (option, parameterLabelRenderer, scheme) -> {
                 Text optionText = scheme.optionText(option.names()[0]).append(parameterLabelRenderer
                         .renderParameterLabel(option, scheme.ansi(), scheme.optionParamStyles));
-                return new Text[][] { { optionText, new Text(scheme.ansi(),
-                        Utils.isEmpty(option.description()) ? "" : option.description()[0]) } };
+                return new Text[][] { { optionText,
+                        new Text(scheme.ansi(), Utils.safeGet(option.description(), 0)) } };
             };
         }
 
         @Override
         public IParameterRenderer createMinimalParameterRenderer() {
-            return (param, parameterLabelRenderer, scheme) -> new Text[][] { {
-                    parameterLabelRenderer.renderParameterLabel(param, scheme.ansi(),
-                            scheme.parameterStyles),
-                    new Text(scheme.ansi(),
-                            Utils.isEmpty(param.description()) ? "" : param.description()[0]) } };
+            return (param, parameterLabelRenderer,
+                    scheme) -> new Text[][] { {
+                            parameterLabelRenderer.renderParameterLabel(param, scheme.ansi(),
+                                    scheme.parameterStyles),
+                            new Text(scheme.ansi(), Utils.safeGet(param.description(), 0)) } };
         }
 
         @Override
@@ -420,7 +420,7 @@ public class Help {
 
                 @Override
                 public String separator() {
-                    return "";
+                    return StringUtils.EMPTY;
                 }
             };
         }
@@ -433,7 +433,7 @@ public class Help {
         @Override
         public IOptionRenderer createOptionRenderer() {
             return new OptionRenderer(help.commandSpec().usageMessage().showDefaultValues(),
-                    "" + help.commandSpec().usageMessage().requiredOptionMarker());
+                    Character.toString(help.commandSpec().usageMessage().requiredOptionMarker()));
         }
 
         @Override
@@ -444,7 +444,7 @@ public class Help {
         @Override
         public IParameterRenderer createParameterRenderer() {
             return new ParameterRenderer(help.commandSpec().usageMessage().showDefaultValues(),
-                    "" + help.commandSpec().usageMessage().requiredOptionMarker());
+                    Character.toString(help.commandSpec().usageMessage().requiredOptionMarker()));
         }
 
         @Override
@@ -612,7 +612,8 @@ public class Help {
         }
 
         public String render(Help help) {
-            return Utils.isEmpty(body.apply(help)) ? "" : renderHeading(help) + renderBody(help);
+            return Utils.isEmptyAtAll(body.apply(help)) ? StringUtils.EMPTY
+                    : renderHeading(help) + renderBody(help);
         }
 
         public String renderBody(Help help) {
@@ -676,7 +677,7 @@ public class Help {
 
     public static abstract class SimpleSectionMemberRenderer<T> implements IHelpElementRenderer<T> {
         protected String doRender(Help help, String... values) {
-            if (Utils.isEmpty(values))
+            if (Utils.isEmptyAtAll(values))
                 return StringUtils.EMPTY;
 
             TextTable table = getTable(help);
@@ -703,7 +704,7 @@ public class Help {
     public static class SynopsisRenderer implements IHelpElementRenderer<UsageMessageSpec> {
         @Override
         public String render(Help help, UsageMessageSpec usageMessage) {
-            if (Utils.isNotEmpty(usageMessage.customSynopsis()))
+            if (Utils.isNotEmptyAtAll(usageMessage.customSynopsis()))
                 return help.rendering().simpleSectionBody().render(help,
                         usageMessage.customSynopsis());
             else
@@ -793,7 +794,7 @@ public class Help {
                 Text param = help.rendering().paramLabel().renderParameterLabel(option,
                         help.colorScheme().ansi(), help.colorScheme().optionParamStyles);
                 if (option.required()) { // e.g., -x=VAL
-                    text.append(" ").append(name).append(param).append("");
+                    text.append(" ").append(name).append(param);
                     if (option.isMultiValue()) { // e.g., -x=VAL [-x=VAL]...
                         text.append(" [").append(name).append(param).append("]...");
                     }
@@ -890,14 +891,14 @@ public class Help {
                 ColorScheme scheme) {
             String[] names = Comparators.Length.sortAsc(option.names());
             int shortOptionCount = names[0].length() == 2 ? 1 : 0;
-            String shortOption = shortOptionCount > 0 ? names[0] : "";
-            sep = shortOptionCount > 0 && names.length > 1 ? "," : "";
+            String shortOption = shortOptionCount > 0 ? names[0] : StringUtils.EMPTY;
+            sep = shortOptionCount > 0 && names.length > 1 ? "," : StringUtils.EMPTY;
 
-            String longOption = Utils.join(names, ", ", shortOptionCount, names.length);
+            String longOption = Utils.safeJoin(names, ", ", shortOptionCount, names.length);
             Text longOptionText = createLongOptionText(option, paramLabelRenderer, scheme,
                     longOption);
 
-            String requiredOption = option.required() ? requiredMarker : "";
+            String requiredOption = option.required() ? requiredMarker : StringUtils.EMPTY;
             return renderDescriptionLines(option, scheme, requiredOption, shortOption,
                     longOptionText);
         }
@@ -977,7 +978,7 @@ public class Help {
             Text label = paramLabelRenderer.renderParameterLabel(param, scheme.ansi(),
                     scheme.parameterStyles);
             Text requiredParameter = scheme
-                    .parameterText(param.arity().min > 0 ? requiredMarker : "");
+                    .parameterText(param.arity().min > 0 ? requiredMarker : StringUtils.EMPTY);
 
             Text EMPTY = Ansi.EMPTY_TEXT;
             boolean[] showDefault = { param.internalShowDefaultValue(showDefaultValues) };
@@ -1023,10 +1024,10 @@ public class Help {
             Range capacity = argSpec.isOption() ? argSpec.arity()
                     : ((PositionalParamSpec) argSpec).capacity();
             if (capacity.max == 0)
-                return new Text(ansi, "");
+                return new Text(ansi, StringUtils.EMPTY);
             if (argSpec.hideParamSyntax())
-                return ansi.apply((argSpec.isOption() ? separator() : "") + argSpec.paramLabel(),
-                        styles);
+                return ansi.apply((argSpec.isOption() ? separator() : StringUtils.EMPTY)
+                        + argSpec.paramLabel(), styles);
 
             Text paramName = ansi.apply(argSpec.paramLabel(), styles);
             String split = argSpec.splitRegex();
@@ -1071,7 +1072,7 @@ public class Help {
                 }
                 result.append("..."); // PARAM...
             }
-            String optionSeparator = argSpec.isOption() ? separator() : "";
+            String optionSeparator = argSpec.isOption() ? separator() : StringUtils.EMPTY;
             if (capacity.min == 0) { // optional
                 String sep2 = StringUtils.isBlank(optionSeparator) ? optionSeparator + "["
                         : "[" + optionSeparator;
@@ -1283,7 +1284,9 @@ public class Help {
         this.aliases.add(0, commandSpec.name());
         this.addAllSubcommands(commandSpec.subcommands());
 
-        this.rendering = commandSpec.commandLine().helpFactory().createRendering(this);
+        this.rendering = commandSpec.commandLine() != null
+                ? commandSpec.commandLine().helpFactory().createRendering(this)
+                : new HelpFactory().createRendering(this);
     }
 
     /**

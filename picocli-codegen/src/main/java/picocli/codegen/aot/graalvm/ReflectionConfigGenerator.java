@@ -1,21 +1,5 @@
 package picocli.codegen.aot.graalvm;
 
-import picocli.CommandLine;
-import picocli.CommandLine.Model.ArgSpec;
-import picocli.CommandLine.Model.CommandSpec;
-import picocli.CommandLine.Model.OptionSpec;
-import picocli.CommandLine.Model.PositionalParamSpec;
-import picocli.CommandLine.Model.UnmatchedArgsBinding;
-import picocli.model.IGetterUnmatchedpicocli.model.ISetterandd;
-import picocli.model.IGetter;
-import picocli.model.ISetter;
-import picocli.annots.Spec;
-import picocli.annots.Unmatched;
-import picocli.annots.Mixin;
-import picocli.annots.Option;
-import picocli.annots.ParentCommand;
-import picocli.Copicocli.annots.Mixinameters;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -30,6 +14,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
+
+import picocli.CommandLine;
+import picocli.annots.Command;
+import picocli.annots.Mixin;
+import picocli.annots.Option;
+import picocli.annots.Parameters;
+import picocli.annots.ParentCommand;
+import picocli.annots.Spec;
+import picocli.annots.Unmatched;
+import picocli.model.ArgSpec;
+import picocli.model.CommandSpec;
+import picocli.model.IGetter;
+import picocli.model.ISetter;
+import picocli.model.OptionSpec;
+import picocli.model.PositionalParamSpec;
+import picocli.model.UnmatchedArgsBinding;
 
 /**
  * {@code ReflectionConfigGenerator} generates a JSON String with the program elements that will be accessed

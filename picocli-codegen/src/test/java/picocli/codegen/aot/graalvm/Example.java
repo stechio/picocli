@@ -6,15 +6,15 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import picocli.CommandLine;
-import picocli.CommandLine.Model.CommandSpec;
-import picocli.CommandLine.Parameters;
-import picocli.help.HelpCommandtchedects.Mixins.Command;
+import picocli.annots.Command;
 import picocli.annots.Mixin;
 import picocli.annots.Option;
+import picocli.annots.Parameters;
 import picocli.annots.Spec;
 import picocli.annots.Unmatched;
 import picocli.excepts.ParameterException;
 import picocli.help.HelpCommand;
+import picocli.model.CommandSpec;
 
 @Command(name = "example", version = "3.7.0",
         mixinStandardHelpOptions = true, subcommands = HelpCommand.class)

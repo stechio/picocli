@@ -178,95 +178,90 @@ public class Help {
         }
     }
 
-    public class HelpRendererFactory implements IHelpRendererFactory {
-        @Override
-        public CommandListRenderer createCommandListRenderer() {
-            return new CommandListRenderer();
-        }
-
-        @Override
-        public IOptionRenderer createMinimalOptionRenderer() {
-            return (option, parameterLabelRenderer, scheme) -> {
-                Text optionText = scheme.optionText(option.names()[0]).append(parameterLabelRenderer
-                        .renderParameterLabel(option, scheme.ansi(), scheme.optionParamStyles));
-                return new Text[][] { { optionText, new Text(scheme.ansi(),
-                        Utils.isEmpty(option.description()) ? "" : option.description()[0]) } };
-            };
-        }
-
-        @Override
-        public IParameterRenderer createMinimalParameterRenderer() {
-            return (param, parameterLabelRenderer, scheme) -> new Text[][] { {
-                    parameterLabelRenderer.renderParameterLabel(param, scheme.ansi(),
-                            scheme.parameterStyles),
-                    new Text(scheme.ansi(),
-                            Utils.isEmpty(param.description()) ? "" : param.description()[0]) } };
-        }
-
-        @Override
-        public IParamLabelRenderer createMinimalParamLabelRenderer() {
-            return new IParamLabelRenderer() {
-                @Override
-                public Text renderParameterLabel(ArgSpec argSpec, Ansi ansi,
-                        List<Ansi.IStyle> styles) {
-                    return ansi.apply(argSpec.paramLabel(), styles);
-                }
-
-                @Override
-                public String separator() {
-                    return "";
-                }
-            };
-        }
-
-        @Override
-        public ArgumentListRenderer<OptionSpec> createOptionListRenderer() {
-            return new OptionListRenderer();
-        }
-
-        @Override
-        public IOptionRenderer createOptionRenderer() {
-            return new OptionRenderer(commandSpec.usageMessage().showDefaultValues(),
-                    "" + commandSpec.usageMessage().requiredOptionMarker());
-        }
-
-        @Override
-        public ArgumentListRenderer<PositionalParamSpec> createParameterListRenderer() {
-            return new ParameterListRenderer();
-        }
-
-        @Override
-        public IParameterRenderer createParameterRenderer() {
-            return new ParameterRenderer(commandSpec.usageMessage().showDefaultValues(),
-                    "" + commandSpec.usageMessage().requiredOptionMarker());
-        }
-
-        @Override
-        public IParamLabelRenderer createParamLabelRenderer() {
-            return new ParamLabelRenderer(commandSpec);
-        }
-
-        @Override
-        public SimpleSectionBodyRenderer createSectionBodyRenderer() {
-            return new SimpleSectionBodyRenderer();
-        }
-
-        @Override
-        public SectionHeadingRenderer createSectionHeadingRenderer() {
-            return new SectionHeadingRenderer();
-        }
-
-        @Override
-        public SynopsisRenderer createSynopsisRenderer() {
-            return new SynopsisRenderer();
-        }
-    }
-
     public interface IHelpElementRenderer<T> {
         String render(Help help, T value);
     }
 
-    public interface IHelpRendererFactory {
+    /**
+     * When customizing online help for {@link OptionSpec Option} details, a custom
+     * {@code IOptionRenderer} can be used to create textual representation of an Option in a
+     * tabular format: one or more rows, each containing one or more columns. The {@link Layout
+     * Layout} is responsible for placing these text values in the {@link TextTable TextTable}.
+     */
+    public interface IOptionRenderer {
+        /**
+         * Returns a text representation of the specified option and its parameter(s) if any.
+         *
+         * @param option
+         *            the command line option to show online usage help for
+         * @param parameterLabelRenderer
+         *            responsible for rendering option parameters to text
+         * @param scheme
+         *            color scheme for applying ansi color styles to options and option parameters
+         * @return a 2-dimensional array of text values: one or more rows, each containing one or
+         *         more columns
+         * @since 3.0
+         */
+        Text[][] render(OptionSpec option, Help.IParamLabelRenderer parameterLabelRenderer,
+                ColorScheme scheme);
+    }
+
+    /**
+     * When customizing online help for {@linkplain PositionalParamSpec positional parameters}
+     * details, a custom {@code IParameterRenderer} can be used to create textual representation of
+     * a Parameters field in a tabular format: one or more rows, each containing one or more
+     * columns. The {@link Layout Layout} is responsible for placing these text values in the
+     * {@link TextTable TextTable}.
+     */
+    public interface IParameterRenderer {
+        /**
+         * Returns a text representation of the specified positional parameter.
+         *
+         * @param param
+         *            the positional parameter to show online usage help for
+         * @param parameterLabelRenderer
+         *            responsible for rendering parameter labels to text
+         * @param scheme
+         *            color scheme for applying ansi color styles to positional parameters
+         * @return a 2-dimensional array of text values: one or more rows, each containing one or
+         *         more columns
+         * @since 3.0
+         */
+        Text[][] render(PositionalParamSpec param, Help.IParamLabelRenderer parameterLabelRenderer,
+                ColorScheme scheme);
+    }
+
+    /**
+     * When customizing online usage help for an option parameter or a positional parameter, a
+     * custom {@code IParamLabelRenderer} can be used to render the parameter name or label to a
+     * String.
+     */
+    public interface IParamLabelRenderer {
+
+        /**
+         * Returns a text rendering of the option parameter or positional parameter; returns an
+         * empty string {@code ""} if the option is a boolean and does not take a parameter.
+         *
+         * @param argSpec
+         *            the named or positional parameter with a parameter label
+         * @param ansi
+         *            determines whether ANSI escape codes should be emitted or not
+         * @param styles
+         *            the styles to apply to the parameter label
+         * @return a text rendering of the Option parameter or positional parameter
+         * @since 3.0
+         */
+        Text renderParameterLabel(ArgSpec argSpec, Ansi ansi, List<Ansi.IStyle> styles);
+
+        /**
+         * Returns the separator between option name and param label.
+         * 
+         * @return the separator between option name and param label
+         */
+        String separator();
+    }
+
+    public interface IRendererFactory {
         CommandListRenderer createCommandListRenderer();
 
         /**
@@ -356,85 +351,6 @@ public class Help {
         SynopsisRenderer createSynopsisRenderer();
     }
 
-    /**
-     * When customizing online help for {@link OptionSpec Option} details, a custom
-     * {@code IOptionRenderer} can be used to create textual representation of an Option in a
-     * tabular format: one or more rows, each containing one or more columns. The {@link Layout
-     * Layout} is responsible for placing these text values in the {@link TextTable TextTable}.
-     */
-    public interface IOptionRenderer {
-        /**
-         * Returns a text representation of the specified option and its parameter(s) if any.
-         *
-         * @param option
-         *            the command line option to show online usage help for
-         * @param parameterLabelRenderer
-         *            responsible for rendering option parameters to text
-         * @param scheme
-         *            color scheme for applying ansi color styles to options and option parameters
-         * @return a 2-dimensional array of text values: one or more rows, each containing one or
-         *         more columns
-         * @since 3.0
-         */
-        Text[][] render(OptionSpec option, Help.IParamLabelRenderer parameterLabelRenderer,
-                ColorScheme scheme);
-    }
-
-    /**
-     * When customizing online help for {@linkplain PositionalParamSpec positional parameters}
-     * details, a custom {@code IParameterRenderer} can be used to create textual representation of
-     * a Parameters field in a tabular format: one or more rows, each containing one or more
-     * columns. The {@link Layout Layout} is responsible for placing these text values in the
-     * {@link TextTable TextTable}.
-     */
-    public interface IParameterRenderer {
-        /**
-         * Returns a text representation of the specified positional parameter.
-         *
-         * @param param
-         *            the positional parameter to show online usage help for
-         * @param parameterLabelRenderer
-         *            responsible for rendering parameter labels to text
-         * @param scheme
-         *            color scheme for applying ansi color styles to positional parameters
-         * @return a 2-dimensional array of text values: one or more rows, each containing one or
-         *         more columns
-         * @since 3.0
-         */
-        Text[][] render(PositionalParamSpec param, Help.IParamLabelRenderer parameterLabelRenderer,
-                ColorScheme scheme);
-    }
-
-    /**
-     * When customizing online usage help for an option parameter or a positional parameter, a
-     * custom {@code IParamLabelRenderer} can be used to render the parameter name or label to a
-     * String.
-     */
-    public interface IParamLabelRenderer {
-
-        /**
-         * Returns a text rendering of the option parameter or positional parameter; returns an
-         * empty string {@code ""} if the option is a boolean and does not take a parameter.
-         *
-         * @param argSpec
-         *            the named or positional parameter with a parameter label
-         * @param ansi
-         *            determines whether ANSI escape codes should be emitted or not
-         * @param styles
-         *            the styles to apply to the parameter label
-         * @return a text rendering of the Option parameter or positional parameter
-         * @since 3.0
-         */
-        Text renderParameterLabel(ArgSpec argSpec, Ansi ansi, List<Ansi.IStyle> styles);
-
-        /**
-         * Returns the separator between option name and param label.
-         * 
-         * @return the separator between option name and param label
-         */
-        String separator();
-    }
-
     public static class OptionListRenderer extends ArgumentListRenderer<OptionSpec> {
         @Override
         protected Comparator<OptionSpec> getComparator(CommandSpec commandSpec) {
@@ -462,8 +378,98 @@ public class Help {
         }
     }
 
+    public static class RendererFactory implements IRendererFactory {
+        protected Help help;
+
+        public RendererFactory(Help help) {
+            this.help = help;
+        }
+
+        @Override
+        public CommandListRenderer createCommandListRenderer() {
+            return new CommandListRenderer();
+        }
+
+        @Override
+        public IOptionRenderer createMinimalOptionRenderer() {
+            return (option, parameterLabelRenderer, scheme) -> {
+                Text optionText = scheme.optionText(option.names()[0]).append(parameterLabelRenderer
+                        .renderParameterLabel(option, scheme.ansi(), scheme.optionParamStyles));
+                return new Text[][] { { optionText, new Text(scheme.ansi(),
+                        Utils.isEmpty(option.description()) ? "" : option.description()[0]) } };
+            };
+        }
+
+        @Override
+        public IParameterRenderer createMinimalParameterRenderer() {
+            return (param, parameterLabelRenderer, scheme) -> new Text[][] { {
+                    parameterLabelRenderer.renderParameterLabel(param, scheme.ansi(),
+                            scheme.parameterStyles),
+                    new Text(scheme.ansi(),
+                            Utils.isEmpty(param.description()) ? "" : param.description()[0]) } };
+        }
+
+        @Override
+        public IParamLabelRenderer createMinimalParamLabelRenderer() {
+            return new IParamLabelRenderer() {
+                @Override
+                public Text renderParameterLabel(ArgSpec argSpec, Ansi ansi,
+                        List<Ansi.IStyle> styles) {
+                    return ansi.apply(argSpec.paramLabel(), styles);
+                }
+
+                @Override
+                public String separator() {
+                    return "";
+                }
+            };
+        }
+
+        @Override
+        public ArgumentListRenderer<OptionSpec> createOptionListRenderer() {
+            return new OptionListRenderer();
+        }
+
+        @Override
+        public IOptionRenderer createOptionRenderer() {
+            return new OptionRenderer(help.commandSpec().usageMessage().showDefaultValues(),
+                    "" + help.commandSpec().usageMessage().requiredOptionMarker());
+        }
+
+        @Override
+        public ArgumentListRenderer<PositionalParamSpec> createParameterListRenderer() {
+            return new ParameterListRenderer();
+        }
+
+        @Override
+        public IParameterRenderer createParameterRenderer() {
+            return new ParameterRenderer(help.commandSpec().usageMessage().showDefaultValues(),
+                    "" + help.commandSpec().usageMessage().requiredOptionMarker());
+        }
+
+        @Override
+        public IParamLabelRenderer createParamLabelRenderer() {
+            return new ParamLabelRenderer(help.commandSpec());
+        }
+
+        @Override
+        public SimpleSectionBodyRenderer createSectionBodyRenderer() {
+            return new SimpleSectionBodyRenderer();
+        }
+
+        @Override
+        public SectionHeadingRenderer createSectionHeadingRenderer() {
+            return new SectionHeadingRenderer();
+        }
+
+        @Override
+        public SynopsisRenderer createSynopsisRenderer() {
+            return new SynopsisRenderer();
+        }
+    }
+
     public static class Rendering {
-        private IHelpRendererFactory factory;
+        private IRendererFactory factory;
 
         private SynopsisRenderer synopsis;
         private SimpleSectionBodyRenderer simpleSectionBody;
@@ -478,7 +484,7 @@ public class Help {
         private IOptionRenderer minimalOption;
         private IParamLabelRenderer minimalParamLabel;
 
-        public Rendering(IHelpRendererFactory factory) {
+        public Rendering(IRendererFactory factory) {
             this.factory = factory;
         }
 
@@ -1271,11 +1277,13 @@ public class Help {
      */
     public Help(CommandSpec commandSpec, ColorScheme colorScheme) {
         this.commandSpec = Assert.notNull(commandSpec, "commandSpec");
+        this.colorScheme = Assert.notNull(colorScheme, "colorScheme").applySystemProperties();
+
         this.aliases = new ArrayList<>(commandSpec.aliases());
         this.aliases.add(0, commandSpec.name());
-        this.colorScheme = Assert.notNull(colorScheme, "colorScheme").applySystemProperties();
-        rendering = new Rendering(new HelpRendererFactory());
         this.addAllSubcommands(commandSpec.subcommands());
+
+        this.rendering = commandSpec.commandLine().helpFactory().createRendering(this);
     }
 
     /**

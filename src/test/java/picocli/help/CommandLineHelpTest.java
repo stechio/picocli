@@ -69,7 +69,6 @@ import picocli.model.IVersionProvider;
 import picocli.model.OptionSpec;
 import picocli.model.PositionalParamSpec;
 import picocli.model.UsageMessageSpec;
-import picocli.util.Comparators;
 
 /**
  * Tests for picocli's "Usage" help functionality.
@@ -1227,7 +1226,7 @@ public class CommandLineHelpTest {
     @Test
     public void testShortestFirstComparator_sortsShortestFirst() {
         String[] values = { "12345", "12", "123", "123456", "1", "", "1234" };
-        Arrays.sort(values, Comparators.Length.Order);
+        Arrays.sort(values, picocli.util.Comparators.Length.Order);
         String[] expected = { "", "1", "12", "123", "1234", "12345", "123456" };
         assertArrayEquals(expected, values);
     }
@@ -1235,7 +1234,7 @@ public class CommandLineHelpTest {
     @Test
     public void testShortestFirstComparator_sortsDeclarationOrderIfEqualLength() {
         String[] values = { "-d", "-", "-a", "--alpha", "--b", "--a", "--beta" };
-        Arrays.sort(values, Comparators.Length.Order);
+        Arrays.sort(values, picocli.util.Comparators.Length.Order);
         String[] expected = { "-", "-d", "-a", "--b", "--a", "--beta", "--alpha" };
         assertArrayEquals(expected, values);
     }
@@ -1251,7 +1250,7 @@ public class CommandLineHelpTest {
             boolean cccc;
         }
         OptionSpec[] fields = options(new App(), "aaaa", "bbbb", "cccc"); // -tkc
-        Arrays.sort(fields, new Help.SortByShortestOptionNameAlphabetically());
+        Arrays.sort(fields, Comparators.OptionNameAlphabeticalLength.Order);
         OptionSpec[] expected = options(new App(), "cccc", "bbbb", "aaaa"); // -ckt
         assertEquals(expected[0], fields[0]);
         assertEquals(expected[1], fields[1]);
@@ -1281,7 +1280,7 @@ public class CommandLineHelpTest {
         OptionSpec[] fields = options(new App(), "tImplicitArity0", "explicitArity1",
                 "kImplicitArity0", "aImplicitArity1", "zImplicitArity1", "bExplicitArity1_3",
                 "fImplicitArity0");
-        Arrays.sort(fields, new Help.SortByOptionArityAndNameAlphabetically());
+        Arrays.sort(fields, new picocli.help.Comparators.OptionArityAndNameAlphabeticalLength());
         OptionSpec[] expected = options(new App(), "fImplicitArity0", "kImplicitArity0",
                 "tImplicitArity0", "aImplicitArity1", "explicitArity1", "zImplicitArity1",
                 "bExplicitArity1_3");

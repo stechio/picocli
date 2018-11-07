@@ -25,7 +25,6 @@ import picocli.model.PositionalParamSpec;
 import picocli.model.Range;
 import picocli.model.UsageMessageSpec;
 import picocli.util.Assert;
-import picocli.util.Comparators;
 import picocli.util.ListMap;
 import picocli.util.StringUtilsExt;
 import picocli.util.Utils;
@@ -354,7 +353,8 @@ public class Help {
     public static class OptionListRenderer extends ArgumentListRenderer<OptionSpec> {
         @Override
         protected Comparator<OptionSpec> getComparator(CommandSpec commandSpec) {
-            return commandSpec.usageMessage().sortOptions() ? createShortOptionNameComparator()
+            return commandSpec.usageMessage().sortOptions()
+                    ? Comparators.OptionNameAlphabeticalLength.Order
                     : null;
         }
 
@@ -709,7 +709,8 @@ public class Help {
                         usageMessage.customSynopsis());
             else
                 return usageMessage.abbreviateSynopsis() ? renderAbbreviated(help)
-                        : renderDetailed(help, createShortOptionArityAndNameComparator(),
+                        : renderDetailed(help,
+                                Comparators.OptionArityAndNameAlphabeticalLength.Order,
                                 help.commandSpec().parser().posixClusteredShortOptionsAllowed());
         }
 
@@ -889,7 +890,7 @@ public class Help {
         @Override
         public Text[][] render(OptionSpec option, Help.IParamLabelRenderer paramLabelRenderer,
                 ColorScheme scheme) {
-            String[] names = Comparators.Length.sortAsc(option.names());
+            String[] names = picocli.util.Comparators.Length.sortAsc(option.names());
             int shortOptionCount = names[0].length() == 2 ? 1 : 0;
             String shortOption = shortOptionCount > 0 ? names[0] : StringUtils.EMPTY;
             sep = shortOptionCount > 0 && names.length > 1 ? "," : StringUtils.EMPTY;
@@ -1090,52 +1091,6 @@ public class Help {
     }
 
     /**
-     * Sorts {@code OptionSpec} instances by their max arity first, then their min arity, then
-     * delegates to super class.
-     */
-    static class SortByOptionArityAndNameAlphabetically
-            extends Help.SortByShortestOptionNameAlphabetically {
-        @Override
-        public int compare(OptionSpec o1, OptionSpec o2) {
-            Range arity1 = o1.arity();
-            Range arity2 = o2.arity();
-            int result = arity1.max - arity2.max;
-            if (result == 0) {
-                result = arity1.min - arity2.min;
-            }
-            if (result == 0) { // arity is same
-                if (o1.isMultiValue() && !o2.isMultiValue()) {
-                    result = 1;
-                } // f1 > f2
-                if (!o1.isMultiValue() && o2.isMultiValue()) {
-                    result = -1;
-                } // f1 < f2
-            }
-            return result == 0 ? super.compare(o1, o2) : result;
-        }
-    }
-
-    /**
-     * Sorts {@code OptionSpec} instances by their name in case-insensitive alphabetic order. If an
-     * option has multiple names, the shortest name is used for the sorting. Help options follow
-     * non-help options.
-     */
-    static class SortByShortestOptionNameAlphabetically implements Comparator<OptionSpec> {
-        @Override
-        public int compare(OptionSpec o1, OptionSpec o2) {
-            if (o1 == null)
-                return 1;
-            else if (o2 == null)
-                return -1;
-            String[] names1 = Comparators.Length.sortAsc(o1.names());
-            String[] names2 = Comparators.Length.sortAsc(o2.names());
-            int result = names1[0].toUpperCase().compareTo(names2[0].toUpperCase()); // case insensitive sort
-            result = result == 0 ? -names1[0].compareTo(names2[0]) : result; // lower case before upper case
-            return o1.help() == o2.help() ? result : o2.help() ? -1 : 1; // help options come last
-        }
-    }
-
-    /**
      * Constant String holding the default program name, value defined in
      * {@link CommandSpec#DEFAULT_COMMAND_NAME}.
      */
@@ -1148,17 +1103,6 @@ public class Help {
     protected static final String DEFAULT_SEPARATOR = ParserSpec.DEFAULT_SEPARATOR;
 
     final static int defaultOptionsColumnWidth = 24;
-
-    /**
-     * Sorts {@link OptionSpec OptionSpecs} by their option {@linkplain Range#max max arity} first,
-     * by {@linkplain Range#min min arity} next, and by
-     * {@linkplain #createShortOptionNameComparator() option name} last.
-     * 
-     * @return a comparator that sorts OptionSpecs by arity first, then their option name
-     */
-    public static Comparator<OptionSpec> createShortOptionArityAndNameComparator() {
-        return new SortByOptionArityAndNameAlphabetically();
-    }
 
     /**
      * Formats each of the specified values and appends it to the specified StringBuilder.
@@ -1191,15 +1135,6 @@ public class Help {
         return sb;
     }
 
-    //    /**
-    //     * Sorts short strings before longer strings.
-    //     *
-    //     * @return a comparators that sorts short strings before longer strings
-    //     */
-    //    public static Comparator<String> shortestFirst() {
-    //        return new LengthComparator();
-    //    }
-
     private static void addTrailingDefaultLine(List<Text[]> result, ArgSpec arg,
             ColorScheme scheme) {
         Text EMPTY = Ansi.EMPTY_TEXT;
@@ -1220,18 +1155,6 @@ public class Help {
             }
         }
         return result;
-    }
-
-    /**
-     * Sorts {@link OptionSpec OptionSpecs} by their option name in case-insensitive alphabetic
-     * order. If an option has multiple names, the shortest name is used for the sorting. Help
-     * options follow non-help options.
-     *
-     * @return a comparator that sorts OptionSpecs by their option name in case-insensitive
-     *         alphabetic order
-     */
-    private static Comparator<OptionSpec> createShortOptionNameComparator() {
-        return new SortByShortestOptionNameAlphabetically();
     }
 
     protected final CommandSpec commandSpec;

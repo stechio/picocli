@@ -4,8 +4,8 @@ import org.apache.commons.lang3.StringUtils;
 
 public class Utils {
     /**
-     * Same as {@link ObjectUtils#isEmpty(Object)}, except that String arrays are considered empty
-     * also when all their items are empty.
+     * Same as {@link ObjectUtils#isEmpty(Object)}, except that CharSequence arrays and Iterable's
+     * are considered empty also when all their items are empty.
      * 
      * @param object
      * @return
@@ -14,15 +14,16 @@ public class Utils {
         if (ObjectUtils.isEmpty(object))
             return true;
         else if (object.getClass().isArray()
-                && object.getClass().getComponentType().equals(String.class)) {
-            String[] array = (String[]) object;
-            for (int index = 0; index < array.length; index++) {
-                if (StringUtils.isNotEmpty(array[index]))
+                && CharSequence.class.isAssignableFrom(object.getClass().getComponentType()))
+            return StringUtils.isAllEmpty((CharSequence[]) object);
+        else if (object instanceof Iterable<?>) {
+            for (Object item : (Iterable<?>) object) {
+                if (!(item instanceof CharSequence) || StringUtils.isNotEmpty((CharSequence) item))
                     return false;
             }
             return true;
-        }
-        return false;
+        } else
+            return false;
     }
 
     public static boolean isNotEmpty(final Object object) {

@@ -18,8 +18,8 @@ apply plugin: 'distribution'
 apply plugin: 'maven-publish'
 
 allprojects {
+    apply plugin: 'java-library'
     apply plugin: 'groovy'
-    apply plugin: 'java'
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
 
@@ -39,7 +39,7 @@ allprojects {
     dependencies {
         implementation "com.google.guava:guava:$guavaVersion"
         implementation "org.apache.commons:commons-lang3:$commonsLangVersion"
-        implementation "org.apache.commons:commons-collections4:$commonsCollectionsVersion"
+        api "org.apache.commons:commons-collections4:$commonsCollectionsVersion"
         compileOnly "org.codehaus.groovy:groovy-all:$groovyVersion"
         ivy         "org.apache.ivy:ivy:$ivyVersion" // for Gradle
         testCompile "junit:junit:$junitVersion",
@@ -49,6 +49,8 @@ allprojects {
                     "com.github.stefanbirkner:system-rules:$systemRulesVersion"
 
     }
+// TODO: re-enable javadoc when refs fixed
+tasks.withType(Javadoc).all { enabled = false }
     tasks.withType(GroovyCompile) {
         // this, and the `configurations {ivy}` section, are a workaround for the dreaded
         // java.lang.NoClassDefFoundError: org/apache/ivy/core/report/ResolveReport

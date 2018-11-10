@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.TreeSet;
 import java.util.concurrent.Callable;
 
@@ -174,6 +175,85 @@ import picocli.util.Tracer;
 public class CommandLine {
     /** This is picocli version {@value}. */
     public static final String VERSION = "3.8.0-SNAPSHOT";
+
+    /**
+     * Crack a command line.
+     *
+     * <p>
+     * This method belongs to the implementation of <a href=
+     * "https://github.com/apache/commons-exec/commit/360c83b02a34e98c9f406a4a3f4618e3e9327c45">org.apache.commons.exec.CommandLine</a>
+     * </p>
+     *
+     * @param toProcess
+     *            the command line to process
+     * @return the command line broken into strings. An empty or null toProcess parameter results in
+     *         a zero sized array
+     */
+    private static String[] translateCommandline(final String toProcess) {
+        if (toProcess == null || toProcess.length() == 0) {
+            // no command? no string
+            return new String[0];
+        }
+
+        // parse with a simple finite state machine
+
+        final int normal = 0;
+        final int inQuote = 1;
+        final int inDoubleQuote = 2;
+        int state = normal;
+        final StringTokenizer tok = new StringTokenizer(toProcess, "\"\' ", true);
+        final ArrayList<String> list = new ArrayList<String>();
+        StringBuilder current = new StringBuilder();
+        boolean lastTokenHasBeenQuoted = false;
+
+        while (tok.hasMoreTokens()) {
+            final String nextTok = tok.nextToken();
+            switch (state) {
+                case inQuote:
+                    if ("\'".equals(nextTok)) {
+                        lastTokenHasBeenQuoted = true;
+                        state = normal;
+                    } else {
+                        current.append(nextTok);
+                    }
+                    break;
+                case inDoubleQuote:
+                    if ("\"".equals(nextTok)) {
+                        lastTokenHasBeenQuoted = true;
+                        state = normal;
+                    } else {
+                        current.append(nextTok);
+                    }
+                    break;
+                default:
+                    if ("\'".equals(nextTok)) {
+                        state = inQuote;
+                    } else if ("\"".equals(nextTok)) {
+                        state = inDoubleQuote;
+                    } else if (" ".equals(nextTok)) {
+                        if (lastTokenHasBeenQuoted || current.length() != 0) {
+                            list.add(current.toString());
+                            current = new StringBuilder();
+                        }
+                    } else {
+                        current.append(nextTok);
+                    }
+                    lastTokenHasBeenQuoted = false;
+                    break;
+            }
+        }
+
+        if (lastTokenHasBeenQuoted || current.length() != 0) {
+            list.add(current.toString());
+        }
+
+        if (state == inQuote || state == inDoubleQuote) {
+            throw new IllegalArgumentException("Unbalanced quotes in " + toProcess);
+        }
+
+        final String[] args = new String[list.size()];
+        return list.toArray(args);
+    }
 
     final Tracer tracer = new Tracer();
     final CommandSpec commandSpec;
@@ -379,8 +459,8 @@ public class CommandLine {
         CommandLine subcommandLine = toCommandLine(command, factory);
         subcommandLine.getCommandSpec().aliases().addAll(Arrays.asList(aliases));
         getCommandSpec().addSubcommand(name, subcommandLine);
-        CommandReflection.initParentCommand(
-                subcommandLine.getCommandSpec().userObject(), getCommandSpec().userObject());
+        CommandReflection.initParentCommand(subcommandLine.getCommandSpec().userObject(),
+                getCommandSpec().userObject());
         return this;
     }
 
@@ -1023,6 +1103,29 @@ public class CommandLine {
     }
 
     /**
+     * @param rawArgs
+     *            The raw command line arguments to parse.
+     * @see #parse(String[])
+     */
+    public List<CommandLine> parse(String rawArgs) {
+        return parse(translateCommandline(rawArgs));
+    }
+
+    /**
+     * @param args
+     *            The command line arguments to parse, either as a raw string or as a string array.
+     * @see #parse(String[])
+     */
+    public List<CommandLine> parse(Object args) {
+        if (args instanceof String[])
+            return parse((String[]) args);
+        else if (args instanceof String)
+            return parse((String) args);
+        else
+            throw new IllegalArgumentException();
+    }
+
+    /**
      * Parses the specified command line arguments and returns a list of {@code ParseResult} with
      * the options, positional parameters, and subcommands (if any) that were recognized and
      * initialized during the parsing process.
@@ -1041,6 +1144,29 @@ public class CommandLine {
     public ParseResult parseArgs(String... args) {
         interpreter.parse(args);
         return interpreter.parseResult.build();
+    }
+
+    /**
+     * @param rawArgs
+     *            The raw command line arguments to parse.
+     * @see #parseArgs(String[])
+     */
+    public ParseResult parseArgs(String rawArgs) {
+        return parseArgs(translateCommandline(rawArgs));
+    }
+
+    /**
+     * @param args
+     *            The command line arguments to parse, either as a raw string or as a string array.
+     * @see #parseArgs(String[])
+     */
+    public ParseResult parseArgs(Object args) {
+        if (args instanceof String[])
+            return parseArgs((String[]) args);
+        else if (args instanceof String)
+            return parseArgs((String) args);
+        else
+            throw new IllegalArgumentException();
     }
 
     public ParseResult getParseResult() {

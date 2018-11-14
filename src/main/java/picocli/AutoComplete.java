@@ -176,7 +176,7 @@ public class AutoComplete {
     }
     private static class HasCompletions implements Predicate<ArgSpec> {
         public boolean test(ArgSpec f) {
-            return f.completionCandidates() != null;
+            return f.choiceValues() != null;
         }
     }
     private static <T> Predicate<T> negate(final Predicate<T> original) {
@@ -501,7 +501,7 @@ public class AutoComplete {
     private static void generateCompletionCandidates(StringBuilder buff, OptionSpec f) {
         buff.append(format("  %s_OPTION_ARGS=\"%s\" # %s values\n",
                 bashify(f.paramLabel()),
-                concat(" ", extract(f.completionCandidates())).trim(),
+                concat(" ", extract(f.choiceValues())).trim(),
                 f.longestName()));
     }
     private static List<String> extract(Iterable<String> generator) {
@@ -532,7 +532,7 @@ public class AutoComplete {
     private static String generateOptionsCases(List<OptionSpec> argOptionFields, List<OptionSpec> enumOptions, String indent, String currWord) {
         StringBuilder buff = new StringBuilder(1024);
         for (OptionSpec option : argOptionFields) {
-            if (enumOptions.contains(option) || option.completionCandidates() != null) {
+            if (enumOptions.contains(option) || option.choiceValues() != null) {
                 buff.append(format("%s    %s)\n", indent, concat("|", option.names()))); // "    -u|--timeUnit)\n"
                 buff.append(format("%s      COMPREPLY=( $( compgen -W \"${%s_OPTION_ARGS}\" -- %s ) )\n", indent, bashify(option.paramLabel()), currWord));
                 buff.append(format("%s      return $?\n", indent));
@@ -698,12 +698,12 @@ public class AutoComplete {
     }
     private static void addCandidatesForArgsFollowing(OptionSpec optionSpec, List<CharSequence> candidates) {
         if (optionSpec != null) {
-            addCompletionCandidates(optionSpec.completionCandidates(), candidates);
+            addCompletionCandidates(optionSpec.choiceValues(), candidates);
         }
     }
     private static void addCandidatesForArgsFollowing(PositionalParamSpec positionalSpec, List<CharSequence> candidates) {
         if (positionalSpec != null) {
-            addCompletionCandidates(positionalSpec.completionCandidates(), candidates);
+            addCompletionCandidates(positionalSpec.choiceValues(), candidates);
         }
     }
     private static void addCompletionCandidates(Iterable<String> completionCandidates, List<CharSequence> candidates) {

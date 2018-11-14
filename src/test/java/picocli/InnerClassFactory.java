@@ -21,7 +21,9 @@ import picocli.model.IFactory;
 import java.lang.reflect.Constructor;
 
 /**
- * Factory for instantiating subcommands etc whose classes are declared inline in a test function. For example:
+ * Factory for instantiating subcommands etc whose classes are declared inline in a test function.
+ * For example:
+ * 
  * <pre>
  * //
  * // This test should fail because the subcommand to instantiate
@@ -36,8 +38,9 @@ import java.lang.reflect.Constructor;
  *         }
  *     }
  *
- *     &#064;Command(subcommands = {ABC.class})
- *     class MainCommand { }
+ *     &#064;Command(subcommands = { ABC.class })
+ *     class MainCommand {
+ *     }
  *
  *     new CommandLine(new MainCommand(), new InnerClassFactory(this));
  * }
@@ -45,21 +48,36 @@ import java.lang.reflect.Constructor;
  */
 public class InnerClassFactory implements IFactory {
     private final Object outer;
-    public InnerClassFactory(Object outer) { this.outer = outer; }
+
+    public InnerClassFactory(Object outer) {
+        this.outer = outer;
+    }
 
     public <K> K create(final Class<K> cls) throws Exception {
+        Constructor<K> constructor = null;
         try {
-            Constructor<K> constructor = cls.getDeclaredConstructor(outer.getClass());
+            constructor = cls.getDeclaredConstructor(outer.getClass());
             return constructor.newInstance(outer);
         } catch (Exception ex) {
+            if (ex instanceof IllegalAccessException) {
+                try {
+                    constructor.setAccessible(true);
+                    return constructor.newInstance(outer);
+                } catch (Exception e) {
+                    /* NOOP: Fall back. */
+                } 
+            }
+
             try {
                 return cls.newInstance();
             } catch (Exception ex2) {
                 try {
-                    Constructor<K> constructor = cls.getDeclaredConstructor();
+                    constructor = cls.getDeclaredConstructor();
                     return constructor.newInstance();
                 } catch (Exception ex3) {
-                    throw new InitializationException("Could not instantiate " + cls.getName() + " either with or without construction parameter " + outer + ": " + ex, ex);
+                    throw new InitializationException("Could not instantiate " + cls.getName()
+                            + " either with or without construction parameter " + outer + ": " + ex,
+                            ex);
                 }
             }
         }

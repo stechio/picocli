@@ -236,7 +236,7 @@ public class ReflectionConfigGenerator {
             visitSetter(argSpec.setter());
             visitType(argSpec.type());
             visitTypes(argSpec.auxiliaryTypes());
-            visitObjectType(argSpec.completionCandidates());
+            visitObjectType(argSpec.choiceValues());
             visitObjectTypes(argSpec.converters());
         }
 

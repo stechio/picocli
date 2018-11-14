@@ -12,12 +12,13 @@ import org.apache.commons.lang3.StringUtils;
 
 import picocli.annots.Option;
 import picocli.annots.Parameters;
+import picocli.excepts.InitializationException;
 import picocli.help.Help;
 import picocli.util.ObjectUtilsExt;
 
 /**
- * Helper class to reflectively create OptionSpec and PositionalParamSpec objects from
- * annotated elements. Package protected for testing. CONSIDER THIS CLASS PRIVATE.
+ * Helper class to reflectively create OptionSpec and PositionalParamSpec objects from annotated
+ * elements. Package protected for testing. CONSIDER THIS CLASS PRIVATE.
  */
 class ArgsReflection {
     static OptionSpec extractOptionSpec(TypedMember member, IFactory factory) {
@@ -29,9 +30,8 @@ class ArgsReflection {
         builder.usageHelp(option.usageHelp());
         builder.versionHelp(option.versionHelp());
         builder.showDefaultValue(option.showDefaultValue());
-        if (!NoCompletionCandidates.class.equals(option.completionCandidates())) {
-            builder.completionCandidates(Factory.createCompletionCandidates(factory,
-                    option.completionCandidates()));
+        if (!NoChoiceValues.class.equals(option.choiceValues())) {
+            builder.choiceValues(Factory.createChoiceValues(factory, option.choiceValues()));
         }
 
         builder.arity(Range.optionArity(member));
@@ -40,8 +40,8 @@ class ArgsReflection {
         Class<?>[] elementTypes = inferTypes(member.getType(), option.type(),
                 member.getGenericType());
         builder.auxiliaryTypes(elementTypes);
-        builder.paramLabel(inferLabel(option.paramLabel(), member.name(), member.getType(),
-                elementTypes));
+        builder.paramLabel(
+                inferLabel(option.paramLabel(), member.name(), member.getType(), elementTypes));
         builder.hideParamSyntax(option.hideParamSyntax());
         builder.description(option.description());
         builder.descriptionKey(option.descriptionKey());
@@ -52,8 +52,7 @@ class ArgsReflection {
         return builder.build();
     }
 
-    static PositionalParamSpec extractPositionalParamSpec(TypedMember member,
-            IFactory factory) {
+    static PositionalParamSpec extractPositionalParamSpec(TypedMember member, IFactory factory) {
         PositionalParamSpec.Builder builder = PositionalParamSpec.builder();
         initCommon(builder, member);
         Range arity = Range.parameterArity(member);
@@ -67,8 +66,8 @@ class ArgsReflection {
         Class<?>[] elementTypes = inferTypes(member.getType(), parameters.type(),
                 member.getGenericType());
         builder.auxiliaryTypes(elementTypes);
-        builder.paramLabel(inferLabel(parameters.paramLabel(), member.name(),
-                member.getType(), elementTypes));
+        builder.paramLabel(
+                inferLabel(parameters.paramLabel(), member.name(), member.getType(), elementTypes));
         builder.hideParamSyntax(parameters.hideParamSyntax());
         builder.description(parameters.description());
         builder.descriptionKey(parameters.descriptionKey());
@@ -77,9 +76,8 @@ class ArgsReflection {
         builder.defaultValue(parameters.defaultValue());
         builder.converters(Factory.createConverter(factory, parameters.converter()));
         builder.showDefaultValue(parameters.showDefaultValue());
-        if (!NoCompletionCandidates.class.equals(parameters.completionCandidates())) {
-            builder.completionCandidates(Factory.createCompletionCandidates(factory,
-                    parameters.completionCandidates()));
+        if (!NoChoiceValues.class.equals(parameters.choiceValues())) {
+            builder.choiceValues(Factory.createChoiceValues(factory, parameters.choiceValues()));
         }
         return builder.build();
     }

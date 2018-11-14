@@ -107,7 +107,7 @@ public class AutoCompleteTest {
     public static class Sub1 {
         @Option(names = "--num", description = "a number") double number;
         @Option(names = "--str", description = "a String") String str;
-        @Option(names = "--candidates", completionCandidates = Candidates.class, description = "with candidates") String str2;
+        @Option(names = "--candidates", choiceValues = Candidates.class, description = "with candidates") String str2;
     }
     @Command(description = "First level subcommand 2")
     public static class Sub2 {
@@ -122,7 +122,7 @@ public class AutoCompleteTest {
     public static class Sub2Child2 {
         @Option(names = {"-u", "--timeUnit"}) private TimeUnit timeUnit;
         @Option(names = {"-t", "--timeout"}) private long timeout;
-        @Parameters(completionCandidates = Candidates.class, description = "with candidates") String str2;
+        @Parameters(choiceValues = Candidates.class, description = "with candidates") String str2;
     }
 
     @Test

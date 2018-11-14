@@ -225,7 +225,12 @@ public class TextTable {
 
             // add row if a value spanned/wrapped and there are still remaining values
             if ((cell.row != row || cell.column != col) && col != values.length - 1) {
-                addEmptyRow();
+                for (int nextCol = col + 1; nextCol < values.length; nextCol++) {
+                    if (StringUtils.isNotEmpty(values[nextCol])) {
+                        addEmptyRow();
+                        break;
+                    }
+                }
             }
         }
     }
@@ -288,7 +293,7 @@ public class TextTable {
                     int charsWritten = lastColumn
                             ? copy(BreakIterator.getLineInstance(), value, textAt(row, col), indent)
                             : copy(value, textAt(row, col), indent);
-                    value = value.substring(charsWritten);
+                    value = value.subSequence(charsWritten);
                     indent = 0;
                     if (value.length() > 0) { // value did not fit in column
                         ++col; // write remainder of value in next column
@@ -305,7 +310,7 @@ public class TextTable {
                 BreakIterator lineBreakIterator = BreakIterator.getLineInstance();
                 do {
                     int charsWritten = copy(lineBreakIterator, value, textAt(row, col), indent);
-                    value = value.substring(charsWritten);
+                    value = value.subSequence(charsWritten);
                     indent = column.indent + indentWrappedLines;
                     if (value.length() > 0) { // value did not fit in column
                         ++row; // write remainder of value in next row
@@ -379,7 +384,7 @@ public class TextTable {
         int done = 0;
         for (int start = line.first(), end = line
                 .next(); end != BreakIterator.DONE; start = end, end = line.next()) {
-            Text word = text.substring(start, end); //.replace("\u00ff", "-"); // not needed
+            Text word = text.subSequence(start, end); //.replace("\u00ff", "-"); // not needed
             if (columnValue.maxLength >= offset + done + word.length()) {
                 done += copy(word, columnValue, offset + done); // TODO messages length
             } else {

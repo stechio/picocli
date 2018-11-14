@@ -35,7 +35,7 @@ class PrototypeDSL {
             usage {
                 header ("this is a header", "header line 2")
                 description "command description"
-                showDefaultValues true
+                defaultValuesVisible true
             }
 
             // OptionSpec attributes on a single line

@@ -46,17 +46,21 @@ public class CompletionCandidatesTest {
     public final ProvideSystemProperty ansiOFF = new ProvideSystemProperty("picocli.ansi", "false");
 
     @Rule
-    public final SystemErrRule systemErrRule = new SystemErrRule().enableLog().muteForSuccessfulTests();
+    public final SystemErrRule systemErrRule = new SystemErrRule().enableLog()
+            .muteForSuccessfulTests();
 
     @Rule
-    public final SystemOutRule systemOutRule = new SystemOutRule().enableLog().muteForSuccessfulTests();
+    public final SystemOutRule systemOutRule = new SystemOutRule().enableLog()
+            .muteForSuccessfulTests();
 
     static class MyAbcdCandidates extends ArrayList<String> {
-        MyAbcdCandidates() { super(Arrays.asList("A", "B", "C", "D")); }
+        MyAbcdCandidates() {
+            super(Arrays.asList("A", "B", "C", "D"));
+        }
     }
 
     enum MyEfgEnum {
-                E, F, G
+        E, F, G
     }
 
     private static List<String> extract(Iterable<String> generator) {
@@ -66,6 +70,7 @@ public class CompletionCandidatesTest {
         }
         return result;
     }
+
     @Test
     public void testCompletionCandidatesEnumValues_forOption() {
         class App {
@@ -74,8 +79,10 @@ public class CompletionCandidatesTest {
         }
         App app = new App();
         CommandLine cmd = new CommandLine(app);
-        assertEquals(Arrays.asList("E", "F", "G"), cmd.getCommandSpec().findOption("x").completionCandidates());
+        assertEquals(Arrays.asList("E", "F", "G"),
+                cmd.getCommandSpec().findOption("x").choiceValues());
     }
+
     @Test
     public void testCompletionCandidatesEnumValues_forParameters() {
         class App {
@@ -84,60 +91,76 @@ public class CompletionCandidatesTest {
         }
         App app = new App();
         CommandLine cmd = new CommandLine(app);
-        assertEquals(Arrays.asList("E", "F", "G"), cmd.getCommandSpec().positionalParameters().get(0).completionCandidates());
+        assertEquals(Arrays.asList("E", "F", "G"),
+                cmd.getCommandSpec().positionalParameters().get(0).choiceValues());
     }
+
     @Test
     public void testCompletionCandidatesPriority_forOption() {
 
         class App {
-            @Option(names = "-x", completionCandidates = MyAbcdCandidates.class)
+            @Option(names = "-x", choiceValues = MyAbcdCandidates.class)
             MyEfgEnum x;
         }
         App app = new App();
         CommandLine cmd = new CommandLine(app);
-        assertEquals(Arrays.asList("A", "B", "C", "D"), cmd.getCommandSpec().findOption("x").completionCandidates());
+        assertEquals(Arrays.asList("A", "B", "C", "D"),
+                cmd.getCommandSpec().findOption("x").choiceValues());
     }
+
     @Test
     public void testCompletionCandidatesPriority_forParameters() {
 
         class App {
-            @Parameters(completionCandidates = MyAbcdCandidates.class)
+            @Parameters(choiceValues = MyAbcdCandidates.class)
             MyEfgEnum x;
         }
         App app = new App();
         CommandLine cmd = new CommandLine(app);
-        assertEquals(Arrays.asList("A", "B", "C", "D"), cmd.getCommandSpec().positionalParameters().get(0).completionCandidates());
+        assertEquals(Arrays.asList("A", "B", "C", "D"),
+                cmd.getCommandSpec().positionalParameters().get(0).choiceValues());
     }
+
     @Test
     public void testCompletionCandidatesValues_forOption() {
         class App {
-            @Option(names = "-x", completionCandidates = MyAbcdCandidates.class)
+            @Option(names = "-x", choiceValues = MyAbcdCandidates.class)
             String x;
         }
         CommandLine cmd = new CommandLine(new App());
-        assertEquals(Arrays.asList("A", "B", "C", "D"), extract(cmd.getCommandSpec().findOption("x").completionCandidates()));
+        assertEquals(Arrays.asList("A", "B", "C", "D"),
+                extract(cmd.getCommandSpec().findOption("x").choiceValues()));
     }
+
     @Test
     public void testCompletionCandidatesValues_forParameters() {
         class App {
-            @Parameters(completionCandidates = MyAbcdCandidates.class)
+            @Parameters(choiceValues = MyAbcdCandidates.class)
             String x;
         }
         CommandLine cmd = new CommandLine(new App());
-        assertEquals(Arrays.asList("A", "B", "C", "D"), extract(cmd.getCommandSpec().positionalParameters().get(0).completionCandidates()));
+        assertEquals(Arrays.asList("A", "B", "C", "D"),
+                extract(cmd.getCommandSpec().positionalParameters().get(0).choiceValues()));
     }
+
     @Test
     public void testCompletionCandidatesValues_forOptionSpec() {
         CommandSpec spec = CommandSpec.create();
-        spec.add(OptionSpec.builder("-x").completionCandidates(Arrays.asList("x", "y", "z")).build());
-        assertEquals(Arrays.asList("x", "y", "z"), extract(spec.findOption("x").completionCandidates()));
+        spec.add(OptionSpec.builder("-x").choiceValues(Arrays.asList("x", "y", "z"))
+                .build());
+        assertEquals(Arrays.asList("x", "y", "z"),
+                extract(spec.findOption("x").choiceValues()));
     }
+
     @Test
     public void testCompletionCandidatesValues_forPositionalParamSpec() {
         CommandSpec spec = CommandSpec.create();
-        spec.add(PositionalParamSpec.builder().completionCandidates(Arrays.asList("x", "y", "z")).build());
-        assertEquals(Arrays.asList("x", "y", "z"), extract(spec.positionalParameters().get(0).completionCandidates()));
+        spec.add(PositionalParamSpec.builder().choiceValues(Arrays.asList("x", "y", "z"))
+                .build());
+        assertEquals(Arrays.asList("x", "y", "z"),
+                extract(spec.positionalParameters().get(0).choiceValues()));
     }
+
     private static Map<String, String> createLongMap() {
         Map<String, String> result = new LinkedHashMap<String, String>();
         result.put("key1", "veryveryverylonglonglongvaluevaluevalue");
@@ -146,87 +169,87 @@ public class CompletionCandidatesTest {
         return result;
     }
 
-    enum Lang { java, kotlin, groovy, javascript, frege, clojure }
+    enum Lang {
+        java, kotlin, groovy, javascript, frege, clojure
+    }
 
     @Test
     public void testUsageHelpVariableReplacement() {
         class MyLongCandidates extends ArrayList<String> {
-            MyLongCandidates() { super(Arrays.asList("This is a very long list of completion candidates that is intended to wrap to the next line. I wonder if it is long enough.".split(" ")));}
+            MyLongCandidates() {
+                super(Arrays.asList(
+                        "This is a very long list of completion candidates that is intended to wrap to the next line. I wonder if it is long enough."
+                                .split(" ")));
+            }
         }
         class App {
-            @Option(names = "--logfile", description = "Use given file for log. Default: ${DEFAULT-VALUE}")
+            @Option(names = "--logfile", description = "Use given file for log.")
             File file = new File("/a/b/c");
 
-            @Option(names = "-P", arity = "0..*", paramLabel = "<key=ppp>",
-                    description = "Use value for project key.%nDefault=${DEFAULT-VALUE}")
+            @Option(names = "-P", arity = "0..*", paramLabel = "<key=ppp>", description = "Use value for project key.")
             Map<String, String> projectMap = createLongMap();
 
-            @Option(names = "--x", split = ",", completionCandidates = MyAbcdCandidates.class,
-                    description = "Comma-separated list of some xxx's. Valid values: ${COMPLETION-CANDIDATES}")
+            @Option(names = "--x", split = ",", choiceValues = MyAbcdCandidates.class, description = "Comma-separated list of some xxx's.")
             String[] x;
 
-            @Option(names = "--y", description = "Test long default. Default: ${DEFAULT-VALUE}")
+            @Option(names = "--y", description = "Test long default.")
             String y = "This is a very long default value that is intended to wrap to the next line. I wonder if it is long enough.";
 
-            @Option(names = "--lib", completionCandidates = MyLongCandidates.class,
-                    description = "comma-separated list of up to 3 paths to search for jars and classes. Some example values: ${COMPLETION-CANDIDATES}")
+            @Option(names = "--lib", choiceValues = MyLongCandidates.class, description = "comma-separated list of up to 3 paths to search for jars and classes.")
             String lib;
 
-            @Option(names = "--boolF", description = "Boolean variable 1. Default: ${DEFAULT-VALUE}")
+            @Option(names = "--boolF", description = "Boolean variable 1.")
             boolean initiallyFalse;
 
-            @Option(names = "--boolT", description = "Boolean variable 2. Default: ${DEFAULT-VALUE}")
+            @Option(names = "--boolT", description = "Boolean variable 2.")
             boolean initiallyTrue = true;
 
-            @Option(names = "--strNull", description = "String without default. Default: ${DEFAULT-VALUE}")
+            @Option(names = "--strNull", description = "String without default.")
             String str = null;
 
-            @Option(names = "--enum", description = "Enum. Values: ${COMPLETION-CANDIDATES}")
+            @Option(names = "--enum", description = "Enum.")
             Lang lang = null;
         }
-        String expected = String.format("" +
-                "Usage: <main class> [--boolF] [--boolT] [--enum=<lang>] [--lib=<lib>]%n" +
-                "                    [--logfile=<file>] [--strNull=<str>] [--y=<y>] [--x=<x>[,%n" +
-                "                    <x>...]]... [-P[=<key=ppp>...]]...%n" +
-                "      --boolF            Boolean variable 1. Default: false%n" +
-                "      --boolT            Boolean variable 2. Default: true%n" +
-                "      --enum=<lang>      Enum. Values: java, kotlin, groovy, javascript, frege,%n" +
-                "                           clojure%n" +
-                "      --lib=<lib>        comma-separated list of up to 3 paths to search for jars%n" +
-                "                           and classes. Some example values: This, is, a, very,%n" +
-                "                           long, list, of, completion, candidates, that, is,%n" +
-                "                           intended, to, wrap, to, the, next, line., I, wonder, if,%n" +
-                "                           it, is, long, enough.%n" +
-                "      --logfile=<file>   Use given file for log. Default: %s%n" +
-                "      --strNull=<str>    String without default. Default: null%n" +
-                "      --x=<x>[,<x>...]   Comma-separated list of some xxx's. Valid values: A, B, C, D%n" +
-                "      --y=<y>            Test long default. Default: This is a very long default%n" +
-                "                           value that is intended to wrap to the next line. I wonder%n" +
-                "                           if it is long enough.%n" +
-                "  -P= [<key=ppp>...]     Use value for project key.%n" +
-                "                         Default={key1=veryveryverylonglonglongvaluevaluevalue,%n" +
-                "                           key2=very2very2very2longlonglongvaluevaluevalue2,%n" +
-                "                           key3=very3very3very3longlonglongvaluevaluevalue3}%n", new File("/a/b/c"));
-        String actual = usageString(new CommandLine(new App(), new InnerClassFactory(this)), Ansi.OFF);
+        String expected = String.format(""
+                + "Usage: <main class> [--boolF] [--boolT] [--enum=<lang>] [--lib=<lib>]%n"
+                + "                    [--logfile=<file>] [--strNull=<str>] [--y=<y>] [--x=<x>[,%n"
+                + "                    <x>...]]... [-P[=<key=ppp>...]]...%n"
+                + "      --boolF            Boolean variable 1.%n"
+                + "      --boolT            Boolean variable 2.%n"
+                + "      --enum=<lang>      Enum.%n"
+                + "                         VALUES: java, kotlin, groovy, javascript, frege, clojure.%n"
+                + "      --lib=<lib>        comma-separated list of up to 3 paths to search for jars%n"
+                + "                           and classes.%n"
+                + "                         VALUES: This, is, a, very, long, list, of, completion,%n"
+                + "                           candidates, that, is, intended, to, wrap, to, the, next,%n"
+                + "                           line., I, wonder, if, it, is, long, enough..%n"
+                + "      --logfile=<file>   Use given file for log.%n"
+                + "      --strNull=<str>    String without default.%n"
+                + "      --x=<x>[,<x>...]   Comma-separated list of some xxx's.%n"
+                + "                         VALUES: A, B, C, D.%n"
+                + "      --y=<y>            Test long default.%n"
+                + "  -P= [<key=ppp>...]     Use value for project key.%n",
+                new File("/a/b/c"));
+        String actual = usageString(new CommandLine(new App(), new InnerClassFactory(this)),
+                Ansi.OFF);
         assertEquals(expected, actual);
     }
 
     @Test
     public void testEnumInCollection() {
         class EnumTest {
-
-            @Option(names = "-list", description = "Multiple languages. Valid values: ${COMPLETION-CANDIDATES}")
+            @Option(names = "-list", description = "Multiple languages.")
             List<Lang> langList;
 
-            @Option(names = "-single", description = "Single language. Valid values: ${COMPLETION-CANDIDATES}")
+            @Option(names = "-single", description = "Single language.")
             Lang lang;
         }
-        String expected = String.format("" +
-                "Usage: <main class> [-single=<lang>] [-list=<langList>]...%n" +
-                "      -list=<langList>   Multiple languages. Valid values: java, kotlin, groovy,%n" +
-                "                           javascript, frege, clojure%n" +
-                "      -single=<lang>     Single language. Valid values: java, kotlin, groovy,%n" +
-                "                           javascript, frege, clojure%n");
+        String expected = String.format(""
+                + "Usage: <main class> [-single=<lang>] [-list=<langList>]...%n"
+                + "      -list=<langList>   Multiple languages.%n"
+                + "                         VALUES: java, kotlin, groovy, javascript, frege, clojure.%n"
+                + "      -single=<lang>     Single language.%n"
+                + "                         VALUES: java, kotlin, groovy, javascript, frege, clojure.%n");
         assertEquals(expected, new CommandLine(new EnumTest()).getUsageMessage());
     }
 }

@@ -210,7 +210,7 @@ public class CommandLineMixinTest {
         assertEquals("Mixin Synopsis Heading%n", commandSpec.usageMessage().synopsisHeading());
         assertTrue("abbreviateSynopsis", commandSpec.usageMessage().abbreviateSynopsis());
         assertArrayEquals(new String[] {"Mixin custom synopsis"}, commandSpec.usageMessage().customSynopsis());
-        assertTrue("showDefaultValues", commandSpec.usageMessage().showDefaultValues());
+        assertTrue("showDefaultValues", commandSpec.usageMessage().isDefaultValuesVisible());
         assertFalse("sortOptions", commandSpec.usageMessage().sortOptions());
 
         String expected = String.format("" +

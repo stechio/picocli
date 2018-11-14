@@ -15,4 +15,8 @@ public class InitializationException extends PicocliException {
     public InitializationException(String msg, Exception ex) {
         super(msg, ex);
     }
+
+    public InitializationException(Exception ex) {
+        super(ex);
+    }
 }

@@ -12,4 +12,13 @@ public class TypeConversionException extends PicocliException {
     public TypeConversionException(String msg) {
         super(msg);
     }
+
+    public TypeConversionException(String msg, Throwable throwable) {
+        super(msg, throwable);
+    }
+
+    public TypeConversionException(String value, Class<?> type, Throwable throwable) {
+        super(String.format("Cannot convert '%s' to %s (%s)", value, type.getSimpleName(),
+                throwable), throwable);
+    }
 }

@@ -3,8 +3,11 @@ package picocli.help;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 import picocli.help.Ansi.IStyle;
 import picocli.help.Ansi.Style;
+import picocli.util.Utils;
 
 /**
  * Encapsulates rich text with styles and colors.
@@ -18,7 +21,7 @@ import picocli.help.Ansi.Style;
  * from style mapping.
  * </p>
  */
-public class Text implements Appendable, Cloneable {
+public class Text implements Appendable, CharSequence, Cloneable {
     private static class StyledChunk implements Cloneable {
         /**
          * Start index within the text buffer.
@@ -75,6 +78,10 @@ public class Text implements Appendable, Cloneable {
     private StringBuilder plainTextBuffer = new StringBuilder();
     private List<StyledChunk> styledChunks = new ArrayList<>();
 
+    public Text(Ansi ansi) {
+        this(ansi, -1);
+    }
+
     /**
      * Constructs a Text with the specified string, which may contain markup like
      * {@code @|bg(red),white,underline some text|@}.
@@ -84,7 +91,7 @@ public class Text implements Appendable, Cloneable {
      *            Marked-up string.
      */
     public Text(Ansi ansi, CharSequence styledText) {
-        this(ansi, -1);
+        this(ansi);
 
         append(styledText);
     }
@@ -99,10 +106,12 @@ public class Text implements Appendable, Cloneable {
      *            Styles to apply to the whole string.
      */
     public Text(Ansi ansi, CharSequence plainText, List<IStyle> styles) {
-        this(ansi, -1);
+        this(ansi);
 
         if (plainText.length() > 0) {
-            addStyledChunk(0, plainText.length(), styles.toArray(new IStyle[styles.size()]));
+            if (Utils.isNotEmptyAtAll(styles)) {
+                addStyledChunk(0, plainText.length(), styles.toArray(new IStyle[styles.size()]));
+            }
             plainTextBuffer.append(plainText);
             length = plainTextBuffer.length();
         }
@@ -147,8 +156,7 @@ public class Text implements Appendable, Cloneable {
                 // No more styled chunks?
                 if (styledChunkStart == -1) {
                     // Add terminal plain chunk!
-                    plainTextBuffer.append(
-                            styledTextString.substring(chunkStart));
+                    plainTextBuffer.append(styledTextString.substring(chunkStart));
                     break;
                 }
 
@@ -192,7 +200,7 @@ public class Text implements Appendable, Cloneable {
 
     @Override
     public Text append(CharSequence styledText, int start, int end) {
-        return append(new Text(ansi, styledText).substring(start, end));
+        return append(new Text(ansi, styledText).subSequence(start, end));
     }
 
     public Text append(Text other) {
@@ -207,6 +215,14 @@ public class Text implements Appendable, Cloneable {
         }
         length = plainTextBuffer.length() - from;
         return this;
+    }
+
+    @Override
+    public char charAt(int index) {
+        if (index < 0 || index >= length)
+            throw new IndexOutOfBoundsException();
+
+        return plainTextBuffer.charAt(from + index);
     }
 
     /**
@@ -268,28 +284,28 @@ public class Text implements Appendable, Cloneable {
         return length == 0;
     }
 
+    @Override
     public int length() {
         return length;
     }
 
     public Text[] splitLines() {
         List<Text> result = new ArrayList<>();
-        boolean trailingEmptyString = plainTextBuffer.length() == 0;
+        boolean trailingEmptyString = length == 0;
         int start = 0, end = 0;
-        for (int i = 0; i < plainTextBuffer.length(); i++, end = i) {
-            char c = plainTextBuffer.charAt(i);
+        for (int i = 0; i < length; i++, end = i) {
+            char c = charAt(i);
             boolean eol = c == '\n';
-            eol |= (c == '\r' && i + 1 < plainTextBuffer.length()
-                    && plainTextBuffer.charAt(i + 1) == '\n' && ++i > 0); // \r\n
+            eol |= (c == '\r' && i + 1 < length && charAt(i + 1) == '\n' && ++i > 0); // \r\n
             eol |= c == '\r';
             if (eol) {
-                result.add(this.substring(start, end));
-                trailingEmptyString = i == plainTextBuffer.length() - 1;
+                result.add(subSequence(start, end));
+                trailingEmptyString = i == length - 1;
                 start = i + 1;
             }
         }
-        if (start < plainTextBuffer.length() || trailingEmptyString) {
-            result.add(this.substring(start, plainTextBuffer.length()));
+        if (start < length || trailingEmptyString) {
+            result.add(subSequence(start));
         }
         return result.toArray(new Text[result.size()]);
     }
@@ -301,8 +317,8 @@ public class Text implements Appendable, Cloneable {
      *            Index in the plain text where to start the substring
      * @return a new Text instance that is a substring of this Text.
      */
-    public Text substring(int start) {
-        return substring(start, length);
+    public Text subSequence(int start) {
+        return subSequence(start, length);
     }
 
     /**
@@ -315,7 +331,8 @@ public class Text implements Appendable, Cloneable {
      *            index in the plain text where to end the substring
      * @return a new Text instance that is a substring of this Text
      */
-    public Text substring(int start, int end) {
+    @Override
+    public Text subSequence(int start, int end) {
         if (start < 0) {
             start = 0;
         }
@@ -351,7 +368,7 @@ public class Text implements Appendable, Cloneable {
         if (!ansi.enabled())
             return plainTextBuffer.toString().substring(from, from + length);
         else if (length == 0)
-            return "";
+            return StringUtils.EMPTY;
 
         StringBuilder sb = new StringBuilder(plainTextBuffer.length() + 20 * styledChunks.size());
         StyledChunk current = null;

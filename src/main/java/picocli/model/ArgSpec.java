@@ -24,6 +24,7 @@ import picocli.util.Assert;
 import picocli.util.ClassUtilsExt;
 import picocli.util.ObjectUtilsExt;
 import picocli.util.Tracer;
+import picocli.util.Utils;
 
 /**
  * Models the shared attributes of {@link OptionSpec} and {@link PositionalParamSpec}.
@@ -31,8 +32,6 @@ import picocli.util.Tracer;
  * @since 3.0
  */
 public abstract class ArgSpec {
-    static final String DESCRIPTION_VARIABLE_DEFAULT_VALUE = "${DEFAULT-VALUE}";
-    static final String DESCRIPTION_VARIABLE_COMPLETION_CANDIDATES = "${COMPLETION-CANDIDATES}";
     private static final String NO_DEFAULT_VALUE = "__no_default_value__";
 
     // help-related fields
@@ -53,7 +52,7 @@ public abstract class ArgSpec {
     private final Class<?> type;
     private final Class<?>[] auxiliaryTypes;
     private final ITypeConverter<?>[] converters;
-    private final Iterable<String> completionCandidates;
+    private Iterable<String> choiceValues;
     private final String defaultValue;
     private final Object initialValue;
     private final boolean hasInitialValue;
@@ -68,24 +67,7 @@ public abstract class ArgSpec {
 
     /** Constructs a new {@code ArgSpec}. */
     protected <T extends Builder<T>> ArgSpec(Builder<T> builder) {
-        description = builder.description == null ? new String[0] : builder.description;
-        descriptionKey = builder.descriptionKey;
-        splitRegex = builder.splitRegex == null ? "" : builder.splitRegex;
-        paramLabel = StringUtils.isBlank(builder.paramLabel) ? "PARAM" : builder.paramLabel;
-        hideParamSyntax = builder.hideParamSyntax;
-        converters = builder.converters == null ? new ITypeConverter<?>[0] : builder.converters;
-        showDefaultValue = builder.showDefaultValue == null ? Help.Visibility.ON_DEMAND
-                : builder.showDefaultValue;
-        hidden = builder.hidden;
         interactive = builder.interactive;
-        required = builder.required && builder.defaultValue == null; //#261 not required if it has a default
-        defaultValue = builder.defaultValue;
-        initialValue = builder.initialValue;
-        hasInitialValue = builder.hasInitialValue;
-        toString = builder.toString;
-        getter = builder.getter;
-        setter = builder.setter;
-
         Range tempArity = builder.arity;
         if (tempArity == null) {
             if (isOption()) {
@@ -98,49 +80,53 @@ public abstract class ArgSpec {
             tempArity = tempArity.unspecified(true);
         }
         arity = tempArity;
-
-        if (builder.type == null) {
-            if (builder.auxiliaryTypes == null || builder.auxiliaryTypes.length == 0) {
-                if (arity.isVariable || arity.max > 1) {
-                    type = String[].class;
-                } else if (arity.max == 1) {
-                    type = String.class;
-                } else {
-                    type = isOption() ? boolean.class : String.class;
-                }
-            } else {
-                type = builder.auxiliaryTypes[0];
-            }
-        } else {
-            type = builder.type;
-        }
-        if (builder.auxiliaryTypes == null || builder.auxiliaryTypes.length == 0) {
-            if (type.isArray()) {
-                auxiliaryTypes = new Class<?>[] { type.getComponentType() };
-            } else if (Collection.class.isAssignableFrom(type)) { // type is a collection but element type is unspecified
-                auxiliaryTypes = new Class<?>[] { String.class }; // use String elements
-            } else if (Map.class.isAssignableFrom(type)) { // type is a map but element type is unspecified
-                auxiliaryTypes = new Class<?>[] { String.class, String.class }; // use String keys and String values
-            } else {
-                auxiliaryTypes = new Class<?>[] { type };
-            }
-        } else {
-            auxiliaryTypes = builder.auxiliaryTypes;
-        }
-        if (builder.completionCandidates == null && auxiliaryTypes[0].isEnum()) {
-            List<String> list = new ArrayList<String>();
-            for (Object c : auxiliaryTypes[0].getEnumConstants()) {
-                list.add(c.toString());
-            }
-            completionCandidates = Collections.unmodifiableList(list);
-        } else {
-            completionCandidates = builder.completionCandidates;
-        }
-        if (interactive && (arity.min != 1 || arity.max != 1)) {
+        if (interactive && (arity.min != 1 || arity.max != 1))
             throw new InitializationException(
                     "Interactive options and positional parameters are only supported for arity=1, not for arity="
                             + arity);
+
+        description = builder.description == null ? new String[0] : builder.description;
+        descriptionKey = builder.descriptionKey;
+        splitRegex = builder.splitRegex == null ? "" : builder.splitRegex;
+        paramLabel = StringUtils.isBlank(builder.paramLabel) ? "PARAM" : builder.paramLabel;
+        hideParamSyntax = builder.hideParamSyntax;
+        converters = builder.converters == null ? new ITypeConverter<?>[0] : builder.converters;
+        showDefaultValue = builder.showDefaultValue == null ? Help.Visibility.ON_DEMAND
+                : builder.showDefaultValue;
+        hidden = builder.hidden;
+        required = builder.required && builder.defaultValue == null; //#261 not required if it has a default
+        defaultValue = builder.defaultValue;
+        initialValue = builder.initialValue;
+        hasInitialValue = builder.hasInitialValue;
+        toString = builder.toString;
+        getter = builder.getter;
+        setter = builder.setter;
+
+        if (builder.type != null) {
+            type = builder.type;
+        } else if (Utils.isNotEmptyAtAll(builder.auxiliaryTypes)) {
+            type = builder.auxiliaryTypes[0];
+        } else if (arity.isVariable || arity.max > 1) {
+            type = String[].class;
+        } else if (arity.max == 1) {
+            type = String.class;
+        } else {
+            type = isOption() ? boolean.class : String.class;
         }
+
+        if (Utils.isNotEmptyAtAll(builder.auxiliaryTypes)) {
+            auxiliaryTypes = builder.auxiliaryTypes;
+        } else if (type.isArray()) {
+            auxiliaryTypes = new Class<?>[] { type.getComponentType() };
+        } else if (Collection.class.isAssignableFrom(type)) { // type is a collection but element type is unspecified
+            auxiliaryTypes = new Class<?>[] { String.class }; // use String elements
+        } else if (Map.class.isAssignableFrom(type)) { // type is a map but element type is unspecified
+            auxiliaryTypes = new Class<?>[] { String.class, String.class }; // use String keys and String values
+        } else {
+            auxiliaryTypes = new Class<?>[] { type };
+        }
+
+        choiceValues = builder.choiceValues;
     }
 
     /**
@@ -195,20 +181,17 @@ public abstract class ArgSpec {
             return desc;
         }
         StringBuilder candidates = new StringBuilder();
-        if (completionCandidates() != null) {
-            for (String c : completionCandidates()) {
+        if (choiceValues() != null) {
+            for (String c : choiceValues()) {
                 if (candidates.length() > 0) {
                     candidates.append(", ");
                 }
                 candidates.append(c);
             }
         }
-        String defaultValueString = defaultValueString();
         String[] result = new String[desc.length];
         for (int i = 0; i < desc.length; i++) {
-            result[i] = String.format(
-                    desc[i].replace(DESCRIPTION_VARIABLE_DEFAULT_VALUE, defaultValueString).replace(
-                            DESCRIPTION_VARIABLE_COMPLETION_CANDIDATES, candidates.toString()));
+            result[i] = String.format(desc[i]);
         }
         return result;
     }
@@ -254,10 +237,10 @@ public abstract class ArgSpec {
     }
 
     /**
-     * Returns one or more {@link ITypeConverter type converters} to use to convert the
-     * command line argument into a strongly typed value (or key-value pair for map fields). This is
-     * useful when a particular option or positional parameter should use a custom conversion that
-     * is different from the normal conversion for the arg spec's type.
+     * Returns one or more {@link ITypeConverter type converters} to use to convert the command line
+     * argument into a strongly typed value (or key-value pair for map fields). This is useful when
+     * a particular option or positional parameter should use a custom conversion that is different
+     * from the normal conversion for the arg spec's type.
      * 
      * @see Option#converter()
      */
@@ -346,26 +329,73 @@ public abstract class ArgSpec {
      * @see ArgSpec#defaultValue()
      */
     public String defaultValueString() {
-        String fromProvider = null;
-        IDefaultValueProvider defaultValueProvider = null;
-        try {
-            defaultValueProvider = commandSpec.defaultValueProvider();
-            fromProvider = defaultValueProvider == null ? null
-                    : defaultValueProvider.defaultValue(this);
-        } catch (Exception ex) {
-            new Tracer().info("Error getting default value for %s from %s: %s", this,
-                    defaultValueProvider, ex);
-        }
-        String defaultVal = fromProvider == null ? this.defaultValue() : fromProvider;
-        Object value = defaultVal == null ? initialValue() : defaultVal;
-        if (value != null && value.getClass().isArray()) {
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < Array.getLength(value); i++) {
-                sb.append(i > 0 ? ", " : "").append(Array.get(value, i));
+        String defaultValue = null;
+        if (commandSpec != null) {
+            IDefaultValueProvider defaultValueProvider = null;
+            try {
+                defaultValueProvider = commandSpec.defaultValueProvider();
+                defaultValue = defaultValueProvider == null ? null
+                        : defaultValueProvider.defaultValue(this);
+            } catch (Exception ex) {
+                new Tracer().info("Error getting default value for %s from %s: %s", this,
+                        defaultValueProvider, ex);
             }
-            return sb.insert(0, "[").append("]").toString();
         }
-        return String.valueOf(value);
+        if (defaultValue == null) {
+            defaultValue = this.defaultValue();
+        }
+        return viewOf(defaultValue != null ? defaultValue : initialValue());
+    }
+
+    private static final ITypeConverter<Object> DefaultTypeConverter = new TypeConverter<Object>() {
+        @Override
+        public Object modelOf(String value) {
+            return value;
+        }
+    };
+
+    /**
+     * 
+     * @param type
+     * @return If {@code type} is null or String or no type-specific converter is available,
+     *         pass-through converter; otherwise, type-specific converter.
+     */
+    private ITypeConverter<?> getTypeConverter(Class<?> type) {
+        ITypeConverter<?> converter = null;
+        if (commandSpec != null && commandSpec.commandLine() != null) {
+            if (type != null && type != String.class) {
+                //TODO:decide which local converter to pick!
+                converter = commandSpec.commandLine().interpreter.getTypeConverter(type, this, 0);
+            }
+            if (converter == null) {
+                converter = commandSpec.commandLine().interpreter.getTypeConverter(String.class);
+            }
+        } else {
+            converter = DefaultTypeConverter;
+        }
+        return converter;
+    }
+
+    /**
+     * Gets the command-line representation of the given value.
+     * 
+     * @param value
+     *            Either domain value or simple String; in the latter case, it's passed-through as a
+     *            command line value without further conversion.
+     * @return
+     */
+    private String viewOf(Object value) {
+        ITypeConverter<?> converter = getTypeConverter(
+                value instanceof String ? null : auxiliaryTypes[0]);
+        if (value != null && value.getClass().isArray()) {
+            StringBuilder sb = new StringBuilder("[");
+            for (int i = 0; i < Array.getLength(value); i++) {
+                sb.append(i > 0 ? ", " : StringUtils.EMPTY)
+                        .append(converter.viewOf(Array.get(value, i)));
+            }
+            return sb.append(']').toString();
+        } else
+            return converter.viewOf(value);
     }
 
     /**
@@ -377,8 +407,17 @@ public abstract class ArgSpec {
      *         constant names, or {@code null}
      * @since 3.2
      */
-    public Iterable<String> completionCandidates() {
-        return completionCandidates;
+    public Iterable<String> choiceValues() {
+        if (choiceValues == null && auxiliaryTypes[0].isEnum()) {
+            List<String> list = new ArrayList<String>();
+            ITypeConverter<?> enumConverter = getTypeConverter(auxiliaryTypes[0]);
+            for (Object c : auxiliaryTypes[0].getEnumConstants()) {
+                list.add(enumConverter.viewOf(c));
+            }
+            choiceValues = Collections.unmodifiableList(list);
+        }
+
+        return choiceValues;
     }
 
     /**
@@ -687,7 +726,7 @@ public abstract class ArgSpec {
         private Object initialValue;
         private boolean hasInitialValue = true;
         private Help.Visibility showDefaultValue;
-        private Iterable<String> completionCandidates;
+        private Iterable<String> choiceValues;
         private String toString;
         private IGetter getter = new ObjectBinding();
         private ISetter setter = (ISetter) getter;
@@ -709,7 +748,7 @@ public abstract class ArgSpec {
             required = original.required;
             interactive = original.interactive;
             showDefaultValue = original.showDefaultValue;
-            completionCandidates = original.completionCandidates;
+            choiceValues = original.choiceValues;
             splitRegex = original.splitRegex;
             toString = original.toString;
             type = original.type;
@@ -800,10 +839,10 @@ public abstract class ArgSpec {
         }
 
         /**
-         * Returns one or more {@link ITypeConverter type converters} to use to convert
-         * the command line argument into a strongly typed value (or key-value pair for map fields).
-         * This is useful when a particular option or positional parameter should use a custom
-         * conversion that is different from the normal conversion for the arg spec's type.
+         * Returns one or more {@link ITypeConverter type converters} to use to convert the command
+         * line argument into a strongly typed value (or key-value pair for map fields). This is
+         * useful when a particular option or positional parameter should use a custom conversion
+         * that is different from the normal conversion for the arg spec's type.
          * 
          * @see Option#converter()
          */
@@ -879,8 +918,8 @@ public abstract class ArgSpec {
          * 
          * @since 3.2
          */
-        public Iterable<String> completionCandidates() {
-            return completionCandidates;
+        public Iterable<String> choiceValues() {
+            return choiceValues;
         }
 
         /**
@@ -1027,9 +1066,8 @@ public abstract class ArgSpec {
          * 
          * @since 3.2
          */
-        public T completionCandidates(Iterable<String> completionCandidates) {
-            this.completionCandidates = Assert.notNull(completionCandidates,
-                    "completionCandidates");
+        public T choiceValues(Iterable<String> choiceValues) {
+            this.choiceValues = Assert.notNull(choiceValues, "choiceValues");
             return self();
         }
 

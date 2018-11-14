@@ -92,6 +92,7 @@ import picocli.model.IFactory;
 import picocli.model.ITypeConverter;
 import picocli.model.IVersionProvider;
 import picocli.model.ParseResult;
+import picocli.model.TypeConverter;
 import picocli.model.UsageMessageSpec;
 
 /**
@@ -166,12 +167,12 @@ public class CommandLineTest {
         }
     }
 
-    static class BadConverter implements ITypeConverter<Long> {
+    static class BadConverter extends TypeConverter<Long> {
         public BadConverter() {
             throw new IllegalStateException("bad class");
         }
 
-        public Long convert(String value) throws Exception {
+        public Long modelOf(String value) {
             return null;
         }
     }
@@ -2583,14 +2584,14 @@ public class CommandLineTest {
         }
     }
 
-    static class CustomType implements ITypeConverter<CustomType> {
+    static class CustomType extends TypeConverter<CustomType> {
         private final String val;
 
         private CustomType(String val) {
             this.val = val;
         }
 
-        public CustomType convert(String value) {
+        public CustomType modelOf(String value) {
             return new CustomType(value);
         }
     }
@@ -3128,7 +3129,7 @@ public class CommandLineTest {
         String content = new String(output.toByteArray(), "UTF-8").replaceAll("\r\n", "\n"); // Normalize line endings.
 
         String expectedOutput = "Usage: <main class> [--foo-bar-baz=<foo>]\n"
-                + "      --foo-bar-baz=<foo>     Default:\n"
+                + "      --foo-bar-baz=<foo>   DEFAULT:\n"
                 + "                              aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n"
                 + "                              aaaaaaaaaaaaaaaaaaaaaaaaaa\n";
 
@@ -4014,12 +4015,12 @@ public class CommandLineTest {
             assertEquals("Missing required option '--out-dir=<outputDir>'", ex.getMessage());
         }
 
-        // a single empty string parameter was specified: this becomes an <inputFile> value
+        // a single empty string parameter specified
         try {
             new CommandLine(new Example()).parse("");
             fail("Expected MissingParameterException");
         } catch (MissingParameterException ex) {
-            assertEquals("Missing required option '--out-dir=<outputDir>'", ex.getMessage());
+            assertEquals("Missing required options [--out-dir=<outputDir>, params[0..*]=<inputFiles>]", ex.getMessage());
         }
 
         // no parameters were specified

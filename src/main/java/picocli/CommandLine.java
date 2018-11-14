@@ -1091,7 +1091,7 @@ public class CommandLine {
      * </p>
      *
      * @param args
-     *            the command line arguments to parse
+     *            The command line arguments to parse.
      * @return a list with the top-level command and any subcommands initialized by this method
      * @throws ParameterException
      *             if the specified command line arguments are invalid; use
@@ -1103,26 +1103,12 @@ public class CommandLine {
     }
 
     /**
-     * @param rawArgs
+     * @param args
      *            The raw command line arguments to parse.
      * @see #parse(String[])
      */
-    public List<CommandLine> parse(String rawArgs) {
-        return parse(translateCommandline(rawArgs));
-    }
-
-    /**
-     * @param args
-     *            The command line arguments to parse, either as a raw string or as a string array.
-     * @see #parse(String[])
-     */
-    public List<CommandLine> parse(Object args) {
-        if (args instanceof String[])
-            return parse((String[]) args);
-        else if (args instanceof String)
-            return parse((String) args);
-        else
-            throw new IllegalArgumentException();
+    public List<CommandLine> parseString(String args) {
+        return parse(translateCommandline(args));
     }
 
     /**
@@ -1134,7 +1120,7 @@ public class CommandLine {
      * </p>
      *
      * @param args
-     *            the command line arguments to parse
+     *            The command line arguments to parse.
      * @return a list with the top-level command and any subcommands initialized by this method
      * @throws ParameterException
      *             if the specified command line arguments are invalid; use
@@ -1147,26 +1133,12 @@ public class CommandLine {
     }
 
     /**
-     * @param rawArgs
+     * @param args
      *            The raw command line arguments to parse.
      * @see #parseArgs(String[])
      */
-    public ParseResult parseArgs(String rawArgs) {
-        return parseArgs(translateCommandline(rawArgs));
-    }
-
-    /**
-     * @param args
-     *            The command line arguments to parse, either as a raw string or as a string array.
-     * @see #parseArgs(String[])
-     */
-    public ParseResult parseArgs(Object args) {
-        if (args instanceof String[])
-            return parseArgs((String[]) args);
-        else if (args instanceof String)
-            return parseArgs((String) args);
-        else
-            throw new IllegalArgumentException();
+    public ParseResult parseArgsString(String args) {
+        return parseArgs(translateCommandline(args));
     }
 
     public ParseResult getParseResult() {

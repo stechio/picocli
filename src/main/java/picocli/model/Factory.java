@@ -13,7 +13,7 @@ public class Factory implements IFactory {
         }
     }
 
-    public static Iterable<String> createCompletionCandidates(IFactory factory,
+    public static Iterable<String> createChoiceValues(IFactory factory,
             Class<? extends Iterable<String>> cls) {
         return create(factory, cls);
     }

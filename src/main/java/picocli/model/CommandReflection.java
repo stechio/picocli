@@ -26,8 +26,8 @@ public class CommandReflection {
             boolean annotationsAreMandatory) {
         Class<?> cls = command.getClass();
         Tracer t = new Tracer();
-        t.debug("Creating CommandSpec for object of class %s with factory %s%n",
-                cls.getName(), factory.getClass().getName());
+        t.debug("Creating CommandSpec for object of class %s with factory %s%n", cls.getName(),
+                factory.getClass().getName());
         if (command instanceof CommandSpec) {
             return (CommandSpec) command;
         }
@@ -44,10 +44,9 @@ public class CommandReflection {
                 t.debug("Factory returned a %s instance%n", commandClassName);
             } catch (InitializationException ex) {
                 if (cls.isInterface()) {
-                    t.debug("%s. Creating Proxy for interface %s%n", ex.getCause(),
-                            cls.getName());
-                    instance = Proxy.newProxyInstance(cls.getClassLoader(),
-                            new Class<?>[] { cls }, new PicocliInvocationHandler());
+                    t.debug("%s. Creating Proxy for interface %s%n", ex.getCause(), cls.getName());
+                    instance = Proxy.newProxyInstance(cls.getClassLoader(), new Class<?>[] { cls },
+                            new PicocliInvocationHandler());
                 } else {
                     throw ex;
                 }
@@ -56,8 +55,7 @@ public class CommandReflection {
             cls = null; // don't mix in options/positional params from outer class @Command
         }
 
-        CommandSpec result = CommandSpec
-                .wrapWithoutInspection(Assert.notNull(instance, "command"));
+        CommandSpec result = CommandSpec.wrapWithoutInspection(Assert.notNull(instance, "command"));
 
         Stack<Class<?>> hierarchy = new Stack<Class<?>>();
         while (cls != null) {
@@ -68,8 +66,7 @@ public class CommandReflection {
         boolean mixinStandardHelpOptions = false;
         while (!hierarchy.isEmpty()) {
             cls = hierarchy.pop();
-            boolean thisCommandHasAnnotation = updateCommandAttributes(cls, result,
-                    factory);
+            boolean thisCommandHasAnnotation = updateCommandAttributes(cls, result, factory);
             hasCommandAnnotation |= thisCommandHasAnnotation;
             hasCommandAnnotation |= initFromAnnotatedFields(instance, cls, result, factory);
             if (cls.isAnnotationPresent(Command.class)) {
@@ -134,23 +131,23 @@ public class CommandReflection {
         for (Class<?> sub : cmd.subcommands()) {
             try {
                 if (Help.class == sub) {
-                    throw new InitializationException(Help.class.getName()
-                            + " is not a valid subcommand. Did you mean "
-                            + HelpCommand.class.getName() + "?");
+                    throw new InitializationException(
+                            Help.class.getName() + " is not a valid subcommand. Did you mean "
+                                    + HelpCommand.class.getName() + "?");
                 }
-                CommandLine subcommandLine = CommandLine.toCommandLine(factory.create(sub), factory);
+                CommandLine subcommandLine = CommandLine.toCommandLine(factory.create(sub),
+                        factory);
                 parent.addSubcommand(subcommandName(sub), subcommandLine);
                 initParentCommand(subcommandLine.getCommandSpec().userObject(),
                         parent.userObject());
             } catch (InitializationException ex) {
                 throw ex;
             } catch (NoSuchMethodException ex) {
-                throw new InitializationException("Cannot instantiate subcommand "
-                        + sub.getName() + ": the class has no constructor", ex);
+                throw new InitializationException("Cannot instantiate subcommand " + sub.getName()
+                        + ": the class has no constructor", ex);
             } catch (Exception ex) {
                 throw new InitializationException(
-                        "Could not instantiate and add subcommand " + sub.getName() + ": "
-                                + ex,
+                        "Could not instantiate and add subcommand " + sub.getName() + ": " + ex,
                         ex);
             }
         }
@@ -176,8 +173,8 @@ public class CommandReflection {
                 cls = cls.getSuperclass();
             }
         } catch (Exception ex) {
-            throw new InitializationException(
-                    "Unable to initialize @ParentCommand field: " + ex, ex);
+            throw new InitializationException("Unable to initialize @ParentCommand field: " + ex,
+                    ex);
         }
     }
 
@@ -190,22 +187,22 @@ public class CommandReflection {
         return subCommand.name();
     }
 
-    private static boolean initFromAnnotatedFields(Object scope, Class<?> cls,
-            CommandSpec receiver, IFactory factory) {
+    private static boolean initFromAnnotatedFields(Object scope, Class<?> cls, CommandSpec receiver,
+            IFactory factory) {
         boolean result = false;
         for (Field field : cls.getDeclaredFields()) {
-            result |= initFromAnnotatedTypedMembers(
-                    TypedMember.createIfAnnotated(field, scope), receiver, factory);
+            result |= initFromAnnotatedTypedMembers(TypedMember.createIfAnnotated(field, scope),
+                    receiver, factory);
         }
         for (Method method : cls.getDeclaredMethods()) {
-            result |= initFromAnnotatedTypedMembers(
-                    TypedMember.createIfAnnotated(method, scope), receiver, factory);
+            result |= initFromAnnotatedTypedMembers(TypedMember.createIfAnnotated(method, scope),
+                    receiver, factory);
         }
         return result;
     }
 
-    private static boolean initFromAnnotatedTypedMembers(TypedMember member,
-            CommandSpec receiver, IFactory factory) {
+    private static boolean initFromAnnotatedTypedMembers(TypedMember member, CommandSpec receiver,
+            IFactory factory) {
         boolean result = false;
         if (member == null) {
             return result;
@@ -225,11 +222,10 @@ public class CommandReflection {
             if (member.isOption()) {
                 receiver.addOption(ArgsReflection.extractOptionSpec(member, factory));
             } else if (member.isParameter()) {
-                receiver.addPositional(
-                        ArgsReflection.extractPositionalParamSpec(member, factory));
+                receiver.addPositional(ArgsReflection.extractPositionalParamSpec(member, factory));
             } else {
-                receiver.addPositional(ArgsReflection
-                        .extractUnannotatedPositionalParamSpec(member, factory));
+                receiver.addPositional(
+                        ArgsReflection.extractUnannotatedPositionalParamSpec(member, factory));
             }
         }
         if (member.isInjectSpec()) {
@@ -249,8 +245,7 @@ public class CommandReflection {
         int optionCount = 0;
         for (int i = 0, count = method.getParameterTypes().length; i < count; i++) {
             MethodParam param = new MethodParam(method, i);
-            if (param.isAnnotationPresent(Option.class)
-                    || param.isAnnotationPresent(Mixin.class)) {
+            if (param.isAnnotationPresent(Option.class) || param.isAnnotationPresent(Mixin.class)) {
                 optionCount++;
             } else {
                 param.position = i - optionCount;
@@ -269,8 +264,8 @@ public class CommandReflection {
         }
         if (member.isMixin() && member.isUnmatched()) {
             throw new DuplicateOptionAnnotationsException(
-                    "A member cannot be both a @Mixin command and an @Unmatched but '"
-                            + member + "' is both.");
+                    "A member cannot be both a @Mixin command and an @Unmatched but '" + member
+                            + "' is both.");
         }
     }
 
@@ -285,8 +280,7 @@ public class CommandReflection {
     private static void validateArgSpecField(TypedMember member) {
         if (member.isOption() && member.isParameter()) {
             throw new DuplicateOptionAnnotationsException(
-                    "A member can be either @Option or @Parameters, but '" + member
-                            + "' is both.");
+                    "A member can be either @Option or @Parameters, but '" + member + "' is both.");
         }
         if (member.isMixin() && member.isArgSpec()) {
             throw new DuplicateOptionAnnotationsException(
@@ -299,16 +293,15 @@ public class CommandReflection {
         Field field = (Field) member.accessible;
         if (Modifier.isFinal(field.getModifiers()) && (field.getType().isPrimitive()
                 || String.class.isAssignableFrom(field.getType()))) {
-            throw new InitializationException(
-                    "Constant (final) primitive and String fields like " + field
-                            + " cannot be used as "
-                            + (member.isOption() ? "an @Option" : "a @Parameter")
-                            + ": compile-time constant inlining may hide new values written to it.");
+            throw new InitializationException("Constant (final) primitive and String fields like "
+                    + field + " cannot be used as "
+                    + (member.isOption() ? "an @Option" : "a @Parameter")
+                    + ": compile-time constant inlining may hide new values written to it.");
         }
     }
 
-    private static void validateCommandSpec(CommandSpec result,
-            boolean hasCommandAnnotation, String commandClassName) {
+    private static void validateCommandSpec(CommandSpec result, boolean hasCommandAnnotation,
+            String commandClassName) {
         if (!hasCommandAnnotation && result.positionalParameters.isEmpty()
                 && result.optionsByNameMap.isEmpty() && result.unmatchedArgs.isEmpty()) {
             throw new InitializationException(commandClassName
@@ -324,8 +317,8 @@ public class CommandReflection {
         }
         if (member.isInjectSpec() && member.isUnmatched()) {
             throw new DuplicateOptionAnnotationsException(
-                    "A member cannot have both @Spec and @Unmatched annotations, but '"
-                            + member + "' has both.");
+                    "A member cannot have both @Spec and @Unmatched annotations, but '" + member
+                            + "' has both.");
         }
         if (member.isInjectSpec() && member.isMixin()) {
             throw new DuplicateOptionAnnotationsException(
@@ -358,12 +351,13 @@ public class CommandReflection {
     }
 
     private static UnmatchedArgsBinding buildUnmatchedForField(final TypedMember member) {
-        if (!(member.getType().equals(String[].class) || (List.class.isAssignableFrom(
-                member.getType()) && member.getGenericType() instanceof ParameterizedType
-                && ((ParameterizedType) member.getGenericType()).getActualTypeArguments()[0]
-                        .equals(String.class)))) {
-            throw new InitializationException("Invalid type for " + member
-                    + ": must be either String[] or List<String>");
+        if (!(member.getType().equals(String[].class)
+                || (List.class.isAssignableFrom(member.getType())
+                        && member.getGenericType() instanceof ParameterizedType
+                        && ((ParameterizedType) member.getGenericType()).getActualTypeArguments()[0]
+                                .equals(String.class)))) {
+            throw new InitializationException(
+                    "Invalid type for " + member + ": must be either String[] or List<String>");
         }
         if (member.getType().equals(String[].class)) {
             return UnmatchedArgsBinding.forStringArrayConsumer(member.setter());

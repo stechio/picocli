@@ -19,6 +19,7 @@ import picocli.annots.Parameters;
 import picocli.help.TextTable.Column;
 import picocli.model.ArgSpec;
 import picocli.model.CommandSpec;
+import picocli.model.ITypeConverter;
 import picocli.model.OptionSpec;
 import picocli.model.ParserSpec;
 import picocli.model.PositionalParamSpec;
@@ -26,6 +27,7 @@ import picocli.model.Range;
 import picocli.model.UsageMessageSpec;
 import picocli.util.Assert;
 import picocli.util.ListMap;
+import picocli.util.ObjectUtilsExt;
 import picocli.util.StringUtilsExt;
 import picocli.util.Utils;
 
@@ -112,7 +114,7 @@ public class Help {
 
         protected int getNameColumnWidth(Help help) {
             int max = 0;
-            IOptionRenderer optionRenderer = new OptionRenderer(false, " ");
+            IOptionRenderer optionRenderer = new OptionRenderer(false, false, " ");
             for (OptionSpec option : help.commandSpec().options()) {
                 Text[][] values = optionRenderer.render(option, help.rendering().paramLabel(),
                         help.colorScheme());
@@ -365,6 +367,137 @@ public class Help {
         }
     }
 
+    /**
+     * The OptionRenderer converts {@link OptionSpec Options} to five columns of text to match the
+     * default {@linkplain TextTable TextTable} column layout. The first row of values looks like
+     * this:
+     * <ol>
+     * <li>the required option marker (if the option is required)</li>
+     * <li>2-character short option name (or empty string if no short option exists)</li>
+     * <li>comma separator (only if both short option and long option exist, empty string
+     * otherwise)</li>
+     * <li>comma-separated string with long option name(s)</li>
+     * <li>first element of the {@link OptionSpec#description()} array</li>
+     * </ol>
+     * <p>
+     * Following this, there will be one row for each of the remaining elements of the
+     * {@link OptionSpec#description()} array, and these rows look like {@code {"", "", "",
+     * option.description()[i]}}.
+     * </p>
+     */
+    public static class OptionRenderer implements Help.IOptionRenderer {
+        private String requiredMarker = " ";
+        private boolean defaultValuesVisible;
+        private boolean choiceValuesVisible;
+        private String sep;
+
+        public OptionRenderer(boolean defaultValuesVisible, boolean choiceValuesVisible,
+                String requiredMarker) {
+            this.defaultValuesVisible = defaultValuesVisible;
+            this.choiceValuesVisible = choiceValuesVisible;
+            this.requiredMarker = Assert.notNull(requiredMarker, "requiredMarker");
+        }
+
+        @Override
+        public Text[][] render(OptionSpec option, Help.IParamLabelRenderer paramLabelRenderer,
+                ColorScheme scheme) {
+            String[] names = picocli.util.Comparators.Length.sortAsc(option.names());
+            int shortOptionCount = names[0].length() == 2 ? 1 : 0;
+            String shortOption = shortOptionCount > 0 ? names[0] : StringUtils.EMPTY;
+            sep = shortOptionCount > 0 && names.length > 1 ? "," : StringUtils.EMPTY;
+
+            String longOption = Utils.safeJoin(names, ", ", shortOptionCount, names.length);
+            Text longOptionText = createLongOptionText(option, paramLabelRenderer, scheme,
+                    longOption);
+
+            String requiredOption = option.required() ? requiredMarker : StringUtils.EMPTY;
+            return renderDescriptionLines(option, scheme, requiredOption, shortOption,
+                    longOptionText);
+        }
+
+        private Text createLongOptionText(OptionSpec option, Help.IParamLabelRenderer renderer,
+                ColorScheme scheme, String longOption) {
+            Text paramLabelText = renderer.renderParameterLabel(option, scheme.ansi(),
+                    scheme.optionParamStyles);
+
+            // if no long option, fill in the space between the short option name and the param label value
+            if (!paramLabelText.isEmpty() && longOption.isEmpty()) {
+                sep = renderer.separator();
+                // #181 paramLabelText may be =LABEL or [=LABEL...]
+                int sepStart = paramLabelText.toPlainString().indexOf(sep);
+                paramLabelText = paramLabelText.subSequence(0, sepStart)
+                        .append(paramLabelText.subSequence(sepStart + sep.length()));
+            }
+            return scheme.optionText(longOption).append(paramLabelText);
+        }
+
+        private Text[][] renderDescriptionLines(OptionSpec option, ColorScheme scheme,
+                String requiredOption, String shortOption, Text longOptionText) {
+            Text EMPTY = Ansi.EMPTY_TEXT;
+            boolean[] showDefault = { option.internalShowDefaultValue(defaultValuesVisible) };
+            List<Text[]> result = new ArrayList<>();
+            String[] description = option.renderedDescription();
+            Text[] descriptionFirstLines = createDescriptionFirstLines(scheme, option, description,
+                    showDefault);
+            result.add(new Text[] { scheme.optionText(requiredOption),
+                    scheme.optionText(shortOption), new Text(scheme.ansi(), sep), longOptionText,
+                    descriptionFirstLines[0] });
+            for (int i = 1; i < descriptionFirstLines.length; i++) {
+                result.add(new Text[] { EMPTY, EMPTY, EMPTY, EMPTY, descriptionFirstLines[i] });
+            }
+            for (int i = 1; i < description.length; i++) {
+                Text[] descriptionNextLines = new Text(scheme.ansi(), description[i]).splitLines();
+                for (Text line : descriptionNextLines) {
+                    result.add(new Text[] { EMPTY, EMPTY, EMPTY, EMPTY, line });
+                }
+            }
+            if (showDefault[0]) {
+                addTrailingDefaultLine(result, option, scheme);
+            }
+            if (choiceValuesVisible && Utils.isNotEmptyAtAll(option.choiceValues())) {
+                ITypeConverter<?> converter = ObjectUtilsExt.safeGet(option.converters(), 0);
+                Text valuesText = null;
+                boolean fullListing = false;
+                for (String choiceValue : option.choiceValues()) {
+                    String valueDescription = null;
+                    if (converter != null) {
+                        valueDescription = StringUtils
+                                .trimToNull(converter.descriptionOf(choiceValue));
+                    }
+
+                    if (!fullListing) {
+                        if (valuesText != null) {
+                            valuesText.append(", ");
+                        } else {
+                            valuesText = new Text(scheme.ansi, "VALUES: ");
+
+                            fullListing = (valueDescription != null);
+                            if (fullListing) {
+                                result.add(new Text[] { EMPTY, EMPTY, EMPTY, EMPTY, valuesText });
+                            }
+                        }
+                    }
+                    if (fullListing) {
+                        valuesText = new Text(scheme.ansi, "  * ");
+                    }
+                    valuesText.append(choiceValue);
+                    if (valueDescription != null) {
+                        valuesText.append(" (").append(StringUtils.uncapitalize(valueDescription))
+                                .append(')');
+                    }
+                    if (fullListing) {
+                        result.add(new Text[] { EMPTY, EMPTY, EMPTY, EMPTY, valuesText });
+                    }
+                }
+                if (!fullListing) {
+                    valuesText.append('.');
+                    result.add(new Text[] { EMPTY, EMPTY, EMPTY, EMPTY, valuesText });
+                }
+            }
+            return result.toArray(new Text[result.size()][]);
+        }
+    }
+
     public static class ParameterListRenderer extends ArgumentListRenderer<PositionalParamSpec> {
         @Override
         protected Comparator<PositionalParamSpec> getComparator(CommandSpec commandSpec) {
@@ -432,7 +565,9 @@ public class Help {
 
         @Override
         public IOptionRenderer createOptionRenderer() {
-            return new OptionRenderer(help.commandSpec().usageMessage().showDefaultValues(),
+            return new OptionRenderer(help.commandSpec().usageMessage().isDefaultValuesVisible(),
+                    //TODO:parameterize choiceValuesVisible
+                    true,
                     Character.toString(help.commandSpec().usageMessage().requiredOptionMarker()));
         }
 
@@ -443,7 +578,7 @@ public class Help {
 
         @Override
         public IParameterRenderer createParameterRenderer() {
-            return new ParameterRenderer(help.commandSpec().usageMessage().showDefaultValues(),
+            return new ParameterRenderer(help.commandSpec().usageMessage().isDefaultValuesVisible(),
                     Character.toString(help.commandSpec().usageMessage().requiredOptionMarker()));
         }
 
@@ -860,94 +995,6 @@ public class Help {
     }
 
     /**
-     * The OptionRenderer converts {@link OptionSpec Options} to five columns of text to match the
-     * default {@linkplain TextTable TextTable} column layout. The first row of values looks like
-     * this:
-     * <ol>
-     * <li>the required option marker (if the option is required)</li>
-     * <li>2-character short option name (or empty string if no short option exists)</li>
-     * <li>comma separator (only if both short option and long option exist, empty string
-     * otherwise)</li>
-     * <li>comma-separated string with long option name(s)</li>
-     * <li>first element of the {@link OptionSpec#description()} array</li>
-     * </ol>
-     * <p>
-     * Following this, there will be one row for each of the remaining elements of the
-     * {@link OptionSpec#description()} array, and these rows look like {@code {"", "", "",
-     * option.description()[i]}}.
-     * </p>
-     */
-    static class OptionRenderer implements Help.IOptionRenderer {
-        private String requiredMarker = " ";
-        private boolean showDefaultValues;
-        private String sep;
-
-        public OptionRenderer(boolean showDefaultValues, String requiredMarker) {
-            this.showDefaultValues = showDefaultValues;
-            this.requiredMarker = Assert.notNull(requiredMarker, "requiredMarker");
-        }
-
-        @Override
-        public Text[][] render(OptionSpec option, Help.IParamLabelRenderer paramLabelRenderer,
-                ColorScheme scheme) {
-            String[] names = picocli.util.Comparators.Length.sortAsc(option.names());
-            int shortOptionCount = names[0].length() == 2 ? 1 : 0;
-            String shortOption = shortOptionCount > 0 ? names[0] : StringUtils.EMPTY;
-            sep = shortOptionCount > 0 && names.length > 1 ? "," : StringUtils.EMPTY;
-
-            String longOption = Utils.safeJoin(names, ", ", shortOptionCount, names.length);
-            Text longOptionText = createLongOptionText(option, paramLabelRenderer, scheme,
-                    longOption);
-
-            String requiredOption = option.required() ? requiredMarker : StringUtils.EMPTY;
-            return renderDescriptionLines(option, scheme, requiredOption, shortOption,
-                    longOptionText);
-        }
-
-        private Text createLongOptionText(OptionSpec option, Help.IParamLabelRenderer renderer,
-                ColorScheme scheme, String longOption) {
-            Text paramLabelText = renderer.renderParameterLabel(option, scheme.ansi(),
-                    scheme.optionParamStyles);
-
-            // if no long option, fill in the space between the short option name and the param label value
-            if (!paramLabelText.isEmpty() && longOption.isEmpty()) {
-                sep = renderer.separator();
-                // #181 paramLabelText may be =LABEL or [=LABEL...]
-                int sepStart = paramLabelText.toPlainString().indexOf(sep);
-                paramLabelText = paramLabelText.substring(0, sepStart)
-                        .append(paramLabelText.substring(sepStart + sep.length()));
-            }
-            return scheme.optionText(longOption).append(paramLabelText);
-        }
-
-        private Text[][] renderDescriptionLines(OptionSpec option, ColorScheme scheme,
-                String requiredOption, String shortOption, Text longOptionText) {
-            Text EMPTY = Ansi.EMPTY_TEXT;
-            boolean[] showDefault = { option.internalShowDefaultValue(showDefaultValues) };
-            List<Text[]> result = new ArrayList<>();
-            String[] description = option.renderedDescription();
-            Text[] descriptionFirstLines = createDescriptionFirstLines(scheme, option, description,
-                    showDefault);
-            result.add(new Text[] { scheme.optionText(requiredOption),
-                    scheme.optionText(shortOption), new Text(scheme.ansi(), sep), longOptionText,
-                    descriptionFirstLines[0] });
-            for (int i = 1; i < descriptionFirstLines.length; i++) {
-                result.add(new Text[] { EMPTY, EMPTY, EMPTY, EMPTY, descriptionFirstLines[i] });
-            }
-            for (int i = 1; i < description.length; i++) {
-                Text[] descriptionNextLines = new Text(scheme.ansi(), description[i]).splitLines();
-                for (Text line : descriptionNextLines) {
-                    result.add(new Text[] { EMPTY, EMPTY, EMPTY, EMPTY, line });
-                }
-            }
-            if (showDefault[0]) {
-                addTrailingDefaultLine(result, option, scheme);
-            }
-            return result.toArray(new Text[result.size()][]);
-        }
-    }
-
-    /**
      * The ParameterRenderer converts {@linkplain PositionalParamSpec positional parameters} to five
      * columns of text to match the default {@linkplain TextTable TextTable} column layout. The
      * first row of values looks like this:
@@ -966,10 +1013,10 @@ public class Help {
      */
     static class ParameterRenderer implements Help.IParameterRenderer {
         private String requiredMarker = " ";
-        private boolean showDefaultValues;
+        private boolean defaultValuesVisible;
 
-        public ParameterRenderer(boolean showDefaultValues, String requiredMarker) {
-            this.showDefaultValues = showDefaultValues;
+        public ParameterRenderer(boolean defaultValuesVisible, String requiredMarker) {
+            this.defaultValuesVisible = defaultValuesVisible;
             this.requiredMarker = Assert.notNull(requiredMarker, "requiredMarker");
         }
 
@@ -982,7 +1029,7 @@ public class Help {
                     .parameterText(param.arity().min > 0 ? requiredMarker : StringUtils.EMPTY);
 
             Text EMPTY = Ansi.EMPTY_TEXT;
-            boolean[] showDefault = { param.internalShowDefaultValue(showDefaultValues) };
+            boolean[] showDefault = { param.internalShowDefaultValue(defaultValuesVisible) };
             List<Text[]> result = new ArrayList<>();
             String[] description = param.renderedDescription();
             Text[] descriptionFirstLines = createDescriptionFirstLines(scheme, param, description,
@@ -1138,17 +1185,19 @@ public class Help {
     private static void addTrailingDefaultLine(List<Text[]> result, ArgSpec arg,
             ColorScheme scheme) {
         Text EMPTY = Ansi.EMPTY_TEXT;
-        result.add(new Text[] { EMPTY, EMPTY, EMPTY, EMPTY,
-                new Text(scheme.ansi(), "  Default: " + arg.defaultValueString()) });
+        result.add(new Text[] { EMPTY, EMPTY, EMPTY, EMPTY, createDefaultValueText(arg, scheme) });
+    }
+
+    private static Text createDefaultValueText(ArgSpec arg, ColorScheme scheme) {
+        return new Text(scheme.ansi(), "DEFAULT: ").append(arg.defaultValueString());
     }
 
     private static Text[] createDescriptionFirstLines(ColorScheme scheme, ArgSpec arg,
             String[] description, boolean[] showDefault) {
         Text[] result = new Text(scheme.ansi(), Utils.safeGet(description, 0)).splitLines();
-        if (result.length == 0 || (result.length == 1 && result[0].isEmpty())) {
+        if (Utils.isEmptyAtAll(result)) {
             if (showDefault[0]) {
-                result = new Text[] {
-                        new Text(scheme.ansi(), "  Default: " + arg.defaultValueString()) };
+                result = new Text[] { createDefaultValueText(arg, scheme) };
                 showDefault[0] = false; // don't show the default value twice
             } else {
                 result = new Text[] { Ansi.EMPTY_TEXT };

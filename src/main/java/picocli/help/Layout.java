@@ -57,7 +57,7 @@ public class Layout {
      *            the TextTable to lay out parts of the usage help message in tabular format
      */
     public Layout(ColorScheme colorScheme, TextTable textTable) {
-        this(colorScheme, textTable, new OptionRenderer(false, " "),
+        this(colorScheme, textTable, new OptionRenderer(false, false, " "),
                 new ParameterRenderer(false, " "));
     }
 

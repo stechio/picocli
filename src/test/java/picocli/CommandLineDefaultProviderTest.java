@@ -29,26 +29,25 @@ public class CommandLineDefaultProviderTest {
         }
     }
 
-    @Command(defaultValueProvider = TestDefaultProvider.class,
-            abbreviateSynopsis = true)
+    @Command(defaultValueProvider = TestDefaultProvider.class, abbreviateSynopsis = true)
     static class App {
-        @Option(names = "-a", description = "Default: ${DEFAULT-VALUE}")
+        @Option(names = "-a")
         private String optionStringFieldWithoutDefaultNorInitialValue;
-        @Option(names = "-b", description = "Default: ${DEFAULT-VALUE}", defaultValue = "Annotated default value")
+        @Option(names = "-b", defaultValue = "Annotated default value")
         private String optionStringFieldWithAnnotatedDefault;
-        @Option(names = "-c", description = "Default: ${DEFAULT-VALUE}", showDefaultValue = Help.Visibility.ALWAYS)
+        @Option(names = "-c",showDefaultValue = Help.Visibility.ALWAYS)
         private String optionStringFieldWithInitDefault = "Initial default value";
 
-        @Parameters(arity = "0..1", description = "Default: ${DEFAULT-VALUE}", showDefaultValue = Help.Visibility.ALWAYS)
+        @Parameters(arity = "0..1", showDefaultValue = Help.Visibility.ALWAYS)
         private String paramStringFieldWithoutDefaultNorInitialValue;
-        @Parameters(arity = "0..1", description = "Default: ${DEFAULT-VALUE}", defaultValue = "Annotated default value")
+        @Parameters(arity = "0..1", defaultValue = "Annotated default value")
         private String paramStringFieldWithAnnotatedDefault;
-        @Parameters(arity = "0..1", description = "Default: ${DEFAULT-VALUE}")
+        @Parameters(arity = "0..1")
         private String paramStringFieldWithInitDefault = "Initial default value";
 
         private String stringForSetterDefault;
 
-        @Option(names = "-d", description = "Default: ${DEFAULT-VALUE}", defaultValue = "Annotated setter default value")
+        @Option(names = "-d", defaultValue = "Annotated setter default value")
         void setString(String val) {
             stringForSetterDefault = val;
         }
@@ -78,7 +77,6 @@ public class CommandLineDefaultProviderTest {
         }
     }
 
-
     @Test
     public void testCommandDefaultProviderByAnnotationOverridesValues() {
         CommandLine cmd = new CommandLine(App.class);
@@ -86,8 +84,10 @@ public class CommandLineDefaultProviderTest {
 
         App app = cmd.getCommand();
         // if no default defined on the option, command default provider should be used
-        assertEquals("Default provider string value", app.optionStringFieldWithoutDefaultNorInitialValue);
-        assertEquals("Default provider string value", app.paramStringFieldWithoutDefaultNorInitialValue);
+        assertEquals("Default provider string value",
+                app.optionStringFieldWithoutDefaultNorInitialValue);
+        assertEquals("Default provider string value",
+                app.paramStringFieldWithoutDefaultNorInitialValue);
         // if a default is defined on the option either by annotation or by initial value, it must
         // override the default provider.
         assertEquals("Default provider string value", app.optionStringFieldWithAnnotatedDefault);
@@ -146,7 +146,8 @@ public class CommandLineDefaultProviderTest {
         cmd.setDefaultValueProvider(new TestDefaultProvider());
 
         assertNotNull(subCommandLine.getCommandSpec().defaultValueProvider());
-        assertEquals(TestDefaultProvider.class, subCommandLine.getCommandSpec().defaultValueProvider().getClass());
+        assertEquals(TestDefaultProvider.class,
+                subCommandLine.getCommandSpec().defaultValueProvider().getClass());
     }
 
     @Test
@@ -158,51 +159,40 @@ public class CommandLineDefaultProviderTest {
 
         App app = cmd.getCommand();
         // if no default defined on the option, command default provider should be used
-        assertEquals("Default provider string value", app.optionStringFieldWithoutDefaultNorInitialValue);
+        assertEquals("Default provider string value",
+                app.optionStringFieldWithoutDefaultNorInitialValue);
     }
 
     @Test
     public void testDefaultValueInDescription() {
-        String expected = String.format("" +
-                "Usage: <main class> [OPTIONS] [<paramStringFieldWithoutDefaultNorInitialValue>] [<paramStringFieldWithAnnotatedDefault>] [<paramStringFieldWithInitDefault>]%n" +
-                "      [<paramStringFieldWithoutDefaultNorInitialValue>]%n" +
-                "                 Default: Default provider string value%n" +
-                "                   Default: Default provider string value%n" +
-                "      [<paramStringFieldWithAnnotatedDefault>]%n" +
-                "                 Default: Default provider string value%n" +
-                "      [<paramStringFieldWithInitDefault>]%n" +
-                "                 Default: Default provider string value%n" +
-                "  -a= <optionStringFieldWithoutDefaultNorInitialValue>%n" +
-                "                 Default: Default provider string value%n" +
-                "  -b= <optionStringFieldWithAnnotatedDefault>%n" +
-                "                 Default: Default provider string value%n" +
-                "  -c= <optionStringFieldWithInitDefault>%n" +
-                "                 Default: Default provider string value%n" +
-                "                   Default: Default provider string value%n" +
-                "  -d= <string>   Default: Default provider string value%n");
+        String expected = String.format(""
+                + "Usage: <main class> [OPTIONS] [<paramStringFieldWithoutDefaultNorInitialValue>] [<paramStringFieldWithAnnotatedDefault>] [<paramStringFieldWithInitDefault>]%n"
+                + "      [<paramStringFieldWithoutDefaultNorInitialValue>]%n"
+                + "                 DEFAULT: Default provider string value%n"
+                + "      [<paramStringFieldWithAnnotatedDefault>]%n"
+                + "      [<paramStringFieldWithInitDefault>]%n"
+                + "  -a= <optionStringFieldWithoutDefaultNorInitialValue>%n"
+                + "  -b= <optionStringFieldWithAnnotatedDefault>%n"
+                + "  -c= <optionStringFieldWithInitDefault>%n"
+                + "                 DEFAULT: Default provider string value%n"
+                + "  -d= <string>%n");
         CommandLine cmd = new CommandLine(App.class);
         assertEquals(expected, cmd.getUsageMessage(Ansi.OFF));
     }
 
     @Test
     public void testDefaultValueInDescriptionAfterSetProvider() {
-        String expected2 = String.format("" +
-                "Usage: <main class> [OPTIONS] [<paramStringFieldWithoutDefaultNorInitialValue>] [<paramStringFieldWithAnnotatedDefault>] [<paramStringFieldWithInitDefault>]%n" +
-                "      [<paramStringFieldWithoutDefaultNorInitialValue>]%n" +
-                "                 Default: XYZ%n" +
-                "                   Default: XYZ%n" +
-                "      [<paramStringFieldWithAnnotatedDefault>]%n" +
-                "                 Default: XYZ%n" +
-                "      [<paramStringFieldWithInitDefault>]%n" +
-                "                 Default: XYZ%n" +
-                "  -a= <optionStringFieldWithoutDefaultNorInitialValue>%n" +
-                "                 Default: XYZ%n" +
-                "  -b= <optionStringFieldWithAnnotatedDefault>%n" +
-                "                 Default: XYZ%n" +
-                "  -c= <optionStringFieldWithInitDefault>%n" +
-                "                 Default: XYZ%n" +
-                "                   Default: XYZ%n" +
-                "  -d= <string>   Default: XYZ%n");
+        String expected2 = String.format(""
+                + "Usage: <main class> [OPTIONS] [<paramStringFieldWithoutDefaultNorInitialValue>] [<paramStringFieldWithAnnotatedDefault>] [<paramStringFieldWithInitDefault>]%n"
+                + "      [<paramStringFieldWithoutDefaultNorInitialValue>]%n"
+                + "                 DEFAULT: XYZ%n"
+                + "      [<paramStringFieldWithAnnotatedDefault>]%n"
+                + "      [<paramStringFieldWithInitDefault>]%n"
+                + "  -a= <optionStringFieldWithoutDefaultNorInitialValue>%n"
+                + "  -b= <optionStringFieldWithAnnotatedDefault>%n"
+                + "  -c= <optionStringFieldWithInitDefault>%n"
+                + "                 DEFAULT: XYZ%n"
+                + "  -d= <string>%n");
         CommandLine cmd = new CommandLine(App.class);
         cmd.setDefaultValueProvider(new IDefaultValueProvider() {
             public String defaultValue(ArgSpec argSpec) throws Exception {
@@ -214,23 +204,17 @@ public class CommandLineDefaultProviderTest {
 
     @Test
     public void testDefaultValueInDescriptionWithErrorProvider() {
-        String expected2 = String.format("" +
-                "Usage: <main class> [OPTIONS] [<paramStringFieldWithoutDefaultNorInitialValue>] [<paramStringFieldWithAnnotatedDefault>] [<paramStringFieldWithInitDefault>]%n" +
-                "      [<paramStringFieldWithoutDefaultNorInitialValue>]%n" +
-                "                 Default: null%n" +
-                "                   Default: null%n" +
-                "      [<paramStringFieldWithAnnotatedDefault>]%n" +
-                "                 Default: Annotated default value%n" +
-                "      [<paramStringFieldWithInitDefault>]%n" +
-                "                 Default: Initial default value%n" +
-                "  -a= <optionStringFieldWithoutDefaultNorInitialValue>%n" +
-                "                 Default: null%n" +
-                "  -b= <optionStringFieldWithAnnotatedDefault>%n" +
-                "                 Default: Annotated default value%n" +
-                "  -c= <optionStringFieldWithInitDefault>%n" +
-                "                 Default: Initial default value%n" +
-                "                   Default: Initial default value%n" +
-                "  -d= <string>   Default: Annotated setter default value%n");
+        String expected2 = String.format(""
+                + "Usage: <main class> [OPTIONS] [<paramStringFieldWithoutDefaultNorInitialValue>] [<paramStringFieldWithAnnotatedDefault>] [<paramStringFieldWithInitDefault>]%n"
+                + "      [<paramStringFieldWithoutDefaultNorInitialValue>]%n"
+                + "                 DEFAULT: null%n"
+                + "      [<paramStringFieldWithAnnotatedDefault>]%n"
+                + "      [<paramStringFieldWithInitDefault>]%n"
+                + "  -a= <optionStringFieldWithoutDefaultNorInitialValue>%n"
+                + "  -b= <optionStringFieldWithAnnotatedDefault>%n"
+                + "  -c= <optionStringFieldWithInitDefault>%n"
+                + "                 DEFAULT: Initial default value%n"
+                + "  -d= <string>%n");
         CommandLine cmd = new CommandLine(App.class);
         cmd.setDefaultValueProvider(new IDefaultValueProvider() {
             public String defaultValue(ArgSpec argSpec) throws Exception {

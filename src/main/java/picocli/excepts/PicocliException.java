@@ -20,4 +20,8 @@ public class PicocliException extends RuntimeException {
     public PicocliException(String msg, Throwable t) {
         super(msg, t);
     }
+
+    public PicocliException(Throwable t) {
+        super(t);
+    }
 }

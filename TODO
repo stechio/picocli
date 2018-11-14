@@ -1,0 +1,27 @@
+NEW FEATURES
+- Customizable Help
+ISSUE: at the moment, usage message structure is hard coded.
+SOLUTION: Customizable sections (title+body, named sections, dynamic sections,
+renderers for each and every element, renderer factory)
+
+- Custom bidirectional type converters
+ISSUE: at the moment, values are represented through their default image only.
+SOLUTION: commandline/domain mapping through a custom member (see ITypeConverter) 
+would allow alternate representations.
+For example, an enum may use a field other than name() to be represented on 
+commandline.
+
+- Description providers for VALUES (aka completion candidates)
+ISSUE: at the moment, no description is available for completion candidates 
+(they are just briefly listed).
+SOLUTION: as such elements may belong to external implementations, annotation is
+not a viable way to define descriptions: a description provider would allow 
+per-element descriptions.
+IDescriptionProvider<T> {
+    String getDescription(T value);
+}
+
+- ENHANCEMENTS
+-- Text objects redefined as Appendable (overall code improvements)
+-- ${COMPLETION-CANDIDATES} description variable removed (redundant, as VALUES 
+are appended at the tail of the argument description)

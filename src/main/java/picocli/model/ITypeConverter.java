@@ -5,9 +5,9 @@ import picocli.annots.Parameters;
 
 /**
  * <p>
- * When parsing command line arguments and initializing fields annotated with
- * {@link Option @Option} or {@link Parameters @Parameters}, String values can be converted to
- * any type for which a {@code ITypeConverter} is registered.
+ * When parsing command line arguments and initializing fields annotated with {@link Option @Option}
+ * or {@link Parameters @Parameters}, String values can be converted to any type for which a
+ * {@code ITypeConverter} is registered.
  * </p>
  * <p>
  * This interface defines the contract for classes that know how to convert a String into some
@@ -46,18 +46,34 @@ import picocli.annots.Parameters;
  * <li>String</li>
  * </ul>
  * 
- * @param <K>
+ * @param <T>
  *            the type of the object that is the result of the conversion
  */
-public interface ITypeConverter<K> {
+public interface ITypeConverter<T> {
     /**
-     * Converts the specified command line argument value to some domain object.
+     * Gets the description of the given value.
      * 
      * @param value
-     *            the command line argument String value
-     * @return the resulting domain object
-     * @throws Exception
-     *             an exception detailing what went wrong during the conversion
+     *            Either model or view value.
+     * @return
      */
-    K convert(String value) throws Exception;
+    default String descriptionOf(Object value) {
+        return null;
+    }
+
+    /**
+     * Converts the specified command line argument value to its corresponding domain object.
+     * 
+     * @param value
+     *            Command line argument value.
+     */
+    T modelOf(String value);
+
+    /**
+     * Converts the specified domain object to its corresponding command line argument value.
+     * 
+     * @param value
+     *            Domain object.
+     */
+    String viewOf(Object value);
 }

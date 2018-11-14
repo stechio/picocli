@@ -1264,8 +1264,9 @@ public class CommandLineModelTest {
                 return null;
             }
         };
-        ITypeConverter<Integer> converter = new ITypeConverter<Integer>() {
-            public Integer convert(String value) throws Exception {
+        ITypeConverter<Integer> converter = new TypeConverter<Integer>() {
+            @Override
+            public Integer modelOf(String value) {
                 return null;
             }
         };
@@ -1327,8 +1328,9 @@ public class CommandLineModelTest {
                 return null;
             }
         };
-        ITypeConverter<Integer> converter = new ITypeConverter<Integer>() {
-            public Integer convert(String value) throws Exception {
+        ITypeConverter<Integer> converter = new TypeConverter<Integer>() {
+            @Override
+            public Integer modelOf(String value) {
                 return null;
             }
         };

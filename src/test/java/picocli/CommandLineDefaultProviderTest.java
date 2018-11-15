@@ -171,11 +171,11 @@ public class CommandLineDefaultProviderTest {
                 + "                 DEFAULT: Default provider string value%n"
                 + "      [<paramStringFieldWithAnnotatedDefault>]%n"
                 + "      [<paramStringFieldWithInitDefault>]%n"
-                + "  -a= <optionStringFieldWithoutDefaultNorInitialValue>%n"
-                + "  -b= <optionStringFieldWithAnnotatedDefault>%n"
-                + "  -c= <optionStringFieldWithInitDefault>%n"
+                + "  -a=<optionStringFieldWithoutDefaultNorInitialValue>%n"
+                + "  -b=<optionStringFieldWithAnnotatedDefault>%n"
+                + "  -c=<optionStringFieldWithInitDefault>%n"
                 + "                 DEFAULT: Default provider string value%n"
-                + "  -d= <string>%n");
+                + "  -d=<string>%n");
         CommandLine cmd = new CommandLine(App.class);
         assertEquals(expected, cmd.getUsageMessage(Ansi.OFF));
     }
@@ -188,11 +188,11 @@ public class CommandLineDefaultProviderTest {
                 + "                 DEFAULT: XYZ%n"
                 + "      [<paramStringFieldWithAnnotatedDefault>]%n"
                 + "      [<paramStringFieldWithInitDefault>]%n"
-                + "  -a= <optionStringFieldWithoutDefaultNorInitialValue>%n"
-                + "  -b= <optionStringFieldWithAnnotatedDefault>%n"
-                + "  -c= <optionStringFieldWithInitDefault>%n"
+                + "  -a=<optionStringFieldWithoutDefaultNorInitialValue>%n"
+                + "  -b=<optionStringFieldWithAnnotatedDefault>%n"
+                + "  -c=<optionStringFieldWithInitDefault>%n"
                 + "                 DEFAULT: XYZ%n"
-                + "  -d= <string>%n");
+                + "  -d=<string>%n");
         CommandLine cmd = new CommandLine(App.class);
         cmd.setDefaultValueProvider(new IDefaultValueProvider() {
             public String defaultValue(ArgSpec argSpec) throws Exception {
@@ -210,11 +210,11 @@ public class CommandLineDefaultProviderTest {
                 + "                 DEFAULT: null%n"
                 + "      [<paramStringFieldWithAnnotatedDefault>]%n"
                 + "      [<paramStringFieldWithInitDefault>]%n"
-                + "  -a= <optionStringFieldWithoutDefaultNorInitialValue>%n"
-                + "  -b= <optionStringFieldWithAnnotatedDefault>%n"
-                + "  -c= <optionStringFieldWithInitDefault>%n"
+                + "  -a=<optionStringFieldWithoutDefaultNorInitialValue>%n"
+                + "  -b=<optionStringFieldWithAnnotatedDefault>%n"
+                + "  -c=<optionStringFieldWithInitDefault>%n"
                 + "                 DEFAULT: Initial default value%n"
-                + "  -d= <string>%n");
+                + "  -d=<string>%n");
         CommandLine cmd = new CommandLine(App.class);
         cmd.setDefaultValueProvider(new IDefaultValueProvider() {
             public String defaultValue(ArgSpec argSpec) throws Exception {

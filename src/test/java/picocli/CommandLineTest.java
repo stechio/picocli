@@ -218,7 +218,7 @@ public class CommandLineTest {
 
     @Test
     public void testVersion() {
-        assertEquals("3.8.0-SNAPSHOT", CommandLine.VERSION);
+        assertEquals("4.0.0-SNAPSHOT", CommandLine.VERSION);
     }
 
     @Test

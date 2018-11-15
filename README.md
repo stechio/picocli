@@ -44,7 +44,7 @@ Picocli-based applications can easily [integrate](https://picocli.info/#_depende
 ![Picocli Demo help message with ANSI colors](docs/images/picocli.Demo.png?raw=true)
 
 ### Releases
-* [Releases](https://github.com/remkop/picocli/releases) - latest: 3.7.0
+* [Releases](https://github.com/remkop/picocli/releases) - latest: 3.8.0
 * [Picocli 3.0.0 Release Notes](https://github.com/remkop/picocli/releases/tag/v3.0.0) - note there are some [potential breaking changes](https://github.com/remkop/picocli/releases/tag/v3.0.0#3.0.0-breaking-changes) from prior versions
 * [Picocli 2.0 Release Notes](https://github.com/remkop/picocli/releases/tag/v2.0.0) - note there are some [potential breaking changes](https://github.com/remkop/picocli/releases/tag/v2.0.0#2.0-breaking-changes) from prior versions
 
@@ -81,7 +81,7 @@ Picocli-based applications can easily [integrate](https://picocli.info/#_depende
 
 ## Adoption
 
-<img src="https://picocli.info/images/groovy-logo.png" height="50">  <img src="http://micronaut.io/images/micronaut_mini_copy_tm.svg" height="50">  <img src="https://picocli.info/images/junit5logo-172x50.png" height="50">  <img src="https://picocli.info/images/debian-logo-192x50.png" height="50"> <img src="https://picocli.info/images/karate-logo.png" height="50" width="50"/>  <img src="https://picocli.info/images/checkstyle-logo-260x50.png" height="50">  <img src="https://picocli.info/images/ballerina-logo.png" height="50">  
+<img src="https://picocli.info/images/groovy-logo.png" height="50">  <img src="https://picocli.info/images/1x1.png" width="10"> <img src="http://micronaut.io/images/micronaut_mini_copy_tm.svg" height="50">  <img src="https://picocli.info/images/1x1.png" width="10"><img src="https://picocli.info/images/junit5logo-172x50.png" height="50"> <img src="https://picocli.info/images/1x1.png" width="10"> <img src="https://picocli.info/images/debian-logo-192x50.png" height="50"> <img src="https://picocli.info/images/1x1.png" width="10"> <img src="https://picocli.info/images/karate-logo.png" height="50" width="50"/>  <img src="https://picocli.info/images/checkstyle-logo-260x50.png" height="50"><img src="https://picocli.info/images/1x1.png" width="10">  <img src="https://picocli.info/images/ballerina-logo.png" height="40">  
 
 * Picocli is now part of Groovy. From Groovy 2.5, all Groovy command line tools are picocli-based, and picocli is the underlying parser for Groovy's [CliBuilder DSL](http://groovy-lang.org/dsls.html#_clibuilder). 
 * Picocli is now part of Micronaut. The Micronaut CLI has been rewritten with picocli, and Micronaut has dedicated support for running microservices [standalone with picocli](https://docs.micronaut.io/snapshot/guide/index.html#commandLineApps).
@@ -89,7 +89,7 @@ Picocli-based applications can easily [integrate](https://picocli.info/#_depende
 * Debian now offers a [libpicocli-java package](https://tracker.debian.org/pkg/picocli). Thanks to [Miroslav Kravec](https://udd.debian.org/dmd/?kravec.miroslav%40gmail.com).
 * Picocli is used in the Intuit [Karate](https://github.com/intuit/karate) standalone JAR / executable.
 * Picocli is part of [Ballerina](https://ballerina.io/). Ballerina uses picocli for all its command line utilities.
-* Picocli is used in the [CheckStyle](https://checkstyle.org/cmdline.html) standalone JAR / executable.
+* Picocli is used in the [CheckStyle](https://checkstyle.org/cmdline.html) standalone JAR / executable from Checkstyle 8.15.
 
 <img src="https://picocli.info/images/downloads-201808.png">
 
@@ -175,35 +175,35 @@ See the [source code](https://github.com/remkop/picocli/blob/master/src/main/jav
 
 ### Gradle
 ```
-compile 'info.picocli:picocli:3.7.0'
+compile 'info.picocli:picocli:3.8.0'
 ```
 ### Maven
 ```
 <dependency>
   <groupId>info.picocli</groupId>
   <artifactId>picocli</artifactId>
-  <version>3.7.0</version>
+  <version>3.8.0</version>
 </dependency>
 ```
 ### Scala SBT
 ```
-libraryDependencies += "info.picocli" % "picocli" % "3.7.0"
+libraryDependencies += "info.picocli" % "picocli" % "3.8.0"
 ```
 ### Ivy
 ```
-<dependency org="info.picocli" name="picocli" rev="3.7.0" />
+<dependency org="info.picocli" name="picocli" rev="3.8.0" />
 ```
 ### Grape
 ```groovy
 @Grapes(
-    @Grab(group='info.picocli', module='picocli', version='3.7.0')
+    @Grab(group='info.picocli', module='picocli', version='3.8.0')
 )
 ```
 ### Leiningen
 ```
-[info.picocli/picocli "3.7.0"]
+[info.picocli/picocli "3.8.0"]
 ```
 ### Buildr
 ```
-'info.picocli:picocli:jar:3.7.0'
+'info.picocli:picocli:jar:3.8.0'
 ```

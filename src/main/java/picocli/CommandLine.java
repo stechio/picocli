@@ -174,7 +174,7 @@ import picocli.util.Tracer;
  */
 public class CommandLine {
     /** This is picocli version {@value}. */
-    public static final String VERSION = "3.8.0-SNAPSHOT";
+    public static final String VERSION = "4.0.0-SNAPSHOT";
 
     /**
      * Crack a command line.

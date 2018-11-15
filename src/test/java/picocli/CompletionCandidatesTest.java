@@ -228,7 +228,7 @@ public class CompletionCandidatesTest {
                 + "      --x=<x>[,<x>...]   Comma-separated list of some xxx's.%n"
                 + "                         VALUES: A, B, C, D.%n"
                 + "      --y=<y>            Test long default.%n"
-                + "  -P= [<key=ppp>...]     Use value for project key.%n",
+                + "  -P=[<key=ppp>...]      Use value for project key.%n",
                 new File("/a/b/c"));
         String actual = usageString(new CommandLine(new App(), new InnerClassFactory(this)),
                 Ansi.OFF);

@@ -1,8 +1,8 @@
 = picocli - a mighty tiny command line interface
 //:author: Remko Popma
 //:email: rpopma@apache.org
-:revnumber: 3.8.0-SNAPSHOT
-:revdate: 2018-10-21
+:revnumber: 4.0.0-SNAPSHOT
+:revdate: 2018-11-13
 :toc: left
 :numbered:
 :toclevels: 2
@@ -541,9 +541,9 @@ Convert convert = CommandLine.populateCommand(new Convert(), args);
 // convert.files now has two File objects
 ----
 
-NOTE: If a collection is returned from a type converter, the _contents_ of the collection are added to the field, not the collection itself.
+NOTE: If a collection is returned from a type converter, the _contents_ of the collection are added to the field or method parameter, not the collection itself.
 
-If the field is `null`, picocli will instantiate it when the option or positional parameter is matched.
+If the field or method parameter is `null`, picocli will instantiate it when the option or positional parameter is successfully matched.
 If the `Collection` type is not a concrete class, picocli will make a best effort to instantiate it based on the field type:
 `List -> ArrayList`, `OrderedSet -> TreeSet`, `Set -> LinkedHashSet`, `Queue -> LinkedList`, otherwise, `ArrayList`.
 
@@ -2637,6 +2637,27 @@ Record changes to the repository
   -m, --message=<arg0>    Use the given <msg> as the commit message.
 ----
 
+==== Mixin Support in `@Command` Methods
+
+From picocli 3.8, `@Command` methods accept `@Mixin` parameters.
+All options and positional parameters defined in the mixin class are added to the command.
+
+Example:
+
+```java
+class CommonParams {
+    @Option(names = "-x") int x;
+    @Option(names = "-y") int y;
+}
+
+class App {
+    @Command
+    public void doit(@Mixin CommonParams params, @Option(names = "-z") int z) {}
+}
+```
+
+In the above example, the `-x` and `-y` options are added to the other options of the `doit` command.
+
 === Less Boilerplate
 You can omit some of the boilerplate code from your application when the annotated object implements `Runnable` or `Callable`:
 
@@ -3082,7 +3103,7 @@ The script body is executed if the user input was valid and did not request usag
 
 [source,groovy]
 ----
-@Grab('info.picocli:picocli:3.8.0-SNAPSHOT')
+@Grab('info.picocli:picocli:4.0.0-SNAPSHOT')
 @Command(name = "myScript",
         mixinStandardHelpOptions = true, // add --help and --version options
         description = "@|bold Groovy script|@ @|underline picocli|@ example")
@@ -3107,7 +3128,7 @@ CAUTION: When using a Groovy version older than 2.4.7, use this workaround for t
 
 [source,groovy]
 ----
-@Grab('info.picocli:picocli:3.8.0-SNAPSHOT')
+@Grab('info.picocli:picocli:4.0.0-SNAPSHOT')
 @GrabExclude('org.codehaus.groovy:groovy-all') // work around GROOVY-7613
 ...
 ----
@@ -3209,7 +3230,7 @@ See the <<Source,source code>> below. Copy and paste it into a file called `Comm
 
 === Gradle
 ----
-compile 'info.picocli:picocli:3.8.0-SNAPSHOT'
+compile 'info.picocli:picocli:4.0.0-SNAPSHOT'
 ----
 
 === Maven
@@ -3217,19 +3238,19 @@ compile 'info.picocli:picocli:3.8.0-SNAPSHOT'
 <dependency>
   <groupId>info.picocli</groupId>
   <artifactId>picocli</artifactId>
-  <version>3.8.0-SNAPSHOT</version>
+  <version>4.0.0-SNAPSHOT</version>
 </dependency>
 ----
 
 === Scala SBT
 ----
-libraryDependencies += "info.picocli" % "picocli" % "3.8.0-SNAPSHOT"
+libraryDependencies += "info.picocli" % "picocli" % "4.0.0-SNAPSHOT"
 ----
 
 === Ivy
 
 ----
-<dependency org="info.picocli" name="picocli" rev="3.8.0-SNAPSHOT" />
+<dependency org="info.picocli" name="picocli" rev="4.0.0-SNAPSHOT" />
 ----
 
 === Source

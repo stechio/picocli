@@ -161,7 +161,8 @@ public class Help {
                                         && command.usageMessage().description().length > 0
                                                 ? command.usageMessage().description()[0]
                                                 : StringUtils.EMPTY);
-                Text[] lines = help.colorScheme().ansi().text(header).splitLines();
+                Text[] lines = help.colorScheme().ansi().text(Utils.safeFormat(header))
+                        .splitLines();
                 textTable.addRowValues(renderCommandNames(helpObj), lines[0]);
                 for (int i = 1; i < lines.length; i++) {
                     textTable.addRowValues(Ansi.EMPTY_TEXT, lines[i]);

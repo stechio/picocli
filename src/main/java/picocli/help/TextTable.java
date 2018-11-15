@@ -61,7 +61,7 @@ public class TextTable {
         /**
          * Indent (number of empty spaces at the start of the column preceding the text value)
          */
-        public final int indent;
+        public int indent;
 
         /** Policy that determines how to handle values larger than the column width. */
         public final Column.Overflow overflow;
@@ -155,6 +155,9 @@ public class TextTable {
         return length;
     }
 
+    private static final int OPTION_SEPARATOR_COLUMN = 2;
+    private static final int LONG_OPTION_COLUMN = 3;
+
     /** The column definitions of this table. */
     private final Column[] columns;
 
@@ -219,6 +222,7 @@ public class TextTable {
             throw new IllegalArgumentException(
                     values.length + " values don't fit in " + columns.length + " columns");
         addEmptyRow();
+        int oldIndent = unindent(values);
         for (int col = 0; col < values.length; col++) {
             int row = rowCount() - 1;// write to last row: previous value may have wrapped to next row
             TextTable.Cell cell = putValue(row, col, values[col]);
@@ -233,6 +237,25 @@ public class TextTable {
                 }
             }
         }
+        reindent(oldIndent);
+    }
+
+    private int unindent(Text[] values) {
+        if (columns.length <= LONG_OPTION_COLUMN) {
+            return 0;
+        }
+        int oldIndent = columns[LONG_OPTION_COLUMN].indent;
+        if ("=".equals(values[OPTION_SEPARATOR_COLUMN].toString())) {
+            columns[LONG_OPTION_COLUMN].indent = 0;
+        }
+        return oldIndent;
+    }
+
+    private void reindent(int oldIndent) {
+        if (columns.length <= LONG_OPTION_COLUMN) {
+            return;
+        }
+        columns[LONG_OPTION_COLUMN].indent = oldIndent;
     }
 
     /**
@@ -391,7 +414,7 @@ public class TextTable {
                 break;
             }
         }
-        if (done == 0 && text.length() > columnValue.maxLength) {
+        if (done == 0 && text.length() + offset > columnValue.maxLength) {
             // The value is a single word that is too big to be written to the column. Write as much as we can.
             done = copy(text, columnValue, offset);
         }

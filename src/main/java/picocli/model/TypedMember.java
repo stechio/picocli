@@ -45,8 +45,7 @@ class TypedMember {
     private TypedMember(Field field, Object scope) {
         this(field);
         if (Proxy.isProxyClass(scope.getClass())) {
-            throw new InitializationException(
-                    "Invalid picocli annotation on interface field");
+            throw new InitializationException("Invalid picocli annotation on interface field");
         }
         FieldBinding binding = new FieldBinding(scope, field);
         getter = binding;
@@ -76,8 +75,7 @@ class TypedMember {
             if (Proxy.isProxyClass(scope.getClass())) {
                 PicocliInvocationHandler handler = (PicocliInvocationHandler) Proxy
                         .getInvocationHandler(scope);
-                PicocliInvocationHandler.ProxyBinding binding = handler.new ProxyBinding(
-                        method);
+                PicocliInvocationHandler.ProxyBinding binding = handler.new ProxyBinding(method);
                 getter = binding;
                 setter = binding;
                 initializeInitialValue(method);
@@ -114,24 +112,26 @@ class TypedMember {
     private boolean initializeInitialValue(Object arg) {
         boolean initialized = true;
         try {
-            if (type == Boolean.TYPE || type == Boolean.class) {
+            if (type == Boolean.TYPE) {
                 setter.set(false);
-            } else if (type == Byte.TYPE || type == Byte.class) {
+            } else if (type == Byte.TYPE) {
                 setter.set(Byte.valueOf((byte) 0));
-            } else if (type == Short.TYPE || type == Short.class) {
+            } else if (type == Short.TYPE) {
                 setter.set(Short.valueOf((short) 0));
-            } else if (type == Integer.TYPE || type == Integer.class) {
+            } else if (type == Integer.TYPE) {
                 setter.set(Integer.valueOf(0));
-            } else if (type == Long.TYPE || type == Long.class) {
+            } else if (type == Long.TYPE) {
                 setter.set(Long.valueOf(0L));
-            } else if (type == Float.TYPE || type == Float.class) {
+            } else if (type == Float.TYPE) {
                 setter.set(Float.valueOf(0f));
-            } else if (type == Double.TYPE || type == Double.class) {
+            } else if (type == Double.TYPE) {
                 setter.set(Double.valueOf(0d));
             } else {
                 initialized = false;
             }
-        } catch (Exception ex) {
+        } catch (
+
+        Exception ex) {
             throw new InitializationException(
                     "Could not set initial value for " + arg + ": " + ex.toString(), ex);
         }
@@ -140,8 +140,7 @@ class TypedMember {
 
     static boolean isAnnotated(AnnotatedElement e) {
         return false || e.isAnnotationPresent(Option.class)
-                || e.isAnnotationPresent(Parameters.class)
-                || e.isAnnotationPresent(Unmatched.class)
+                || e.isAnnotationPresent(Parameters.class) || e.isAnnotationPresent(Unmatched.class)
                 || e.isAnnotationPresent(Mixin.class) || e.isAnnotationPresent(Spec.class)
                 || e.isAnnotationPresent(ParentCommand.class);
     }

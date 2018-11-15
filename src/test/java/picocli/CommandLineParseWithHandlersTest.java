@@ -397,7 +397,7 @@ public class CommandLineParseWithHandlersTest {
             "Usage: mycmd [-hV] [-x=<option>]%n" +
             "  -h, --help      Show this help message and exit.%n" +
             "  -V, --version   Print version information and exit.%n" +
-            "  -x= <option>    this is an option%n");
+            "  -x=<option>     this is an option%n");
 
     private static final String INVALID_INPUT = format("" +
             "Unmatched argument: invalid input%n");
@@ -408,7 +408,7 @@ public class CommandLineParseWithHandlersTest {
             "Usage: @|bold mycmd|@ [@|yellow -hV|@] [@|yellow -x|@=@|italic <option>|@]%n" +
             "  @|yellow -h|@, @|yellow --help|@      Show this help message and exit.%n" +
             "  @|yellow -V|@, @|yellow --version|@   Print version information and exit.%n" +
-            "  @|yellow -x|@= @|italic <|@@|italic option>|@    this is an option%n")).toString();
+            "  @|yellow -x|@=@|italic <|@@|italic option>|@     this is an option%n")).toString();
 
     @Test
     public void testCall1WithInvalidInput() {
@@ -665,7 +665,7 @@ public class CommandLineParseWithHandlersTest {
                 "Usage: mycmd [-hV] [-x=<option>]%n" +
                 "  -h, --help      Show this help message and exit.%n" +
                 "  -V, --version   Print version information and exit.%n" +
-                "  -x= <option>    this is an option%n");
+                "  -x=<option>     this is an option%n");
         Runnable[] variations = new Runnable[] {
                 new Runnable() {public void run() {CommandLine.call(MyCallable.class, new InnerClassFactory(this), "-x");}},
                 new Runnable() {public void run() {CommandLine.call(MyCallable.class, new InnerClassFactory(this), System.out, "-x");}},
@@ -742,7 +742,7 @@ public class CommandLineParseWithHandlersTest {
                 "Usage: mycmd [-hV] [-x=<option>]%n" +
                 "  -h, --help      Show this help message and exit.%n" +
                 "  -V, --version   Print version information and exit.%n" +
-                "  -x= <option>    this is an option%n");
+                "  -x=<option>     this is an option%n");
         Runnable[] variations = new Runnable[] {
                 new Runnable() {public void run() {CommandLine.run(MyRunnable.class, new InnerClassFactory(this), "-x");}},
                 new Runnable() {public void run() {CommandLine.run(MyRunnable.class, new InnerClassFactory(this), System.out, "-x");}},

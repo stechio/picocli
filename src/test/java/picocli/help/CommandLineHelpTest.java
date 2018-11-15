@@ -106,10 +106,10 @@ public class CommandLineHelpTest {
         String result = usageString(new FineGrainedDefaults(), Ansi.OFF);
         assertEquals(format(""
                 + "Usage: <main class> [-a=<optionA>] [-b=<optionB>] [-c=<optionC>] [-d=<optionD>]%n"
-                + "  -a= <optionA>   ALWAYS shown even if null%n"
-                + "                  DEFAULT: null%n" + "  -b= <optionB>   NEVER shown%n"
-                + "  -c= <optionC>   ON_DEMAND hides null%n"
-                + "  -d= <optionD>   ON_DEMAND shows non-null%n"
+                + "  -a=<optionA>    ALWAYS shown even if null%n"
+                + "                  DEFAULT: null%n" + "  -b=<optionB>    NEVER shown%n"
+                + "  -c=<optionC>    ON_DEMAND hides null%n"
+                + "  -d=<optionD>    ON_DEMAND shows non-null%n"
                 + "                  DEFAULT: abc%n"), result);
     }
 
@@ -169,9 +169,8 @@ public class CommandLineHelpTest {
             File file = new File("/tmp/file");
         }
         String result = usageString(new Params(), Ansi.OFF);
-        assertEquals(format(
-                "" + "Usage: <main class> -f=<file>%n" + "  -f, --file=<file>   the file to use%n"
-                        + "                      DEFAULT: %s%n",
+        assertEquals(format("" + "Usage: <main class> -f=<file>%n"
+                + "  -f, --file=<file>   the file to use%n" + "                      DEFAULT: %s%n",
                 new File("/tmp/file")), result);
     }
 
@@ -338,21 +337,18 @@ public class CommandLineHelpTest {
         @Command
         class Params {
             @Option(names = { "-x",
-                    "--array" }, required = true, description = "null array.", showDefaultValue=ALWAYS)
+                    "--array" }, required = true, description = "null array.", showDefaultValue = ALWAYS)
             int[] nil;
             @Option(names = { "-y",
-                    "--other" }, required = true, description = "non-null.", showDefaultValue=ALWAYS)
+                    "--other" }, required = true, description = "non-null.", showDefaultValue = ALWAYS)
             int[] other = { 1, 5, 11, 23 };
         }
         String result = usageString(new Params(), Ansi.OFF);
-        assertEquals(format(
-                "" + "Usage: <main class> -x=<nil> [-x=<nil>]... -y=<other> [-y=<other>]...%n"
-                        + "  -x, --array=<nil>     null array.%n"
-                        + "                        DEFAULT: null%n"
-                        + "  -y, --other=<other>   non-null.%n"
-                        + "                        DEFAULT: [1, 5, 11, 23]%n"
-                        ),
-                result);
+        assertEquals(format(""
+                + "Usage: <main class> -x=<nil> [-x=<nil>]... -y=<other> [-y=<other>]...%n"
+                + "  -x, --array=<nil>     null array.%n"
+                + "                        DEFAULT: null%n" + "  -y, --other=<other>   non-null.%n"
+                + "                        DEFAULT: [1, 5, 11, 23]%n"), result);
     }
 
     @Test
@@ -490,9 +486,9 @@ public class CommandLineHelpTest {
         }
         String result = usageString(new Params(), Ansi.OFF);
         assertEquals(format("" + "Usage: <main class> <file> <other>%n"
-                + "      <file>    the file to use%n"
-                + "                DEFAULT: theDefault.txt%n" + "      <other>   another option%n"
-                + "                DEFAULT: other.txt%n"), result);
+                + "      <file>    the file to use%n" + "                DEFAULT: theDefault.txt%n"
+                + "      <other>   another option%n" + "                DEFAULT: other.txt%n"),
+                result);
     }
 
     @Test
@@ -505,11 +501,9 @@ public class CommandLineHelpTest {
             File other = new File("other.txt");
         }
         String result = usageString(new Params(), Ansi.OFF);
-        assertEquals(format(
-                "" + "Usage: <main class> <file> <other>%n" + "      <file>    the file to use%n"
-                        + "                DEFAULT: theDefault.txt%n"
-                        + "      <other>   another option%n"),
-                result);
+        assertEquals(format("" + "Usage: <main class> <file> <other>%n"
+                + "      <file>    the file to use%n" + "                DEFAULT: theDefault.txt%n"
+                + "      <other>   another option%n"), result);
     }
 
     @Test
@@ -523,9 +517,9 @@ public class CommandLineHelpTest {
         }
         String result = usageString(new Params(), Ansi.OFF);
         assertEquals(format("" + "Usage: <main class> <file> <other>%n"
-                + "      <file>    the file to use%n"
-                + "                DEFAULT: theDefault.txt%n" + "      <other>   another option%n"
-                + "                DEFAULT: other.txt%n"), result);
+                + "      <file>    the file to use%n" + "                DEFAULT: theDefault.txt%n"
+                + "      <other>   another option%n" + "                DEFAULT: other.txt%n"),
+                result);
     }
 
     @Test
@@ -594,8 +588,8 @@ public class CommandLineHelpTest {
         assertEquals(format(""
                 + "Usage: <main class> [-n=<number>] [-f=FILE]... [-P=KEY=VALUE]... NUM <host>%n"
                 + "      NUM         number param%n" + "      <host>      the host parameter%n"
-                + "  -f= FILE        files%n" + "  -n= <number>    a number option%n"
-                + "  -P= KEY=VALUE   Project properties (key-value pairs)%n"), result);
+                + "  -f=FILE         files%n" + "  -n=<number>     a number option%n"
+                + "  -P=KEY=VALUE    Project properties (key-value pairs)%n"), result);
     }
 
     @Test
@@ -619,8 +613,8 @@ public class CommandLineHelpTest {
         assertEquals(format(
                 "" + "Usage: <main class> [-f=FILE] [-n=<number>] [-P=KEY=VALUE]... NUM <host>%n"
                         + "      NUM        number param%n"
-                        + "      <host>     the host parameter%n" + "  -f= FILE       a file%n"
-                        + "  -n= <number>   a number option%n" + "  -P, --properties=KEY=VALUE%n"
+                        + "      <host>     the host parameter%n" + "  -f=FILE        a file%n"
+                        + "  -n=<number>    a number option%n" + "  -P, --properties=KEY=VALUE%n"
                         + "                 Project properties (key-value pairs)%n"),
                 result);
     }
@@ -644,7 +638,7 @@ public class CommandLineHelpTest {
         String expected = String.format(""
                 + "Usage: <main class> -a=ARG [-a=ARG]... -b[=ARG...] [-b[=ARG...]]... -c=ARG...%n"
                 + "                    [-c=ARG...]... -d=ARG ARG... [-d=ARG ARG...]...%n"
-                + "  -a= ARG%n" + "  -b= [ARG...]%n" + "  -c= ARG...%n" + "  -d= ARG ARG...%n");
+                + "  -a=ARG%n" + "  -b=[ARG...]%n" + "  -c=ARG...%n" + "  -d=ARG ARG...%n");
         //CommandLine.usage(new Args(), System.out);
         assertEquals(expected, usageString(new Args(), Ansi.OFF));
     }
@@ -663,8 +657,8 @@ public class CommandLineHelpTest {
         }
         String expected = String.format(
                 "" + "Usage: <main class> [-a=ARG]... [-b[=ARG...]]... [-c=ARG...]... [-d=ARG%n"
-                        + "                    ARG...]...%n" + "  -a= ARG%n" + "  -b= [ARG...]%n"
-                        + "  -c= ARG...%n" + "  -d= ARG ARG...%n");
+                        + "                    ARG...]...%n" + "  -a=ARG%n" + "  -b=[ARG...]%n"
+                        + "  -c=ARG...%n" + "  -d=ARG ARG...%n");
         //CommandLine.usage(new Args(), System.out);
         assertEquals(expected, usageString(new Args(), Ansi.OFF));
     }
@@ -686,8 +680,8 @@ public class CommandLineHelpTest {
         String expected = String.format(""
                 + "Usage: <main class> -a[=ARG] [-a[=ARG]]... -b=ARG [ARG] [-b=ARG [ARG]]...%n"
                 + "                    -c=ARG [ARG [ARG]] [-c=ARG [ARG [ARG]]]... -d=ARG ARG [ARG%n"
-                + "                    [ARG]] [-d=ARG ARG [ARG [ARG]]]...%n" + "  -a= [ARG]%n"
-                + "  -b= ARG [ARG]%n" + "  -c= ARG [ARG [ARG]]%n" + "  -d= ARG ARG [ARG [ARG]]%n");
+                + "                    [ARG]] [-d=ARG ARG [ARG [ARG]]]...%n" + "  -a=[ARG]%n"
+                + "  -b=ARG [ARG]%n" + "  -c=ARG [ARG [ARG]]%n" + "  -d=ARG ARG [ARG [ARG]]%n");
         //CommandLine.usage(new Args(), System.out);
         assertEquals(expected, usageString(new Args(), Ansi.OFF));
     }
@@ -706,8 +700,8 @@ public class CommandLineHelpTest {
         }
         String expected = String.format(""
                 + "Usage: <main class> [-a[=ARG]]... [-b=ARG [ARG]]... [-c=ARG [ARG [ARG]]]...%n"
-                + "                    [-d=ARG ARG [ARG [ARG]]]...%n" + "  -a= [ARG]%n"
-                + "  -b= ARG [ARG]%n" + "  -c= ARG [ARG [ARG]]%n" + "  -d= ARG ARG [ARG [ARG]]%n");
+                + "                    [-d=ARG ARG [ARG [ARG]]]...%n" + "  -a=[ARG]%n"
+                + "  -b=ARG [ARG]%n" + "  -c=ARG [ARG [ARG]]%n" + "  -d=ARG ARG [ARG [ARG]]%n");
         //CommandLine.usage(new Args(), System.out);
         assertEquals(expected, usageString(new Args(), Ansi.OFF));
     }
@@ -728,8 +722,8 @@ public class CommandLineHelpTest {
         }
         String expected = String.format(""
                 + "Usage: <main class> -b [-b]... -a=ARG [-a=ARG]... -c=ARG [-c=ARG]... -d=ARG ARG%n"
-                + "                    [-d=ARG ARG]...%n" + "  -a= ARG%n" + "  -b%n" + "  -c= ARG%n"
-                + "  -d= ARG ARG%n");
+                + "                    [-d=ARG ARG]...%n" + "  -a=ARG%n" + "  -b%n" + "  -c=ARG%n"
+                + "  -d=ARG ARG%n");
         //CommandLine.usage(new Args(), System.out);
         assertEquals(expected, usageString(new Args(), Ansi.OFF));
     }
@@ -748,7 +742,7 @@ public class CommandLineHelpTest {
         }
         String expected = String
                 .format("" + "Usage: <main class> [-b]... [-a=ARG]... [-c=ARG]... [-d=ARG ARG]...%n"
-                        + "  -a= ARG%n" + "  -b%n" + "  -c= ARG%n" + "  -d= ARG ARG%n");
+                        + "  -a=ARG%n" + "  -b%n" + "  -c=ARG%n" + "  -d=ARG ARG%n");
         //CommandLine.usage(new Args(), System.out);
         assertEquals(expected, usageString(new Args(), Ansi.OFF));
     }
@@ -909,8 +903,8 @@ public class CommandLineHelpTest {
                 + "                    [=<String=String>...]]... -c=<String=TimeUnit>...%n"
                 + "                    [-c=<String=TimeUnit>...]... -d=<Integer=URL>%n"
                 + "                    <Integer=URL>... [-d=<Integer=URL> <Integer=URL>...]...%n"
-                + "  -a= KEY=VAL%n" + "  -b= [<String=String>...]%n"
-                + "  -c= <String=TimeUnit>...%n" + "  -d= <Integer=URL> <Integer=URL>...%n"
+                + "  -a=KEY=VAL%n" + "  -b=[<String=String>...]%n" + "  -c=<String=TimeUnit>...%n"
+                + "  -d=<Integer=URL> <Integer=URL>...%n"
                 + "                             description%n");
         //CommandLine.usage(new Args(), System.out);
         assertEquals(expected, usageString(new Args(), Ansi.OFF));
@@ -933,9 +927,8 @@ public class CommandLineHelpTest {
         String expected = String.format(""
                 + "Usage: <main class> [-a=<String=String>]... [-b[=<Integer=Integer>...]]...%n"
                 + "                    [-c=KEY=VALUE...]... [-d=<String=URL> <String=URL>...]...%n"
-                + "  -a= <String=String>%n" + "  -b= [<Integer=Integer>...]%n" + 
-                "  -c= KEY=VALUE...%n" + "  -d= <String=URL> <String=URL>...%n"
-                + "                        description%n");
+                + "  -a=<String=String>%n" + "  -b=[<Integer=Integer>...]%n" + "  -c=KEY=VALUE...%n"
+                + "  -d=<String=URL> <String=URL>...%n" + "                        description%n");
         //CommandLine.usage(new Args(), System.out);
         assertEquals(expected, usageString(new Args(), Ansi.OFF));
     }
@@ -963,12 +956,11 @@ public class CommandLineHelpTest {
                 + "                    -c=<String=URL> [<String=URL> [<String=URL>]]%n"
                 + "                    [-c=<String=URL> [<String=URL> [<String=URL>]]]... -d=K=URL%n"
                 + "                    K=URL [K=URL [K=URL]] [-d=K=URL K=URL [K=URL [K=URL]]]...%n"
-                + "  -a= [<String=String>]   a description%n"
-                + "  -b= <Integer=Integer> [<Integer=Integer>]%n"
+                + "  -a=[<String=String>]    a description%n"
+                + "  -b=<Integer=Integer> [<Integer=Integer>]%n"
                 + "                          b description%n"
-                + "  -c= <String=URL> [<String=URL> [<String=URL>]]%n"
-                + "                          c description%n"
-                + "  -d= K=URL K=URL [K=URL [K=URL]]%n"
+                + "  -c=<String=URL> [<String=URL> [<String=URL>]]%n"
+                + "                          c description%n" + "  -d=K=URL K=URL [K=URL [K=URL]]%n"
                 + "                          d description%n");
         //CommandLine.usage(new Args(), System.out);
         assertEquals(expected, usageString(new Args(), Ansi.OFF));
@@ -992,12 +984,11 @@ public class CommandLineHelpTest {
                 + "Usage: <main class> [-a[=<UUID=URL>]]... [-b=<Long=UUID> [<Long=UUID>]]...%n"
                 + "                    [-c=<String=String> [<String=String> [<String=String>]]]...%n"
                 + "                    [-d=K=V K=V [K=V [K=V]]]...%n"
-                + "  -a= [<UUID=URL>]          a description%n"
-                + "  -b= <Long=UUID> [<Long=UUID>]%n"
+                + "  -a=[<UUID=URL>]           a description%n" + "  -b=<Long=UUID> [<Long=UUID>]%n"
                 + "                            b description%n"
-                + "  -c= <String=String> [<String=String> [<String=String>]]%n"
+                + "  -c=<String=String> [<String=String> [<String=String>]]%n"
                 + "                            c description%n"
-                + "  -d= K=V K=V [K=V [K=V]]   d description%n");
+                + "  -d=K=V K=V [K=V [K=V]]    d description%n");
         //CommandLine.usage(new Args(), System.out);
         assertEquals(expected, usageString(new Args(), Ansi.OFF));
     }
@@ -1023,10 +1014,10 @@ public class CommandLineHelpTest {
                 + "Usage: <main class> -b [-b]... -a=<Short=Field> [-a=<Short=Field>]...%n"
                 + "                    -c=<Long=File> [-c=<Long=File>]... -d=<URI=URL> <URI=URL>%n"
                 + "                    [-d=<URI=URL> <URI=URL>]...%n"
-                + "  -a= <Short=Field>         a description%n"
+                + "  -a=<Short=Field>          a description%n"
                 + "  -b                        b description%n"
-                + "  -c= <Long=File>           c description%n"
-                + "  -d= <URI=URL> <URI=URL>   d description%n");
+                + "  -c=<Long=File>            c description%n"
+                + "  -d=<URI=URL> <URI=URL>    d description%n");
         //CommandLine.usage(new Args(), System.out);
         assertEquals(expected, usageString(new Args(), Ansi.OFF));
     }
@@ -1050,10 +1041,10 @@ public class CommandLineHelpTest {
         String expected = String.format(
                 "" + "Usage: <main class> [-b]... [-a=<Short=Field>]... [-c=<Long=File>]...%n"
                         + "                    [-d=<URI=URL> <URI=URL>]...%n"
-                        + "  -a= <Short=Field>         a description%n"
+                        + "  -a=<Short=Field>          a description%n"
                         + "  -b                        b description%n"
-                        + "  -c= <Long=File>           c description%n"
-                        + "  -d= <URI=URL> <URI=URL>   d description%n");
+                        + "  -c=<Long=File>            c description%n"
+                        + "  -d=<URI=URL> <URI=URL>    d description%n");
         //CommandLine.usage(new Args(), System.out);
         assertEquals(expected, usageString(new Args(), Ansi.OFF));
     }
@@ -1221,7 +1212,7 @@ public class CommandLineHelpTest {
         String expected = String.format(""
                 + "Usage: @|reverse <main class>|@ [@|bg_magenta -x|@=@|bg_yellow <options>|@]... [@|bg_cyan <params>|@...]%n"
                 + "      [@|bg_cyan <params>|@...]   param desc%n"
-                + "  @|bg_magenta -x|@= @|bg_yellow <|@@|bg_yellow options>|@       option desc%n");
+                + "  @|bg_magenta -x|@=@|bg_yellow <|@@|bg_yellow options>|@        option desc%n");
         assertEquals(new Text(Ansi.ON, expected).toString(), actual);
     }
 
@@ -1359,8 +1350,8 @@ public class CommandLineHelpTest {
         assertEquals(2, row2.length);
         assertArrayEquals(Arrays.toString(row2[0]),
                 textArray(help, "", "-b", ",", "-a, --alpha=<otherField>", "other"), row2[0]);
-        assertArrayEquals(Arrays.toString(row2[1]),
-                textArray(help, "", "", "", "", "DEFAULT: abc"), row2[1]);
+        assertArrayEquals(Arrays.toString(row2[1]), textArray(help, "", "", "", "", "DEFAULT: abc"),
+                row2[1]);
     }
 
     @Test
@@ -1378,8 +1369,8 @@ public class CommandLineHelpTest {
         assertEquals(2, row.length);
         assertArrayEquals(Arrays.toString(row[0]),
                 textArray(help, "*", "-b", ",", "-a, --alpha=<otherField>", "other"), row[0]);
-        assertArrayEquals(Arrays.toString(row[1]),
-                textArray(help, "", "", "", "", "DEFAULT: abc"), row[1]);
+        assertArrayEquals(Arrays.toString(row[1]), textArray(help, "", "", "", "", "DEFAULT: abc"),
+                row[1]);
     }
 
     @Test
@@ -1654,10 +1645,9 @@ public class CommandLineHelpTest {
                 + "Usage: <main class> [-x1=<single>] [-x2=<singleHide>] [-o3=<multiSplit>[,%n"
                 + "                    <multiSplit>...]]... [-s3=<multiHideSplit>]... [-s1=<multi>%n"
                 + "                    <multi>]... [-s2=<multiHide>]...%n"
-                + "      -o3=<multiSplit>[,<multiSplit>...]%n" 
-                + "      -s1=<multi> <multi>%n" + "      -s2=<multiHide>%n"
-                + "      -s3=<multiHideSplit>%n" + "      -x1=<single>%n"
-                + "      -x2=<singleHide>%n");
+                + "      -o3=<multiSplit>[,<multiSplit>...]%n" + "      -s1=<multi> <multi>%n"
+                + "      -s2=<multiHide>%n" + "      -s3=<multiHideSplit>%n"
+                + "      -x1=<single>%n" + "      -x2=<singleHide>%n");
         assertEquals(expected, actual);
     }
 
@@ -3520,11 +3510,11 @@ public class CommandLineHelpTest {
                 + "      --logfile=<file>   use given file for log%n"
                 + "      --x[=<x>[,<x>]]    comma-separated list of up to 2 xxx's%n"
                 + "      --y=<y>,<y>,<y>    exactly 3 y's%n"
-                + "  -D= <key=ddd>...       use value for given property%n"
-                + "  -P= [<key=ppp>...]     use value for project key%n"
-                + "  -S= [<key=sss>[,<key=sss>]...]%n"
+                + "  -D=<key=ddd>...        use value for given property%n"
+                + "  -P=[<key=ppp>...]      use value for project key%n"
+                + "  -S=[<key=sss>[,<key=sss>]...]%n"
                 + "                         use value for project key%n"
-                + "  -T= <key=ttt>[,<key=ttt>]...%n"
+                + "  -T=<key=ttt>[,<key=ttt>]...%n"
                 + "                         use value for given property%n");
         assertEquals(expected, actual);
     }
@@ -3554,11 +3544,11 @@ public class CommandLineHelpTest {
                 + "Usage: <main class> [-a=<Integer=URI>]... [-b=<TimeUnit=StringBuilder>]...%n"
                 + "                    [-c=<String=String>]... [-d=<d>]... [-e=<Integer=Long>]...%n"
                 + "                    [-f=<Long=Float>]... [-g=<TimeUnit=Float>]...%n"
-                + "  -a= <Integer=URI>%n" + "  -b= <TimeUnit=StringBuilder>%n" 
+                + "  -a=<Integer=URI>%n" + "  -b=<TimeUnit=StringBuilder>%n"
                 + "                         VALUES: NANOSECONDS, MICROSECONDS, MILLISECONDS, SECONDS,%n"
-                + "                           MINUTES, HOURS, DAYS.%n" + "  -c= <String=String>%n"
-                + "  -d= <d>%n" + "  -e= <Integer=Long>%n" + "  -f= <Long=Float>%n"
-                + "  -g= <TimeUnit=Float>%n"
+                + "                           MINUTES, HOURS, DAYS.%n" + "  -c=<String=String>%n"
+                + "  -d=<d>%n" + "  -e=<Integer=Long>%n" + "  -f=<Long=Float>%n"
+                + "  -g=<TimeUnit=Float>%n"
                 + "                         VALUES: NANOSECONDS, MICROSECONDS, MILLISECONDS, SECONDS,%n"
                 + "                           MINUTES, HOURS, DAYS.%n");
         assertEquals(expected, actual);
@@ -3609,7 +3599,7 @@ public class CommandLineHelpTest {
         String expected = Ansi.ON.string(String.format(""
                 + "Usage: @|bg_cyan <main class>|@ [@|green -hV|@] [@|green -f|@=@|magenta ARCHIVE|@] @|bg_white POSITIONAL|@%n"
                 + "@|bg_white  |@     @|bg_white POSITIONAL|@   positional arg%n"
-                + "  @|green -f|@= @|magenta A|@@|magenta RCHIVE|@      the archive file%n"
+                + "  @|green -f|@=@|magenta A|@@|magenta RCHIVE|@       the archive file%n"
                 + "  @|green -h|@, @|green --help|@       Show this help message and exit.%n"
                 + "  @|green -V|@, @|green --version|@    Print version information and exit.%n"));
         assertEquals(expected, baos.toString());
@@ -4133,7 +4123,7 @@ public class CommandLineHelpTest {
                         + "      --very-very-very-looooooooooooooooong-option-name=<lengthyOption>%n"
                         + "                      The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick%n"
                         + "                        brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog.%n"
-                        + "  -s= <shortOption>   The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick%n"
+                        + "  -s=<shortOption>    The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick%n"
                         + "                        brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog.%n");
     }
 
@@ -4204,7 +4194,9 @@ public class CommandLineHelpTest {
         rootCmd.addSubcommand("subA", createCmd("subA", "regular description for subA"));
         rootCmd.addSubcommand("subB",
                 createCmd("subB", "very,\nspecial,\nChristopher Walken style,\ndescription."));
-        rootCmd.addSubcommand("subC", createCmd("subC", "regular description for subC"));
+        rootCmd.addSubcommand("subC",
+                createCmd("subC", "not so,%nspecial,%nJon Voight style,%ndescription."));
+        rootCmd.addSubcommand("subD", createCmd("subD", "regular description for subD"));
 
         assertEquals(
                 String.format("" + "Usage: newlines [-hV] [COMMAND]%n"
@@ -4213,8 +4205,72 @@ public class CommandLineHelpTest {
                         + "  -V, --version   Print version information and exit.%n" + "Commands:%n"
                         + "  subA  regular description for subA%n" + "  subB  very,%n"
                         + "        special,%n" + "        Christopher Walken style,%n"
-                        + "        description.%n" + "  subC  regular description for subC%n"),
+                        + "        description.%n" + "  subC  not so,%n" + "        special,%n"
+                        + "        Jon Voight style,%n" + "        description.%n"
+                        + "  subD  regular description for subD%n"),
                 new CommandLine(rootCmd).getUsageMessage());
+    }
+
+    @Test
+    public void testMultiLineWrappedDescription() {
+        CommandSpec rootCmd = createCmd("wrapDescriptions",
+                "Displays sub commands, with extra long descriptions");
+
+        CommandSpec oneLineCmd = createCmd("oneLine",
+                "The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog.");
+        CommandSpec multiLineCmd = createCmd("multiLine",
+                "The quick brown fox jumped over the lazy dog.%nThe quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog.%n%nThe quick brown fox jumped over the lazy dog.");
+
+        rootCmd.addSubcommand("oneLine", oneLineCmd);
+        rootCmd.addSubcommand("multiLine", multiLineCmd);
+
+        assertEquals(String.format("" + "Usage: wrapDescriptions [-hV] [COMMAND]%n"
+                + "Displays sub commands, with extra long descriptions%n"
+                + "  -h, --help      Show this help message and exit.%n"
+                + "  -V, --version   Print version information and exit.%n" + "Commands:%n"
+                + "  oneLine    The quick brown fox jumped over the lazy dog. The quick brown fox%n"
+                + "               jumped over the lazy dog. The quick brown fox jumped over the%n"
+                + "               lazy dog. The quick brown fox jumped over the lazy dog. The%n"
+                + "               quick brown fox jumped over the lazy dog. The quick brown fox%n"
+                + "               jumped over the lazy dog.%n"
+                + "  multiLine  The quick brown fox jumped over the lazy dog.%n"
+                + "             The quick brown fox jumped over the lazy dog. The quick brown fox%n"
+                + "               jumped over the lazy dog. The quick brown fox jumped over the%n"
+                + "               lazy dog. The quick brown fox jumped over the lazy dog.%n%n"
+                + "             The quick brown fox jumped over the lazy dog.%n"),
+                new CommandLine(rootCmd).getUsageMessage());
+
+        assertEquals(String.format("Usage: wrapDescriptions oneLine [-hV]%n"
+                + "The quick brown fox jumped over the lazy dog. The quick brown fox jumped over%n"
+                + "the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox%n"
+                + "jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The%n"
+                + "quick brown fox jumped over the lazy dog.%n"
+                + "  -h, --help      Show this help message and exit.%n"
+                + "  -V, --version   Print version information and exit.%n"),
+                new CommandLine(oneLineCmd).getUsageMessage());
+
+        assertEquals(String.format("Usage: wrapDescriptions multiLine [-hV]%n"
+                + "The quick brown fox jumped over the lazy dog.%n"
+                + "The quick brown fox jumped over the lazy dog. The quick brown fox jumped over%n"
+                + "the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox%n"
+                + "jumped over the lazy dog.%n%n"
+                + "The quick brown fox jumped over the lazy dog.%n"
+                + "  -h, --help      Show this help message and exit.%n"
+                + "  -V, --version   Print version information and exit.%n"),
+                new CommandLine(multiLineCmd).getUsageMessage());
+    }
+
+    @Test
+    public void testMultiLineWrappedDefaultValueWontRunIntoInfiniteLoop() {
+        class Args {
+            @Parameters(arity = "1..*", description = "description", defaultValue = "/long/value/length/equals/columnValue/maxlength/and/non/null/offset/xxx", showDefaultValue = ALWAYS)
+            String[] c;
+        }
+        String expected = String.format("" + "Usage: <main class> <c>...%n"
+                + "      <c>...   description%n" + "               DEFAULT:%n"
+                + "                 /long/value/length/equals/columnValue/maxlength/and/non/null/offset/%n"
+                + "                 xxx%n");
+        assertEquals(expected, usageString(new Args(), Ansi.OFF));
     }
 
     private static CommandSpec createCmd(String name, String description) {

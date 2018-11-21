@@ -403,10 +403,6 @@ public @interface Option {
      * {@link Command#showDefaultValues()} is set {@code true} on the command. Use this attribute to
      * specify whether the default value for this specific option should always be shown or never be
      * shown, regardless of the command setting.
-     * <p>
-     * Note that picocli 3.2 allows {@linkplain #description() embedding default values} anywhere in
-     * the description that ignores this setting.
-     * </p>
      * 
      * @return whether this option's default value should be shown in the usage help message
      */

@@ -845,8 +845,7 @@ public class Help {
                         usageMessage.customSynopsis());
             else
                 return usageMessage.abbreviateSynopsis() ? renderAbbreviated(help)
-                        : renderDetailed(help,
-                                Comparators.OptionArityAndNameAlphabeticalLength.Order,
+                        : renderDetailed(help, null,
                                 help.commandSpec().parser().posixClusteredShortOptionsAllowed());
         }
 
@@ -863,9 +862,8 @@ public class Help {
                 boolean clusterBooleanOptions) {
             Text text = new Text(help.ansi(), 0);
             List<OptionSpec> options = new ArrayList<>(help.commandSpec().options());
-            if (optionSort != null) {
-                Collections.sort(options, optionSort);
-            }
+            Collections.sort(options, optionSort != null ? optionSort
+                    : Comparators.OptionArityAndNameAlphabeticalLength.Order);
             if (clusterBooleanOptions) {
                 text = renderClusteredOptions(help, options, text);
             }

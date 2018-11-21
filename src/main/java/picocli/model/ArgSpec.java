@@ -20,6 +20,7 @@ import picocli.annots.Parameters;
 import picocli.excepts.InitializationException;
 import picocli.excepts.PicocliException;
 import picocli.help.Help;
+import picocli.model.PositionalParamSpec.Builder;
 import picocli.util.Assert;
 import picocli.util.ClassUtilsExt;
 import picocli.util.ObjectUtilsExt;
@@ -587,6 +588,8 @@ public abstract class ArgSpec {
         return this;
     }
 
+    public abstract Builder<?> toBuilder();
+
     /** Returns a string respresentation of this option or positional parameter. */
     public String toString() {
         return toString;
@@ -709,7 +712,7 @@ public abstract class ArgSpec {
                 + 37 * Arrays.hashCode(auxiliaryTypes);
     }
 
-    abstract static class Builder<T extends Builder<T>> {
+    public abstract static class Builder<T extends Builder<T>> {
         private Range arity;
         private String[] description;
         private String descriptionKey;

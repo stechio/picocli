@@ -18,6 +18,12 @@ public class MissingParameterException extends ParameterException {
     private static final long serialVersionUID = 5075678535706338753L;
     private final List<ArgSpec> missing;
 
+    public MissingParameterException(CommandLine commandLine, ArgSpec missing) {
+        this(commandLine, missing,
+                "Missing required " + (missing.isOption() ? "option" : "parameter") + ": "
+                        + describe(missing, commandLine.getCommandSpec().parser().separator()));
+    }
+
     public MissingParameterException(CommandLine commandLine, ArgSpec missing, String msg) {
         this(commandLine, Arrays.asList(missing), msg);
     }
@@ -32,8 +38,8 @@ public class MissingParameterException extends ParameterException {
         return missing;
     }
 
-    public static MissingParameterException create(CommandLine cmd,
-            Collection<ArgSpec> missing, String separator) {
+    public static MissingParameterException create(CommandLine cmd, Collection<ArgSpec> missing,
+            String separator) {
         if (missing.size() == 1) {
             return new MissingParameterException(cmd, missing, "Missing required option '"
                     + describe(missing.iterator().next(), separator) + "'");
@@ -47,8 +53,8 @@ public class MissingParameterException extends ParameterException {
     }
 
     private static String describe(ArgSpec argSpec, String separator) {
-        String prefix = (argSpec.isOption()) ? ((OptionSpec) argSpec).longestName() + separator
-                : "params[" + ((PositionalParamSpec) argSpec).index() + "]" + separator;
-        return prefix + argSpec.paramLabel();
+        return ((argSpec.isOption()) ? ((OptionSpec) argSpec).shortestName()
+                : "params[" + ((PositionalParamSpec) argSpec).index() + "]") + separator
+                + argSpec.paramLabel();
     }
 }

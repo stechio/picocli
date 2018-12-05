@@ -1,7 +1,7 @@
 package picocli.groovy
 
-import picocli.annots.Command
-import picocli.annots.Option
+import picocli.annot.Command
+import picocli.annot.Option
 
 @Command(name = 'cmd', description = 'my description')
 

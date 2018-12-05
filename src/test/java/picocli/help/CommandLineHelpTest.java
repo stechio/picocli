@@ -57,11 +57,11 @@ import org.junit.contrib.java.lang.system.ProvideSystemProperty;
 import picocli.CommandLine;
 import picocli.Demo;
 import picocli.InnerClassFactory;
-import picocli.annots.Command;
-import picocli.annots.Option;
-import picocli.annots.Parameters;
-import picocli.excepts.ExecutionException;
-import picocli.excepts.InitializationException;
+import picocli.annot.Command;
+import picocli.annot.Option;
+import picocli.annot.Parameters;
+import picocli.except.ExecutionException;
+import picocli.except.InitializationException;
 import picocli.help.Ansi.IStyle;
 import picocli.help.Ansi.Style;
 import picocli.model.CommandSpec;
@@ -2364,7 +2364,8 @@ public class CommandLineHelpTest {
         }
         Help help = new Help(CommandSpec.forAnnotatedObject(new App()), Ansi.OFF);
         assertEquals(String.format(
-                "Usage: <best-app-ever> [--another-long-option-name=^[<another-long-option-value>]]%n"
+                "Usage: <best-app-ever> [--another-long-option-name=^%n"
+                        + "                       [<another-long-option-value>]]%n"
                         + "                       [--fourth-long-option-name=<fourth-long-option-value>]%n"
                         + "                       [--long-option@-name=<long-option-valu@@e>]%n"
                         + "                       [--third-long-option-name=<third-long-option-value>]%n"),

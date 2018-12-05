@@ -25,11 +25,11 @@ import java.util.List;
 
 import org.junit.Test;
 
-import picocli.annots.Command;
-import picocli.annots.Option;
-import picocli.annots.Parameters;
-import picocli.annots.ParentCommand;
-import picocli.excepts.InitializationException;
+import picocli.annot.Command;
+import picocli.annot.Option;
+import picocli.annot.Parameters;
+import picocli.annot.ParentCommand;
+import picocli.except.InitializationException;
 
 public class ParentCommandTest {
 

@@ -31,9 +31,9 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import picocli.annots.Command;
-import picocli.annots.Option;
-import picocli.annots.Parameters;
+import picocli.annot.Command;
+import picocli.annot.Option;
+import picocli.annot.Parameters;
 import picocli.model.CommandSpec;
 import picocli.model.OptionSpec;
 import picocli.model.ParseResult;

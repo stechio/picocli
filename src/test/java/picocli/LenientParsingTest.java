@@ -29,8 +29,8 @@ import org.junit.contrib.java.lang.system.ProvideSystemProperty;
 import org.junit.contrib.java.lang.system.SystemErrRule;
 import org.junit.contrib.java.lang.system.SystemOutRule;
 
-import picocli.annots.Option;
-import picocli.annots.Parameters;
+import picocli.annot.Option;
+import picocli.annot.Parameters;
 import picocli.model.CommandSpec;
 import picocli.model.OptionSpec;
 import picocli.model.PositionalParamSpec;

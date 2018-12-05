@@ -21,8 +21,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.ProvideSystemProperty;
 
-import picocli.annots.Option;
-import picocli.excepts.InitializationException;
+import picocli.annot.Option;
+import picocli.except.InitializationException;
 
 public class CommandLineAnnotatedMethodSpecTest {
     @Rule

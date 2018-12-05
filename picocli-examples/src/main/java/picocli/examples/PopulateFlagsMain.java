@@ -17,8 +17,8 @@
 package picocli.examples;
 
 import picocli.CommandLine;
-import picocli.annots.Option;
-import picocli.excepts.ParameterException;
+import picocli.annot.Option;
+import picocli.except.ParameterException;
 
 /**
  * This example demonstrates the usage with a simple flag class.

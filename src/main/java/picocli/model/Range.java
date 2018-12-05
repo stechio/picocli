@@ -2,9 +2,9 @@ package picocli.model;
 
 import java.lang.reflect.Field;
 
-import picocli.annots.Option;
-import picocli.annots.Parameters;
-import picocli.excepts.InitializationException;
+import picocli.annot.Option;
+import picocli.annot.Parameters;
+import picocli.except.InitializationException;
 import picocli.util.ClassUtilsExt;
 import picocli.util.ObjectUtilsExt;
 

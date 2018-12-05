@@ -4,8 +4,8 @@ import java.util.ResourceBundle;
 
 import org.apache.commons.lang3.StringUtils;
 
-import picocli.annots.Command;
-import picocli.excepts.InitializationException;
+import picocli.annot.Command;
+import picocli.except.InitializationException;
 import picocli.util.Tracer;
 
 /**

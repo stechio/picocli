@@ -14,11 +14,11 @@ import java.util.TreeMap;
 import org.apache.commons.lang3.StringUtils;
 
 import picocli.CommandLine;
-import picocli.annots.Command;
-import picocli.annots.Option;
-import picocli.annots.Parameters;
-import picocli.excepts.InitializationException;
-import picocli.excepts.PicocliException;
+import picocli.annot.Command;
+import picocli.annot.Option;
+import picocli.annot.Parameters;
+import picocli.except.InitializationException;
+import picocli.except.PicocliException;
 import picocli.help.Help;
 import picocli.model.PositionalParamSpec.Builder;
 import picocli.util.Assert;

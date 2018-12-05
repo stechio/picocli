@@ -10,9 +10,9 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
-import picocli.annots.Option;
-import picocli.annots.Parameters;
-import picocli.excepts.InitializationException;
+import picocli.annot.Option;
+import picocli.annot.Parameters;
+import picocli.except.InitializationException;
 import picocli.help.Help;
 import picocli.util.ObjectUtilsExt;
 

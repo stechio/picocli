@@ -1,7 +1,7 @@
 package picocli.model;
 
-import picocli.annots.Option;
-import picocli.annots.Parameters;
+import picocli.annot.Option;
+import picocli.annot.Parameters;
 
 /**
  * <p>

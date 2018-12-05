@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
 
-import picocli.annots.Command;
-import picocli.annots.Option;
+import picocli.annot.Command;
+import picocli.annot.Option;
 import picocli.util.Assert;
 
 /**

@@ -3,9 +3,9 @@ package picocli.help;
 import java.io.PrintStream;
 
 import picocli.CommandLine;
-import picocli.annots.Command;
-import picocli.excepts.ParameterException;
-import picocli.handlers.DefaultExceptionHandler;
+import picocli.annot.Command;
+import picocli.except.ParameterException;
+import picocli.handler.DefaultExceptionHandler;
 
 /**
  * Help commands that provide usage help for other commands can implement this interface to be

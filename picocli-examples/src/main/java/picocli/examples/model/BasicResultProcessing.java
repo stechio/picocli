@@ -20,7 +20,7 @@ import java.util.Collections;
 import java.util.List;
 
 import picocli.CommandLine;
-import picocli.excepts.ParameterException;
+import picocli.except.ParameterException;
 import picocli.model.CommandSpec;
 import picocli.model.OptionSpec;
 import picocli.model.ParseResult;

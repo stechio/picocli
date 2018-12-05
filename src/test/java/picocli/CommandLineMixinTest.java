@@ -31,14 +31,14 @@ import java.io.UnsupportedEncodingException;
 
 import org.junit.Test;
 
-import picocli.annots.Command;
-import picocli.annots.Mixin;
-import picocli.annots.Option;
-import picocli.annots.Parameters;
-import picocli.annots.Spec;
-import picocli.excepts.DuplicateOptionAnnotationsException;
-import picocli.excepts.InitializationException;
-import picocli.excepts.ParameterException;
+import picocli.annot.Command;
+import picocli.annot.Mixin;
+import picocli.annot.Option;
+import picocli.annot.Parameters;
+import picocli.annot.Spec;
+import picocli.except.DuplicateOptionAnnotationsException;
+import picocli.except.InitializationException;
+import picocli.except.ParameterException;
 import picocli.help.Ansi;
 import picocli.model.CommandSpec;
 import picocli.model.ISetter;

@@ -19,8 +19,8 @@ import java.net.URL;
 import java.util.Properties;
 
 import picocli.CommandLine;
-import picocli.annots.Command;
-import picocli.annots.Option;
+import picocli.annot.Command;
+import picocli.annot.Option;
 import picocli.model.IVersionProvider;
 
 /**

@@ -7,9 +7,9 @@ import static org.junit.Assert.assertSame;
 
 import org.junit.Test;
 
-import picocli.annots.Command;
-import picocli.annots.Option;
-import picocli.annots.Parameters;
+import picocli.annot.Command;
+import picocli.annot.Option;
+import picocli.annot.Parameters;
 import picocli.help.Ansi;
 import picocli.help.Help;
 import picocli.model.ArgSpec;

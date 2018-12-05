@@ -16,9 +16,9 @@
 package picocli.examples;
 
 import picocli.CommandLine;
-import picocli.annots.Command;
-import picocli.excepts.ParameterException;
-import picocli.handlers.RunLast;
+import picocli.annot.Command;
+import picocli.except.ParameterException;
+import picocli.handler.RunLast;
 
 @Command
 public class ExitCodeDemo implements Runnable {

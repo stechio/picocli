@@ -29,9 +29,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import picocli.annots.Command;
-import picocli.annots.Option;
-import picocli.annots.Parameters;
+import picocli.annot.Command;
+import picocli.annot.Option;
+import picocli.annot.Parameters;
 import picocli.help.Help;
 import picocli.model.ArgSpec;
 import picocli.model.CommandSpec;

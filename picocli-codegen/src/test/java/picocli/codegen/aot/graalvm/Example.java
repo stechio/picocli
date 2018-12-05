@@ -6,13 +6,13 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import picocli.CommandLine;
-import picocli.annots.Command;
-import picocli.annots.Mixin;
-import picocli.annots.Option;
-import picocli.annots.Parameters;
-import picocli.annots.Spec;
-import picocli.annots.Unmatched;
-import picocli.excepts.ParameterException;
+import picocli.annot.Command;
+import picocli.annot.Mixin;
+import picocli.annot.Option;
+import picocli.annot.Parameters;
+import picocli.annot.Spec;
+import picocli.annot.Unmatched;
+import picocli.except.ParameterException;
 import picocli.help.HelpCommand;
 import picocli.model.CommandSpec;
 

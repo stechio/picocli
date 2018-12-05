@@ -1,7 +1,7 @@
 package picocli.model;
 
 import picocli.CommandLine;
-import picocli.annots.Command;
+import picocli.annot.Command;
 import picocli.util.Assert;
 
 /**

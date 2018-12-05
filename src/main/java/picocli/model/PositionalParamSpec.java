@@ -1,8 +1,8 @@
 package picocli.model;
 
 import picocli.CommandLine;
-import picocli.annots.Parameters;
-import picocli.excepts.InitializationException;
+import picocli.annot.Parameters;
+import picocli.except.InitializationException;
 import picocli.util.Assert;
 
 /**

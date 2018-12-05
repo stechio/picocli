@@ -18,8 +18,8 @@ package picocli.examples;
 import java.io.File;
 
 import picocli.CommandLine;
-import picocli.annots.Option;
-import picocli.annots.Parameters;
+import picocli.annot.Option;
+import picocli.annot.Parameters;
 
 /**
  * The picocli example in the README.md.

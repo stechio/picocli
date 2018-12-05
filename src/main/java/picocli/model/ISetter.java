@@ -1,6 +1,6 @@
 package picocli.model;
 
-import picocli.excepts.PicocliException;
+import picocli.except.PicocliException;
 
 /**
  * Customizable setter for modifying the value of an option or positional parameter. When an

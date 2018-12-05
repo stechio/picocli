@@ -68,21 +68,21 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.ProvideSystemProperty;
 
-import picocli.annots.Command;
-import picocli.annots.Mixin;
-import picocli.annots.Option;
-import picocli.annots.Parameters;
-import picocli.annots.Unmatched;
-import picocli.excepts.DuplicateOptionAnnotationsException;
-import picocli.excepts.InitializationException;
-import picocli.excepts.MissingParameterException;
-import picocli.excepts.MissingTypeConverterException;
-import picocli.excepts.OverwrittenOptionException;
-import picocli.excepts.ParameterException;
-import picocli.excepts.ParameterIndexGapException;
-import picocli.excepts.UnmatchedArgumentException;
-import picocli.handlers.IParseResultHandler;
-import picocli.handlers.RunAll;
+import picocli.annot.Command;
+import picocli.annot.Mixin;
+import picocli.annot.Option;
+import picocli.annot.Parameters;
+import picocli.annot.Unmatched;
+import picocli.except.DuplicateOptionAnnotationsException;
+import picocli.except.InitializationException;
+import picocli.except.MissingParameterException;
+import picocli.except.MissingTypeConverterException;
+import picocli.except.OverwrittenOptionException;
+import picocli.except.ParameterException;
+import picocli.except.ParameterIndexGapException;
+import picocli.except.UnmatchedArgumentException;
+import picocli.handler.IParseResultHandler;
+import picocli.handler.RunAll;
 import picocli.help.Ansi;
 import picocli.help.ColorScheme;
 import picocli.help.Help;
@@ -3084,7 +3084,7 @@ public class CommandLineTest {
             commandLine.parse("-u", "foo");
             fail("expected exception");
         } catch (MissingParameterException ex) {
-            assertEquals("Missing required option '--password=<password>'",
+            assertEquals("Missing required option '-p=<password>'",
                     ex.getLocalizedMessage());
         }
         commandLine.parse("-u", "foo", "-p", "abc");
@@ -4012,7 +4012,7 @@ public class CommandLineTest {
             new CommandLine(new Example()).parse("inputfile1", "inputfile2");
             fail("Expected MissingParameterException");
         } catch (MissingParameterException ex) {
-            assertEquals("Missing required option '--out-dir=<outputDir>'", ex.getMessage());
+            assertEquals("Missing required option '-o=<outputDir>'", ex.getMessage());
         }
 
         // a single empty string parameter specified
@@ -4020,7 +4020,7 @@ public class CommandLineTest {
             new CommandLine(new Example()).parse("");
             fail("Expected MissingParameterException");
         } catch (MissingParameterException ex) {
-            assertEquals("Missing required options [--out-dir=<outputDir>, params[0..*]=<inputFiles>]", ex.getMessage());
+            assertEquals("Missing required options [-o=<outputDir>, params[0..*]=<inputFiles>]", ex.getMessage());
         }
 
         // no parameters were specified
@@ -4029,7 +4029,7 @@ public class CommandLineTest {
             fail("Expected MissingParameterException");
         } catch (MissingParameterException ex) {
             assertEquals(
-                    "Missing required options [--out-dir=<outputDir>, params[0..*]=<inputFiles>]",
+                    "Missing required options [-o=<outputDir>, params[0..*]=<inputFiles>]",
                     ex.getMessage());
         }
 

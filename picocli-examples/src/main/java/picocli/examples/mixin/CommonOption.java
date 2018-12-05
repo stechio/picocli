@@ -1,7 +1,7 @@
 package picocli.examples.mixin;
 
-import picocli.annots.Command;
-import picocli.annots.Option;
+import picocli.annot.Command;
+import picocli.annot.Option;
 
 @Command(footer = "Common footer")
 public class CommonOption {

@@ -21,9 +21,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.ProvideSystemProperty;
 
-import picocli.annots.Option;
-import picocli.excepts.ParameterException;
-import picocli.excepts.PicocliException;
+import picocli.annot.Option;
+import picocli.except.ParameterException;
+import picocli.except.PicocliException;
 
 public class CommandLineAnnotatedMethodImplTest {
     @Rule
@@ -282,7 +282,7 @@ public class CommandLineAnnotatedMethodImplTest {
             assertNotNull(ex.getCause());
             assertTrue(ex.getCause() instanceof PicocliException);
             assertEquals("Pico!", ex.getCause().getMessage());
-            assertEquals("PicocliException: Pico! while processing argument at or before arg[1] 'abc' in [--pico, abc]: picocli.excepts.PicocliException: Pico!", ex.getMessage());
+            assertEquals("PicocliException: Pico! while processing argument at or before arg[1] 'abc' in [--pico, abc]: picocli.except.PicocliException: Pico!", ex.getMessage());
         }
     }
 }

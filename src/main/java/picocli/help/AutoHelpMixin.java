@@ -1,6 +1,6 @@
 package picocli.help;
 
-import picocli.annots.Option;
+import picocli.annot.Option;
 
 public class AutoHelpMixin {
     public static final String KEY = "mixinStandardHelpOptions";

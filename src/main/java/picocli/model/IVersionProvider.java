@@ -1,6 +1,6 @@
 package picocli.model;
 
-import picocli.annots.Command;
+import picocli.annot.Command;
 
 /**
  * Provides version information for a command. Commands may configure a provider with the

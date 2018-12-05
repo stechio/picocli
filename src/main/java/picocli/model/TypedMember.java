@@ -10,13 +10,13 @@ import java.lang.reflect.Type;
 
 import org.apache.commons.lang3.StringUtils;
 
-import picocli.annots.Mixin;
-import picocli.annots.Option;
-import picocli.annots.Parameters;
-import picocli.annots.ParentCommand;
-import picocli.annots.Spec;
-import picocli.annots.Unmatched;
-import picocli.excepts.InitializationException;
+import picocli.annot.Mixin;
+import picocli.annot.Option;
+import picocli.annot.Parameters;
+import picocli.annot.ParentCommand;
+import picocli.annot.Spec;
+import picocli.annot.Unmatched;
+import picocli.except.InitializationException;
 import picocli.util.Assert;
 import picocli.util.ObjectUtilsExt;
 

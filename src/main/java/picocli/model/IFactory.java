@@ -1,9 +1,9 @@
 package picocli.model;
 
 import picocli.CommandLine;
-import picocli.annots.Command;
-import picocli.annots.Option;
-import picocli.annots.Parameters;
+import picocli.annot.Command;
+import picocli.annot.Option;
+import picocli.annot.Parameters;
 
 /**
  * Factory for instantiating classes that are registered declaratively with annotation

@@ -4,8 +4,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import picocli.CommandLine;
-import picocli.excepts.ParameterException;
-import picocli.excepts.PicocliException;
+import picocli.except.ParameterException;
+import picocli.except.PicocliException;
 
 public class MethodBinding implements IGetter, ISetter {
     private final Object scope;

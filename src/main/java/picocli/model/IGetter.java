@@ -1,6 +1,6 @@
 package picocli.model;
 
-import picocli.excepts.PicocliException;
+import picocli.except.PicocliException;
 
 /**
  * Customizable getter for obtaining the current value of an option or positional parameter.

@@ -4,8 +4,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 
 import picocli.CommandLine;
-import picocli.annots.Option;
-import picocli.excepts.InitializationException;
+import picocli.annot.Option;
+import picocli.except.InitializationException;
 import picocli.util.Assert;
 import picocli.util.Comparators;
 

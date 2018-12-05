@@ -2,7 +2,7 @@ package picocli.model;
 
 import java.lang.reflect.Constructor;
 
-import picocli.excepts.InitializationException;
+import picocli.except.InitializationException;
 
 public class Factory implements IFactory {
     public static <T> T create(IFactory factory, Class<T> cls) {

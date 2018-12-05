@@ -14,10 +14,10 @@ import java.util.Map;
 import org.junit.Test;
 
 import picocli.CommandLine;
-import picocli.annots.Option;
-import picocli.annots.Parameters;
-import picocli.excepts.MissingParameterException;
-import picocli.excepts.UnmatchedArgumentException;
+import picocli.annot.Option;
+import picocli.annot.Parameters;
+import picocli.except.MissingParameterException;
+import picocli.except.UnmatchedArgumentException;
 
 
 public class ArgSplitTest {

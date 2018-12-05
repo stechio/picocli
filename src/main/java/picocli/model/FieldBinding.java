@@ -2,7 +2,7 @@ package picocli.model;
 
 import java.lang.reflect.Field;
 
-import picocli.excepts.PicocliException;
+import picocli.except.PicocliException;
 
 class FieldBinding implements IGetter, ISetter {
     private final Object scope;

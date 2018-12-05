@@ -10,7 +10,7 @@ import org.junit.Test;
 
 import picocli.CommandLine;
 import picocli.CommandLineTest;
-import picocli.annots.Command;
+import picocli.annot.Command;
 import picocli.model.CommandSpec;
 import picocli.model.OptionSpec;
 

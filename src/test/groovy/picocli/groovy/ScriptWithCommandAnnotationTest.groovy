@@ -6,7 +6,7 @@ import picocli.groovy.PicocliScript
 
 import org.junit.Test
 import picocli.CommandLine
-import picocli.annots.Command
+import picocli.annot.Command
 
 /**
  * Tests putting @Command annotations on the package declaration of a class.

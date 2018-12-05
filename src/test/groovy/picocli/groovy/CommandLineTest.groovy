@@ -2,8 +2,8 @@ package picocli.groovy
 
 import org.junit.Test
 import picocli.CommandLine
-import picocli.annots.Option
-import picocli.annots.Parameters
+import picocli.annot.Option
+import picocli.annot.Parameters
 
 import static org.junit.Assert.assertEquals
 

@@ -1,8 +1,8 @@
 package picocli.groovy
 
 import groovy.transform.Field
-import picocli.annots.Command
-import picocli.annots.Option
+import picocli.annot.Command
+import picocli.annot.Option
 
 @Command(name = 'sub', description = 'my description')
 @PicocliScript PicocliBaseScriptSubclass me

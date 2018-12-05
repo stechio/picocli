@@ -3,7 +3,7 @@ package picocli.model;
 import java.util.Arrays;
 import java.util.Collection;
 
-import picocli.excepts.PicocliException;
+import picocli.except.PicocliException;
 import picocli.util.Assert;
 
 /**

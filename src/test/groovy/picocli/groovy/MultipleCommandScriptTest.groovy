@@ -26,9 +26,10 @@ package picocli.groovy
 import groovy.transform.BaseScript
 import groovy.transform.Field
 import picocli.CommandLine
-import picocli.annots.Command
-import picocli.annots.Option
-import picocli.annots.Parameters
+import picocli.annot.Command
+import picocli.annot.Option
+import picocli.annot.Parameters
+
 import java.util.concurrent.Callable
 
 @Command(name = "git", subcommands = [picocli.groovy.CommandCommit, picocli.groovy.CommandAdd])

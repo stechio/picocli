@@ -4,9 +4,9 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-import picocli.annots.Command;
-import picocli.annots.Option;
-import picocli.handlers.RunAll;
+import picocli.annot.Command;
+import picocli.annot.Option;
+import picocli.handler.RunAll;
 
 import static java.lang.String.format;
 import static org.junit.Assert.assertEquals;

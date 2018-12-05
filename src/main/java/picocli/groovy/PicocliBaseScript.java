@@ -18,8 +18,8 @@ package picocli.groovy;
 import groovy.lang.MissingPropertyException;
 import groovy.lang.Script;
 import picocli.CommandLine;
-import picocli.excepts.ExecutionException;
-import picocli.excepts.ParameterException;
+import picocli.except.ExecutionException;
+import picocli.except.ParameterException;
 
 import java.io.PrintStream;
 import java.util.Arrays;

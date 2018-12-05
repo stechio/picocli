@@ -9,9 +9,9 @@ import jline.console.ConsoleReader;
 import jline.console.completer.ArgumentCompleter.ArgumentList;
 import jline.console.completer.ArgumentCompleter.WhitespaceArgumentDelimiter;
 import picocli.CommandLine;
-import picocli.annots.Command;
-import picocli.annots.Option;
-import picocli.annots.ParentCommand;
+import picocli.annot.Command;
+import picocli.annot.Option;
+import picocli.annot.ParentCommand;
 import picocli.shell.jline2.PicocliJLineCompleter;
 
 /**

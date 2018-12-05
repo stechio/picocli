@@ -10,12 +10,12 @@ import java.util.List;
 import java.util.Stack;
 
 import picocli.CommandLine;
-import picocli.annots.Command;
-import picocli.annots.Mixin;
-import picocli.annots.Option;
-import picocli.annots.ParentCommand;
-import picocli.excepts.DuplicateOptionAnnotationsException;
-import picocli.excepts.InitializationException;
+import picocli.annot.Command;
+import picocli.annot.Mixin;
+import picocli.annot.Option;
+import picocli.annot.ParentCommand;
+import picocli.except.DuplicateOptionAnnotationsException;
+import picocli.except.InitializationException;
 import picocli.help.Help;
 import picocli.help.HelpCommand;
 import picocli.util.Assert;

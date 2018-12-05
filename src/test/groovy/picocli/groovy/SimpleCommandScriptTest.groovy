@@ -25,8 +25,8 @@ package picocli.groovy
 @groovy.transform.BaseScript(PicocliBaseScript)
 import groovy.transform.Field
 import picocli.CommandLine
-import picocli.annots.Option
-import picocli.annots.Parameters
+import picocli.annot.Option
+import picocli.annot.Parameters
 
 
 @Parameters

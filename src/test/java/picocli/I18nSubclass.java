@@ -1,8 +1,8 @@
 package picocli;
 
-import picocli.annots.Command;
-import picocli.annots.Option;
-import picocli.annots.Parameters;
+import picocli.annot.Command;
+import picocli.annot.Option;
+import picocli.annot.Parameters;
 
 @Command(name = "i18n-sub",
         description = {"orig sub desc 1", "orig sub desc 2"},

@@ -16,9 +16,9 @@
 package picocli.help;
 
 import picocli.CommandLine;
-import picocli.annots.Command;
-import picocli.annots.Option;
-import picocli.annots.Parameters;
+import picocli.annot.Command;
+import picocli.annot.Option;
+import picocli.annot.Parameters;
 import picocli.help.Help.IOptionRenderer;
 import picocli.help.Help.IParameterRenderer;
 import picocli.help.TextTable.Column;

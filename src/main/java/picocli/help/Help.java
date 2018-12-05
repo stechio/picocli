@@ -13,9 +13,9 @@ import java.util.function.Function;
 import org.apache.commons.lang3.StringUtils;
 
 import picocli.CommandLine;
-import picocli.annots.Command;
-import picocli.annots.Option;
-import picocli.annots.Parameters;
+import picocli.annot.Command;
+import picocli.annot.Option;
+import picocli.annot.Parameters;
 import picocli.help.TextTable.Column;
 import picocli.model.ArgSpec;
 import picocli.model.CommandSpec;

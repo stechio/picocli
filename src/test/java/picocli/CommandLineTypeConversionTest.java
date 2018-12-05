@@ -57,9 +57,9 @@ import java.util.regex.Pattern;
 
 import org.junit.Test;
 
-import picocli.annots.Option;
-import picocli.annots.Parameters;
-import picocli.excepts.ParameterException;
+import picocli.annot.Option;
+import picocli.annot.Parameters;
+import picocli.except.ParameterException;
 import picocli.model.IFactory;
 import picocli.model.ITypeConverter;
 import picocli.model.TypeConverter;
